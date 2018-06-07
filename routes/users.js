@@ -17,7 +17,7 @@ router.post('/find', (req, res, next) => {
                 meta: {
                     success: true,
                     code: 200,
-                    message: 'Account with that email is already exists'
+                    message: 'Users successfully founded'
                 },
                 data: {
                     users: users
@@ -29,6 +29,35 @@ router.post('/find', (req, res, next) => {
                     success: false,
                     code: 200,
                     message: 'No users with such name'
+                },
+                data: null
+            });
+        }
+    });
+});
+
+
+router.get('/find/id/:id', (req, res, next) => {
+    User.findOne({
+        _id: req.params.id
+    }, (err, users) => {
+        if (users) {
+            res.json({
+                meta: {
+                    success: true,
+                    code: 200,
+                    message: 'User successfully found'
+                },
+                data: {
+                    user: users
+                }
+            });
+        } else {
+            res.json({
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No users with such id'
                 },
                 data: null
             });

@@ -14,6 +14,10 @@ const StoreSchema = new Schema({
         email: String,
         address: String,
     },
+    rating: {
+        type: Number,
+        default: 0
+    },
     short_description: String,
     logo: String,
     background: String,

@@ -17,7 +17,7 @@ const GoodSchema = new Schema({
     store_id: String,
     rating: {
         type: Number,
-        default: null
+        default: 0
     },
     type: String,
     is_promoted: {
