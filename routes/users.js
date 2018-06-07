@@ -40,8 +40,8 @@ router.post('/find', (req, res, next) => {
 router.get('/find/id/:id', (req, res, next) => {
     User.findOne({
         _id: req.params.id
-    }, (err, users) => {
-        if (users) {
+    }, (err, user) => {
+        if (user) {
             res.json({
                 meta: {
                     success: true,
@@ -49,7 +49,7 @@ router.get('/find/id/:id', (req, res, next) => {
                     message: 'User successfully found'
                 },
                 data: {
-                    user: users
+                    user: user
                 }
             });
         } else {
