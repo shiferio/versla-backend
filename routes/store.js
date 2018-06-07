@@ -131,6 +131,40 @@ router.route('/update').put(checkJWT, (req, res, next) => {
     });
 });
 
+
+router.route('/update/name').put(checkJWT, (req, res, next) => {
+    Store.findOneAndUpdate({
+        creator_id: req.decoded.user._id,
+        link: req.body.link
+    }, {
+        $set: {
+            name: req.body.name
+        }
+    }, {new: true}, function (err, store) {
+        if (err) {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: false,
+                    message: err.message
+                },
+                data: null
+            });
+        } else {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Name successfully updated"
+                },
+                data: {
+                    store: store
+                }
+            });
+        }
+    });
+});
+
 router.route('/update/tags').put(checkJWT, (req, res, next) => {
     Store.findOneAndUpdate({
         creator_id: req.decoded.user._id,
