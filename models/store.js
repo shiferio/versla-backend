@@ -14,6 +14,21 @@ const StoreSchema = new Schema({
     background: String,
     tags: [String],
     creator_id: String,
+    location: {
+        lat: {
+            type: Number,
+            default: null
+        },
+        lng: {
+            type: Number,
+            default: null
+        }
+    },
+    contact_faces: [String],
+    is_promoted: {
+        type: Boolean,
+        default: false
+    },
     created: {
         type: Date,
         default: Date.now

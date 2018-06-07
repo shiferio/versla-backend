@@ -63,6 +63,7 @@ router.route('/add').post(checkJWT, (req, res, next) => {
             let store = new Store();
 
             store.creator_id = req.decoded.user._id;
+            store.contact_faces = [req.decoded.user._id];
             if (req.body.name) store.name = req.body.name;
             if (req.body.short_description) store.short_description = req.body.short_description;
             if (req.body.description) store.description = req.body.description;
