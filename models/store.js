@@ -9,6 +9,11 @@ const StoreSchema = new Schema({
         lowercase: true
     },
     description: String,
+    contacts: {
+        phone: String,
+        email: String,
+        address: String,
+    },
     short_description: String,
     logo: String,
     background: String,

@@ -165,6 +165,37 @@ router.route('/update/name').put(checkJWT, (req, res, next) => {
     });
 });
 
+router.route('/update/contacts').put(checkJWT, (req, res, next) => {
+    Store.findOne({
+        _id: req.decoded.user._id
+    }, (err, store) => {
+        if (err) {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: false,
+                    message: err.message
+                },
+                data: null
+            });
+        }
+
+        if (req.body.email) store.contacts.email = req.body.email;
+        if (req.body.phone) store.contacts.phone = req.body.phone;
+        if (req.body.address) store.contacts.address = req.body.address;
+
+        store.save();
+        res.json({
+            meta: {
+                code: 200,
+                success: true,
+                message: "Successfully updated contacts"
+            },
+            data: null
+        });
+    });
+});
+
 router.route('/update/tags').put(checkJWT, (req, res, next) => {
     Store.findOneAndUpdate({
         creator_id: req.decoded.user._id,

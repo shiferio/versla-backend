@@ -25,10 +25,12 @@ app.use(cors());
 const userRoutes = require('./routes/account');
 const storeRoutes = require('./routes/store');
 const usersRoutes = require('./routes/users');
+const goodsRoutes = require('./routes/goods');
 
 app.use('/api/accounts', userRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/goods', goodsRoutes);
 
 app.listen(config.port, (err) => {
     console.log('App runned on ' + config.port);

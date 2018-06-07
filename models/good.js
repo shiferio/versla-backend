@@ -3,18 +3,22 @@ const Schema = mongoose.Schema;
 const autoIncrement = require('mongoose-plugin-autoinc').autoIncrement;
 
 const GoodSchema = new Schema({
-    goodId: {
+    good_id: {
         type: Number,
         unique: true
     },
+    price: Number,
     name: String,
     description: String,
     short_description: String,
-    logo: String,
+    picture: String,
     tags: [String],
     creator_id: String,
     store_id: String,
-    rating: Number,
+    rating: {
+        type: Number,
+        default: null
+    },
     type: String,
     is_promoted: {
         type: Boolean,
@@ -26,6 +30,6 @@ const GoodSchema = new Schema({
     }
 });
 
-GoodSchema.plugin(autoIncrement, { model: 'Good', field: 'goodId' });
+GoodSchema.plugin(autoIncrement, {model: 'Good', field: 'goodId'});
 
 module.exports = mongoose.model('Good', GoodSchema);
