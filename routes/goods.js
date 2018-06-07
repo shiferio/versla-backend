@@ -26,7 +26,7 @@ router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
     });
 });
 
-router.get('/:goodId', (req, res, next) => {
+router.get('/:good_id', (req, res, next) => {
     Good.findOne({
         good_id: req.params.good_id
     }, (err, store) => {
