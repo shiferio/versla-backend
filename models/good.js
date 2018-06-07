@@ -30,6 +30,6 @@ const GoodSchema = new Schema({
     }
 });
 
-GoodSchema.plugin(autoIncrement, {model: 'Good', field: 'goodId'});
+GoodSchema.plugin(autoIncrement, {model: 'Good', field: 'good_id'});
 
 module.exports = mongoose.model('Good', GoodSchema);
