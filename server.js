@@ -24,8 +24,11 @@ app.use(cors());
 
 const userRoutes = require('./routes/account');
 const storeRoutes = require('./routes/store');
+const usersRoutes = require('./routes/users');
+
 app.use('/api/accounts', userRoutes);
 app.use('/api/stores', storeRoutes);
+app.use('/api/users', usersRoutes);
 
 app.listen(config.port, (err) => {
     console.log('App runned on ' + config.port);
