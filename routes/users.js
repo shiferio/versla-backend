@@ -8,19 +8,19 @@ const config = require('../config');
 const checkJWT = require('../middlewares/check-jwt.js');
 
 
-router.post('/find', (req, res, next) => {
-    User.find({
-        login: req.body.login
-    }, (err, users) => {
-        if (users) {
+router.get('/find/login/:login', (req, res, next) => {
+    User.findOne({
+        login: req.params.login
+    }, (err, user) => {
+        if (user) {
             res.json({
                 meta: {
                     success: true,
                     code: 200,
-                    message: 'Users successfully founded'
+                    message: 'User successfully founded'
                 },
                 data: {
-                    users: users
+                    user: user
                 }
             });
         } else {
