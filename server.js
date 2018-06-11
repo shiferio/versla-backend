@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+
 const config = require('./config');
 const app = express();
 
@@ -31,6 +32,8 @@ app.use('/api/accounts', userRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/goods', goodsRoutes);
+
+app.use(express.static('public'));
 
 app.listen(config.port, (err) => {
     console.log('App runned on ' + config.port);

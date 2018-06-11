@@ -7,6 +7,30 @@ const Store = require('../models/store');
 const config = require('../config');
 const checkJWT = require('../middlewares/check-jwt.js');
 
+/**
+ * @api {post} /api/accounts/signup User SignUp
+ * @apiName SignUp
+ * @apiGroup Accounts
+ *
+ * @apiParam {String} login
+ * @apiParam {String} password
+ * @apiParam {String} email
+ * @apiParam {String} phone
+ *
+ * @apiSuccess {String} token Security token
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     meta: {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "You are successfully logined"
+ *     },
+ *     data: {
+ *      "token": "token"
+ *     }
+ */
+
 router.post('/signup', (req, res, next) => {
     let user = new User();
     user.login = req.body.login;
@@ -49,6 +73,27 @@ router.post('/signup', (req, res, next) => {
     });
 });
 
+/**
+ * @api {post} /api/accounts/login User authorization
+ * @apiName Login
+ * @apiGroup Accounts
+ *
+ * @apiParam {String} email
+ * @apiParam {String} password
+ *
+ * @apiSuccess {String} token Security token
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     meta: {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "You are successfully logined"
+ *     },
+ *     data: {
+ *      "token": "token"
+ *     }
+ */
 router.post('/login', (req, res, next) => {
     User.findOne({
         email: req.body.email
@@ -97,6 +142,45 @@ router.post('/login', (req, res, next) => {
     });
 });
 
+/**
+ * @api {get} /api/accounts/profile Get user profile
+ * @apiName Get Profile
+ * @apiGroup Accounts
+ *
+ * @apiHeader {token} User token
+ *
+ * @apiSuccess {Object} user User profile
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     meta: {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "Successfully get your profile"
+ *     },
+ *     data: {
+ *      "user": {
+ *			"address": {
+ *				"addr1": "Street 1",
+ *				"addr2": "Street",
+ *				"city": "Kirov",
+ *				"country": "Russia",
+ *				"postalCode": "610000"
+ *			},
+ *			"isSeller": true,
+ *			"_id": "5b137f7e57d4fe093f5b51f3",
+ *			"created": "2018-06-03T05:41:18.798Z",
+ *			"login": "denis",
+ *			"password": "$2a$10$/MsH1M3s/5GzRM2A60f0R.DXx7BhWPerNbMWPgqJtX76bm27EARji",
+ *			"email": "dl@progears.ru",
+ *			"picture": "http://images.versla.ru/files/7f847a561a88046a59989dc394e6efef91e8bb56bf43ed04a342b2f8ec16fbad.jpeg",
+ *			"__v": 0,
+ *			"first_name": "Denis",
+ *			"last_name": "Lubyannikov",
+ *			"phone": "9991008820"
+ *		}
+ *     }
+ */
 router.route('/profile').get(checkJWT, (req, res, next) => {
     User.findOne({
         _id: req.decoded.user._id

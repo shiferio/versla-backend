@@ -1,68 +1,17 @@
 const router = require('express').Router();
-const jwt = require('jsonwebtoken');
 
-const User = require('../models/user');
-const Store = require('../models/store');
-
-const config = require('../config');
-const checkJWT = require('../middlewares/check-jwt.js');
+const dbUsers = require('../utils/db/db.users');
 
 
-router.get('/find/login/:login', (req, res, next) => {
-    User.findOne({
-        login: req.params.login
-    }, (err, user) => {
-        if (user) {
-            res.json({
-                meta: {
-                    success: true,
-                    code: 200,
-                    message: 'User successfully founded'
-                },
-                data: {
-                    user: user
-                }
-            });
-        } else {
-            res.json({
-                meta: {
-                    success: false,
-                    code: 200,
-                    message: 'No users with such name'
-                },
-                data: null
-            });
-        }
-    });
+router.get('/find/login/:login', async (req, res) => {
+    let data = await dbUsers.findUserByLogin(req.params.login);
+    return res.status(data['meta'].code).send(data);
 });
 
 
-router.get('/find/id/:id', (req, res, next) => {
-    User.findOne({
-        _id: req.params.id
-    }, (err, user) => {
-        if (user) {
-            res.json({
-                meta: {
-                    success: true,
-                    code: 200,
-                    message: 'User successfully found'
-                },
-                data: {
-                    user: user
-                }
-            });
-        } else {
-            res.json({
-                meta: {
-                    success: false,
-                    code: 200,
-                    message: 'No users with such id'
-                },
-                data: null
-            });
-        }
-    });
+router.get('/find/id/:id', async (req, res) => {
+    let data = await dbUsers.findUserById(req.params.id);
+    return res.status(data['meta'].code).send(data);
 });
 
 

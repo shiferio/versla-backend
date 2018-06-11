@@ -7,6 +7,27 @@ const Good = require('../models/good');
 const config = require('../config');
 const checkJWT = require('../middlewares/check-jwt.js');
 
+/**
+ * @api {get} /api/goods/list/:pageNumber/:pageSize List all goods
+ * @apiName List Goods
+ * @apiGroup Goods
+ *
+ * @apiParam {Number} pageNumber Page Number.
+ * @apiParam {Number} pageSize Page Size
+ *
+ * @apiSuccess {Object} goods Array of goods
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     meta: {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "Successfully get goods"
+ *     },
+ *     data: {
+ *      "goods": []
+ *     }
+ */
 router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
     var pageNumber = parseInt(req.params.pageNumber);
     var pageSize = parseInt(req.params.pageSize);
@@ -26,10 +47,30 @@ router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
     });
 });
 
+/**
+ * @api {get} /api/goods/:id Get good info
+ * @apiName Get good info
+ * @apiGroup Goods
+ *
+ * @apiParam {Number} id Id of Good
+ *
+ * @apiSuccess {Object} Good
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     meta: {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "Successfully get good"
+ *     },
+ *     data: {
+ *      "goods": good
+ *     }
+ */
 router.get('/:good_id', (req, res, next) => {
     Good.findOne({
         good_id: req.params.good_id
-    }, (err, store) => {
+    }, (err, good) => {
         if (err) {
             res.json({
                 meta: {
@@ -47,13 +88,38 @@ router.get('/:good_id', (req, res, next) => {
                     message: "Successfully get good"
                 },
                 data: {
-                    good: store
+                    good: good
                 }
             });
         }
     });
 });
 
+/**
+ * @api {post} /api/goods/add Add good
+ * @apiName Add good
+ * @apiGroup Goods
+ *
+ * @apiParam {String} store_id Good store id
+ * @apiParam {String} name Good name
+ * @apiParam {Number} price Good price
+ * @apiParam {String} picture Good picture
+ * @apiParam {Object} tags Good tags
+ * @apiParam {String} type Good type
+ *
+ * @apiSuccess {Object} Good
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     meta: {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "Good successfully added"
+ *     },
+ *     data: {
+ *      "goods": good
+ *     }
+ */
 
 router.route('/add').post(checkJWT, (req, res, next) => {
      User.findOne({
@@ -99,6 +165,27 @@ router.route('/add').post(checkJWT, (req, res, next) => {
         }
     });
 });
+
+/**
+ * @api {delete} /api/goods/delete Delete good
+ * @apiName Delete good
+ * @apiGroup Goods
+ *
+ * @apiParam {Number} good_id Good store id
+ *
+ * @apiSuccess {Object} Good
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     meta: {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "Good successfully deleted"
+ *     },
+ *     data: {
+ *      "good": null
+ *     }
+ */
 
 router.route('/delete').delete(checkJWT, (req, res, next) => {
     Good.deleteOne({
