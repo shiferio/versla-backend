@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
 const config = require('../config');
 
 module.exports = function(req, res, next) {
@@ -8,8 +8,12 @@ module.exports = function(req, res, next) {
         jwt.verify(token, config.secret, (err, decoded) => {
             if (err) {
                 res.json({
-                    success: false,
-                    message: 'Failed to authenticate token'
+                    meta: {
+                        success: false,
+                        code: 200,
+                        message: 'Failed to authenticate token'
+                    },
+                    data: null
                 })
             } else {
                 req.decoded = decoded;
@@ -18,9 +22,12 @@ module.exports = function(req, res, next) {
         })
     } else {
         res.status(403).json({
-            success: false,
-            message: 'No token provided'
+            meta: {
+                success: false,
+                code: 403,
+                message: 'No token provided'
+            },
+            data: null
         })
     }
-
-}
+};
