@@ -120,7 +120,6 @@ router.get('/:good_id', (req, res, next) => {
  *      "goods": good
  *     }
  */
-
 router.route('/add').post(checkJWT, (req, res, next) => {
      User.findOne({
         _id: req.decoded.user._id,
@@ -186,7 +185,6 @@ router.route('/add').post(checkJWT, (req, res, next) => {
  *      "good": null
  *     }
  */
-
 router.route('/delete').delete(checkJWT, (req, res, next) => {
     Good.deleteOne({
         creator_id: req.decoded.user._id,
