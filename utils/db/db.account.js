@@ -64,7 +64,7 @@ module.exports = {
                 data: null
             };
         } else if (user) {
-            let validPassword = user.comparePassword(req.body.password);
+            let validPassword = user.comparePassword(userData.password);
             if (!validPassword) {
                 return {
                     meta: {

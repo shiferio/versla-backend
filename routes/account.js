@@ -58,6 +58,7 @@ router.post('/signup', async (req, res) => {
  */
 router.post('/login', async (req, res) => {
     let data = await dbAccount.login(req.body);
+    console.log(data);
     return res.status(data['meta'].code).send(data);
 });
 
