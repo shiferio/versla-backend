@@ -102,20 +102,9 @@ router.post('/login', async (req, res) => {
  *     }
  */
 router.route('/profile').get(checkJWT, async (req, res) => {
-    User.findOne({
-        _id: req.decoded.user._id
-    }, (err, user) => {
-        res.json({
-            meta: {
-                code: 200,
-                success: true,
-                message: "Successfully get your profile"
-            },
-            data: {
-                user: user
-            }
-        });
-    });
+    let data = await dbUsers.findUserById(req.decoded.user._id);
+    return res.status(data['meta'].code).send(data);
+
 })
 /**
  * @api {post} /api/accounts/profile Update user profile
