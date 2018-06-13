@@ -96,7 +96,7 @@ router.route('/update/name').put(checkJWT, (req, res, next) => {
 
 router.route('/update/contacts').put(checkJWT, (req, res, next) => {
     Store.findOne({
-        _id: req.decoded.user._id
+        link: req.body.link
     }, (err, store) => {
         if (err) {
             res.json({
