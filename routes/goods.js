@@ -6,6 +6,7 @@ const Store = require('../models/store');
 const Good = require('../models/good');
 const config = require('../config');
 const checkJWT = require('../middlewares/check-jwt.js');
+var mongoose = require('mongoose');
 
 /**
  * @api {get} /api/goods/list/:pageNumber/:pageSize List all goods
@@ -138,9 +139,10 @@ router.route('/add').post(checkJWT, async (req, res, next) => {
                         good.picture = req.body.picture;
                         good.tags = req.body.tags;
                         good.type = req.body.type;
-                        good.save();
+                        await good.save();
 
                         let newgood = await Good.findOne().where("_id").in(good._id).exec();
+
                         if (newgood) {
                             res.json({
                                 meta: {
