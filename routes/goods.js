@@ -120,14 +120,14 @@ router.get('/:good_id', (req, res, next) => {
  *      "goods": good
  *     }
  */
-router.route('/add').post(checkJWT, (req, res, next) => {
+router.route('/add').post(checkJWT, async (req, res, next) => {
      User.findOne({
         _id: req.decoded.user._id,
     }, (err, user) => {
         if (user.isSeller) {
             Store.findOne({
                 _id: req.body.store_id
-            }, (err, store) => {
+            }, async (err, store) => {
                 if (store) {
                     if (store.creator_id === req.decoded.user._id) {
                         let good = new Good();
@@ -139,16 +139,29 @@ router.route('/add').post(checkJWT, (req, res, next) => {
                         good.tags = req.body.tags;
                         good.type = req.body.type;
                         good.save();
-                        res.json({
-                            meta: {
-                                code: 200,
-                                success: true,
-                                message: "Good successfully added"
-                            },
-                            data: {
-                                good: good
-                            }
-                        });
+
+                        let newgood = await Good.findOne().where("_id").in(good._id).exec();
+                        if (newgood) {
+                            res.json({
+                                meta: {
+                                    code: 200,
+                                    success: true,
+                                    message: "Good successfully added"
+                                },
+                                data: {
+                                    good: newgood
+                                }
+                            });
+                        } else {
+                            res.json({
+                                meta: {
+                                    success: false,
+                                    code: 200,
+                                    message: 'FATAL ERROR'
+                                },
+                                data: null
+                            });
+                        }
                     }
                 }
             });
