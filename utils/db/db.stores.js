@@ -1,5 +1,6 @@
 const Store = require('../../models/store');
 const User = require('../../models/user');
+const Good = require('../../models/good');
 
 module.exports = {
 
@@ -38,7 +39,7 @@ module.exports = {
     },
     /**
      * Find user by id
-     * @param id
+     * @param link
      * @returns {Object}
      */
     findStoreByName: async (link) => {
@@ -60,6 +61,35 @@ module.exports = {
                     success: false,
                     code: 200,
                     message: 'No stores with such name'
+                },
+                data: null
+            };
+        }
+    },
+    /**
+     * Find all goods for current store
+     * @param id
+     * @returns {Object}
+     */
+    findGoodsByStoreId: async (id) => {
+        let goods = await Good.find().where("store_id").in(id).exec();
+        if (goods) {
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully get goods"
+                },
+                data: {
+                    goods: goods
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No goods with such id'
                 },
                 data: null
             };
