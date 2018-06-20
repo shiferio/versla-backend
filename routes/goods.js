@@ -361,4 +361,72 @@ router.route('/update/short_description').put(checkJWT, (req, res, next) => {
 });
 
 
+router.route('/update/tags').put(checkJWT, (req, res, next) => {
+    Good.findOneAndUpdate({
+        creator_id: req.decoded.user._id,
+        good_id: req.body.good_id
+    }, {
+        $set: {
+            tags: req.body.tags
+        }
+    }, {new: true}, function (err, good) {
+        if (err) {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: false,
+                    message: err.message
+                },
+                data: null
+            });
+        } else {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Good successfully updated"
+                },
+                data: {
+                    good: good
+                }
+            });
+        }
+    });
+});
+
+router.route('/update/type').put(checkJWT, (req, res, next) => {
+    Good.findOneAndUpdate({
+        creator_id: req.decoded.user._id,
+        good_id: req.body.good_id
+    }, {
+        $set: {
+            type: req.body.type
+        }
+    }, {new: true}, function (err, good) {
+        if (err) {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: false,
+                    message: err.message
+                },
+                data: null
+            });
+        } else {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Good successfully updated"
+                },
+                data: {
+                    good: good
+                }
+            });
+        }
+    });
+});
+
+
+
 module.exports = router;
