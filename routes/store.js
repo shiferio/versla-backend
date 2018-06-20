@@ -17,6 +17,11 @@ router.get('/:link', async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+router.get('/id/:id', async (req, res) => {
+    let data = await dbStores.findStoreById(req.params.id);
+    return res.status(data['meta'].code).send(data);
+});
+
 
 router.route('/add').post(checkJWT, async (req, res) => {
     let data = await dbStores.addStore(req.body, req.decoded.user._id);

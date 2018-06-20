@@ -67,6 +67,36 @@ module.exports = {
     },
 
     /**
+     * Find user by id
+     * @param id
+     * @returns {Object}
+     */
+    findStoreById: async (id) => {
+        let store = await Store.findOne().where("_id").in(id).exec();
+        if (store) {
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully get store"
+                },
+                data: {
+                    store: store
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No stores with such name'
+                },
+                data: null
+            };
+        }
+    },
+
+    /**
      * Add store
      * @param storeData Data of new Store
      * @param userId Creator id
