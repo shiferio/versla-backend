@@ -427,6 +427,38 @@ router.route('/update/type').put(checkJWT, (req, res, next) => {
     });
 });
 
+router.route('/update/picture').put(checkJWT, (req, res, next) => {
+    Good.findOneAndUpdate({
+        creator_id: req.decoded.user._id,
+        good_id: req.body.good_id
+    }, {
+        $set: {
+            picture: req.body.picture
+        }
+    }, {new: true}, function (err, good) {
+        if (err) {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: false,
+                    message: err.message
+                },
+                data: null
+            });
+        } else {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Good successfully updated"
+                },
+                data: {
+                    good: good
+                }
+            });
+        }
+    });
+});
 
 
 module.exports = router;
