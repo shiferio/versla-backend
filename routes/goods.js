@@ -7,6 +7,7 @@ const Good = require('../models/good');
 const config = require('../config');
 const checkJWT = require('../middlewares/check-jwt.js');
 var mongoose = require('mongoose');
+const dbGoods = require('../utils/db/db.goods');
 
 /**
  * @api {get} /api/goods/list/:pageNumber/:pageSize List all goods
@@ -458,6 +459,11 @@ router.route('/update/picture').put(checkJWT, (req, res, next) => {
             });
         }
     });
+});
+
+router.route('/update/params').post(checkJWT, async (req, res) => {
+    let data = await dbGoods.updateGoodParams(req.body.params, req.decoded.user._id);
+    return res.status(data['meta'].code).send(data);
 });
 
 

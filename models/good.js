@@ -15,6 +15,12 @@ const GoodSchema = new Schema({
     tags: [String],
     creator_id: String,
     store_id: String,
+    params: [
+        {
+            name: String,
+            values: [String]
+        }
+    ],
     rating: {
         type: Number,
         default: 0
