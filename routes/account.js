@@ -151,7 +151,7 @@ router.route('/profile').get(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {put} /api/accounts/cart Update user profile
+ * @api {put} /api/accounts/cart Update cart
  * @apiName Update cart
  * @apiGroup Accounts
  *
