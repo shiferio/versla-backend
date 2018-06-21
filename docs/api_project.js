@@ -1,0 +1,1 @@
+define({  "name": "versla_server",  "version": "1.0.0",  "description": "",  "sampleUrl": false,  "defaultVersion": "0.0.0",  "apidoc": "0.3.0",  "generator": {    "name": "apidoc",    "time": "2018-06-21T10:46:57.601Z",    "url": "http://apidocjs.com",    "version": "0.17.6"  }});

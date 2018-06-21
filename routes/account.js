@@ -150,6 +150,50 @@ router.route('/profile').get(checkJWT, async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+/**
+ * @api {put} /api/accounts/cart Update user profile
+ * @apiName Update cart
+ * @apiGroup Accounts
+ *
+ * @apiHeader {token} User token
+ *
+ * @apiSuccess {Object} user User profile
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     meta: {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "Successfully updated your profile"
+ *     },
+ *     data: {
+ *      "user": {
+ *			"address": {
+ *				"addr1": "Street 1",
+ *				"addr2": "Street",
+ *				"city": "Kirov",
+ *				"country": "Russia",
+ *				"postalCode": "610000"
+ *			},
+ *			"isSeller": true,
+ *			"_id": "5b137f7e57d4fe093f5b51f3",
+ *			"created": "2018-06-03T05:41:18.798Z",
+ *			"login": "denis",
+ *			"password": "$2a$10$/MsH1M3s/5GzRM2A60f0R.DXx7BhWPerNbMWPgqJtX76bm27EARji",
+ *			"email": "dl@progears.ru",
+ *			"picture": "http://images.versla.ru/files/7f847a561a88046a59989dc394e6efef91e8bb56bf43ed04a342b2f8ec16fbad.jpeg",
+ *			"__v": 0,
+ *			"first_name": "Denis",
+ *			"last_name": "Lubyannikov",
+ *			"phone": "9991008820"
+ *		}
+ *     }
+ */
+router.route('/cart').put(checkJWT, async (req, res) => {
+    let data = await dbAccount.updateCart(req.body.cart, req.decoded.user._id);
+    return res.status(data['meta'].code).send(data);
+});
+
 router.route('/profile/security').put(checkJWT, (req, res, next) => {
     User.findOne({
         _id: req.decoded.user._id

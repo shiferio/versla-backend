@@ -28,6 +28,10 @@ const UserSchema = new Schema({
         country: String,
         postalCode: String
     },
+    cart: [{
+        good_id: Number,
+        quantity: Number
+    }],
     created: {
         type: Date,
         default: Date.now

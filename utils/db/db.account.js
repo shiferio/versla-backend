@@ -128,5 +128,37 @@ module.exports = {
                 data: null
             };
         }
+    },
+    /**
+     * Update user cart
+     * @param cart Cart array
+     * @param userId userId
+     * @returns {Promise<*>}
+     */
+    updateCart: async (cart, userId) => {
+        let user = await User.findOne().where("_id").in(userId).exec();
+        if (user) {
+            if (cart) user.cart = cart;
+
+            user.save();
+
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully updated your cart"
+                },
+                data: user
+            };
+        } else {
+            return {
+                meta: {
+                    code: 404,
+                    success: false,
+                    message: "User not found"
+                },
+                data: null
+            };
+        }
     }
 };
