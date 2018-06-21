@@ -33,4 +33,62 @@ module.exports = {
             }
         };
     },
+    /**
+     * Get all Good Comments
+     * @param good_id
+     * @returns {Object}
+     */
+    getAllGoodComments: async (good_id) => {
+        let comments = await Comment.find().where("good_id").in(good_id).exec();
+        if (comments) {
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully get comments"
+                },
+                data: {
+                    comments: comments
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No comments with such good id'
+                },
+                data: null
+            };
+        }
+    },
+    /**
+     * Get All Comment Comments
+     * @param comment_id
+     * @returns {Object}
+     */
+    getAllCommentComments: async (comment_id) => {
+        let comments = await Comment.find().where("comment_id").in(comment_id).exec();
+        if (comments) {
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully get comments"
+                },
+                data: {
+                    comments: comments
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No comments with such comment id'
+                },
+                data: null
+            };
+        }
+    }
 };

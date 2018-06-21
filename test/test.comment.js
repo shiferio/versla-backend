@@ -30,4 +30,29 @@ describe('Comment', () => {
                 });
         });
     });
+
+    describe('/GET Comments for Good', () => {
+        it('it get comments for good', (done) => {
+            chai.request('http://api.versla.ru/api')
+                .get('/comments/good/5b27bce94de6a514b4cf1462')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+                    res.body.data.should.have.property('comments');
+                    done();
+                });
+        });
+    });
+    describe('/GET Comments for Comment', () => {
+        it('it should get comments for comment', (done) => {
+            chai.request('http://api.versla.ru/api')
+                .get('/comments/comment/5b2b9c252b0ea00b39fb6347')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+                    res.body.data.should.have.property('comments');
+                    done();
+                });
+        });
+    });
 });
