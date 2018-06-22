@@ -6,7 +6,7 @@ const Store = require('../models/store');
 const Good = require('../models/good');
 const config = require('../config');
 const checkJWT = require('../middlewares/check-jwt.js');
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const dbGoods = require('../utils/db/db.goods');
 
 /**
@@ -31,8 +31,8 @@ const dbGoods = require('../utils/db/db.goods');
  *     }
  */
 router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
-    var pageNumber = parseInt(req.params.pageNumber);
-    var pageSize = parseInt(req.params.pageSize);
+    let pageNumber = parseInt(req.params.pageNumber);
+    let pageSize = parseInt(req.params.pageSize);
 
     Good.find({}).skip(pageNumber > 0 ? ((pageNumber - 1) * pageSize) : 0).limit(
         pageSize).exec((err, goods) => {
@@ -361,7 +361,6 @@ router.route('/update/short_description').put(checkJWT, (req, res, next) => {
     });
 });
 
-
 router.route('/update/tags').put(checkJWT, (req, res, next) => {
     Good.findOneAndUpdate({
         creator_id: req.decoded.user._id,
@@ -462,7 +461,7 @@ router.route('/update/picture').put(checkJWT, (req, res, next) => {
 });
 
 router.route('/update/params').post(checkJWT, async (req, res) => {
-    let data = await dbGoods.updateGoodParams(req.body.params, req.decoded.user._id);
+    let data = await dbGoods.updateGoodParams(req.body.good_id, req.body.params, req.decoded.user._id);
     return res.status(data['meta'].code).send(data);
 });
 

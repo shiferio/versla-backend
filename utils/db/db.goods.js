@@ -9,7 +9,7 @@ module.exports = {
      * @param params Params
      * @returns {Promise<*>}
      */
-    updateGoodParams: async (id, params) => {
+    updateGoodParams: async (id, params, user_id) => {
         let good = await Good.findOne().where("_id").in(id).exec();
         if (good) {
             if (params) good.params = params;
