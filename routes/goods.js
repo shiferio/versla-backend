@@ -460,7 +460,7 @@ router.route('/update/picture').put(checkJWT, (req, res, next) => {
     });
 });
 
-router.route('/update/params').post(checkJWT, async (req, res) => {
+router.route('/update/params').put(checkJWT, async (req, res) => {
     let data = await dbGoods.updateGoodParams(req.body.good_id, req.body.params, req.decoded.user._id);
     return res.status(data['meta'].code).send(data);
 });
