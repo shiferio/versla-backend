@@ -30,7 +30,23 @@ const UserSchema = new Schema({
     },
     cart: [{
         good_id: Number,
-        quantity: Number
+        quantity: Number,
+        values: [{
+            name: String,
+            value: String
+        }]
+    }],
+    orders: [{
+        good_id: Number,
+        quantity: Number,
+        values: [{
+            name: String,
+            value: String
+        }],
+        date: {
+            type: Date,
+            default: Date.now
+        }
     }],
     created: {
         type: Date,

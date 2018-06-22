@@ -160,5 +160,37 @@ module.exports = {
                 data: null
             };
         }
+    },
+    /**
+     * Update user orders
+     * @param orders Orders array
+     * @param userId userId
+     * @returns {Promise<*>}
+     */
+    updateOrders: async (orders, userId) => {
+        let user = await User.findOne().where("_id").in(userId).exec();
+        if (user) {
+            if (orders) user.orders = orders;
+
+            user.save();
+
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully updated your orders"
+                },
+                data: user
+            };
+        } else {
+            return {
+                meta: {
+                    code: 404,
+                    success: false,
+                    message: "User not found"
+                },
+                data: null
+            };
+        }
     }
 };
