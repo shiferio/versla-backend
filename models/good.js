@@ -13,8 +13,8 @@ const GoodSchema = new Schema({
     short_description: String,
     picture: String,
     tags: [String],
-    creator_id: String,
-    store_id: String,
+    creator_id: { type: Schema.Types.ObjectId, ref: 'User' },
+    store_id: { type: Schema.Types.ObjectId, ref: 'Store' },
     params: [
         {
             name: String,
@@ -39,6 +39,7 @@ const GoodSchema = new Schema({
         default: Date.now
     }
 });
+
 
 GoodSchema.plugin(autoIncrement, {model: 'Good', field: 'good_id', startAt: 1, incrementBy: 1});
 

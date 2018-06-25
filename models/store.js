@@ -22,7 +22,7 @@ const StoreSchema = new Schema({
     logo: String,
     background: String,
     tags: [String],
-    creator_id: String,
+    creator_id: { type: Schema.Types.ObjectId, ref: 'User' },
     location: {
         lat: {
             type: Number,
@@ -33,7 +33,7 @@ const StoreSchema = new Schema({
             default: null
         }
     },
-    contact_faces: [String],
+    contact_faces: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     is_promoted: {
         type: Boolean,
         default: false

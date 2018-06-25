@@ -69,32 +69,32 @@ router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
  *      "goods": good
  *     }
  */
-router.get('/:good_id', (req, res, next) => {
-    Good.findOne({
-        good_id: req.params.good_id
-    }, (err, good) => {
-        if (err) {
-            res.json({
-                meta: {
-                    code: 200,
-                    success: false,
-                    message: err.message
-                },
-                data: null
-            });
-        } else {
-            res.json({
-                meta: {
-                    code: 200,
-                    success: true,
-                    message: "Successfully get good"
-                },
-                data: {
-                    good: good
-                }
-            });
-        }
-    });
+router.get('/:good_id', async (req, res, next) => {
+
+    let goods = await Good.aggregate([
+        { $match : { good_id : +req.params.good_id } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "creator_id",
+                foreignField: "_id",
+                as: "creator" }
+        },
+        {$unwind: '$creator'}
+    ]).exec();
+
+    if (goods) {
+        res.json({
+            meta: {
+                code: 200,
+                success: true,
+                message: "Successfully get good"
+            },
+            data: {
+                good: goods[0]
+            }
+        });
+    }
 });
 
 /**
