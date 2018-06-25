@@ -26,6 +26,10 @@ const GoodSchema = new Schema({
         default: 0
     },
     type: String,
+    is_available: {
+        type: Boolean,
+        default: true
+    },
     is_promoted: {
         type: Boolean,
         default: false

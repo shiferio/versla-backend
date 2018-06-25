@@ -137,6 +137,7 @@ router.route('/add').post(checkJWT, async (req, res, next) => {
                         good.creator_id = req.decoded.user._id;
                         good.price = req.body.price;
                         good.name = req.body.name;
+                        if(req.body.is_available) good.is_available = req.body.is_available;
                         good.picture = req.body.picture;
                         good.tags = req.body.tags;
                         good.type = req.body.type;
@@ -462,6 +463,11 @@ router.route('/update/picture').put(checkJWT, (req, res, next) => {
 
 router.route('/update/params').put(checkJWT, async (req, res) => {
     let data = await dbGoods.updateGoodParams(req.body.good_id, req.body.params, req.decoded.user._id);
+    return res.status(data['meta'].code).send(data);
+});
+
+router.route('/update/available').put(checkJWT, async (req, res) => {
+    let data = await dbGoods.updateAvailableStatus(req.body.good_id, req.body.is_available, req.decoded.user._id);
     return res.status(data['meta'].code).send(data);
 });
 

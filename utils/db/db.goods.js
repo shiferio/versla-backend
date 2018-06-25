@@ -34,5 +34,37 @@ module.exports = {
                 data: null
             };
         }
+    },
+    /**
+     * Update good params
+     * @param id Good id
+     * @param is_available Is Available Status
+     * @returns {Promise<*>}
+     */
+    updateAvailableStatus: async (id, is_available, user_id) => {
+        let good = await Good.findOne().where("_id").in(id).exec();
+        if (good) {
+            good.is_available = is_available;
+            good.save();
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Good successfully updated"
+                },
+                data: {
+                    good: good
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No goods with such id'
+                },
+                data: null
+            };
+        }
     }
 };
