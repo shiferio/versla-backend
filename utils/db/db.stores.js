@@ -3,7 +3,6 @@ const User = require('../../models/user');
 const Good = require('../../models/good');
 
 module.exports = {
-
     /**
      * List Store with params
      * @param pageNumber
@@ -37,6 +36,7 @@ module.exports = {
         }
 
     },
+
     /**
      * Find user by id
      * @param link
@@ -66,6 +66,7 @@ module.exports = {
             };
         }
     },
+
     /**
      * Find all goods for current store
      * @param id

@@ -43,6 +43,7 @@ const UserSchema = new Schema({
             name: String,
             value: String
         }],
+        price: Number,
         date: {
             type: Date,
             default: Date.now
