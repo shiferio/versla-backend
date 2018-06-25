@@ -69,6 +69,7 @@ router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
  *      "goods": good
  *     }
  */
+
 router.get('/:good_id', async (req, res, next) => {
 
     let goods = await Good.aggregate([
@@ -130,14 +131,16 @@ router.route('/add').post(checkJWT, async (req, res, next) => {
             Store.findOne({
                 _id: req.body.store_id
             }, async (err, store) => {
+
                 if (store) {
-                    if (store.creator_id === req.decoded.user._id) {
+
+                    if (store.creator_id.toString() === req.decoded.user._id) {
+                        console.log(store);
                         let good = new Good();
                         good.store_id = store._id;
                         good.creator_id = req.decoded.user._id;
                         good.price = req.body.price;
                         good.name = req.body.name;
-                        if(req.body.is_available) good.is_available = req.body.is_available;
                         good.picture = req.body.picture;
                         good.tags = req.body.tags;
                         good.type = req.body.type;
