@@ -40,7 +40,19 @@ module.exports = {
      * @returns {Object}
      */
     getAllGoodComments: async (good_id) => {
-        let comments = await Comment.find().where("good_id").in(good_id).exec();
+        console.log(good_id);
+        // let comments = await Comment.aggregate([
+        //     { $match : { good_id : mongoose.Types.ObjectId(good_id) } },
+        //     {
+        //         $lookup: {
+        //             from: "users",
+        //             localField: "creator_id",
+        //             foreignField: "_id",
+        //             as: "creator" }
+        //     },
+        //     {$unwind: '$creator'}
+        // ]).exec();
+        let comments = await Comment.find().where("good_id").in(good_id).populate('creator_id').exec();
         if (comments) {
             return {
                 meta: {
