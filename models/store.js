@@ -21,6 +21,10 @@ const StoreSchema = new Schema({
     short_description: String,
     logo: String,
     background: String,
+    balance: {
+        type: Number,
+        default: 0
+    },
     tags: [String],
     creator_id: { type: Schema.Types.ObjectId, ref: 'User' },
     location: {

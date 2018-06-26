@@ -27,12 +27,14 @@ const storeRoutes = require('./routes/store');
 const usersRoutes = require('./routes/users');
 const goodsRoutes = require('./routes/goods');
 const commentsRoutes = require('./routes/comment');
+const ordersRoutes = require('./routes/orders');
 
 app.use('/api/accounts', userRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/goods', goodsRoutes);
 app.use('/api/comments', commentsRoutes);
+app.use('/api/orders', ordersRoutes);
 
 app.use(express.static('public'));
 

@@ -6,6 +6,7 @@ const Store = require('../models/store');
 const checkJWT = require('../middlewares/check-jwt.js');
 const dbAccount = require('../utils/db/db.account');
 const dbUsers = require('../utils/db/db.users');
+const dbOrders = require('../utils/db/db.order');
 
 /**
  * @api {post} /api/accounts/signup User SignUp
@@ -150,6 +151,11 @@ router.route('/profile').get(checkJWT, async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+
+router.route('/orders').get(checkJWT, async (req, res) => {
+    let data = await dbOrders.getOrderByUserId(req.decoded.user._id);
+    return res.status(data['meta'].code).send(data);
+});
 /**
  * @api {put} /api/accounts/cart Update cart
  * @apiName Update cart
