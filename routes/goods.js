@@ -72,17 +72,7 @@ router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
 
 router.get('/:good_id', async (req, res, next) => {
 
-    let goods = await Good.aggregate([
-        { $match : { _id : req.params.good_id } },
-        {
-            $lookup: {
-                from: "users",
-                localField: "creator_id",
-                foreignField: "_id",
-                as: "creator" }
-        },
-        {$unwind: '$creator'}
-    ]).exec();
+    let goods = await Good.find().where("_id").in(req.params.good_id).populate('creator_id').exec();
 
     if (goods) {
         res.json({
