@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const autoIncrement = require('mongoose-plugin-autoinc').autoIncrement;
-const mongoolia = require('mongoolia').default;
 
 const GoodSchema = new Schema({
     good_id: {
@@ -43,18 +42,5 @@ const GoodSchema = new Schema({
 
 GoodSchema.plugin(autoIncrement, {model: 'Good', field: 'good_id', startAt: 1, incrementBy: 1});
 
-GoodSchema.plugin(mongoolia, {
-    appId: '25YP50AOBM',
-    apiKey: 'bef2cad3b44304d6ce844cbc476dae3e',
-    indexName: 'versla'
-});
-
-let Model = mongoose.model('Good', GoodSchema);
-//Model.syncWithAlgolia();
-// Model.setAlgoliaIndexSettings({
-//         searchableAttributes: ['name', 'tags', 'short_description']
-// });
-
-//searchableAttributes: ['name', 'tags', 'short_description']
-module.exports = Model;
+module.exports = mongoose.model('Good', GoodSchema);
 
