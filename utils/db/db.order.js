@@ -33,6 +33,37 @@ module.exports = {
     },
 
     /**
+     * Add orders
+     * @param orderArray Data of new Order
+     * @param userId Creator id
+     * @returns {Promise<*>}
+     */
+    addOrders: async (orderArray, userId) => {
+        await orderArray.forEach(async (orderData) => {
+            let order = new Order();
+
+            order.user = mongoose.Types.ObjectId(userId);
+            order.store = mongoose.Types.ObjectId(orderData.store_id);
+            order.good = mongoose.Types.ObjectId(orderData.good_id);
+
+            if (orderData.quantity) order.quantity = orderData.quantity;
+            if (orderData.values) order.values = orderData.values;
+            if (orderData.price) order.price = orderData.price;
+
+            await order.save();
+        });
+
+        return {
+            meta: {
+                code: 200,
+                success: true,
+                message: "Orders successfully added"
+            },
+            data: null
+        };
+    },
+
+    /**
      * Get orders by user_id
      * @param user_id
      * @returns {Object}

@@ -33,6 +33,11 @@ router.route('/add').post(checkJWT, async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+router.route('/add/array').post(checkJWT, async (req, res) => {
+    let data = await dbOrders.addOrders(req.body.orders, req.decoded.user._id);
+    return res.status(data['meta'].code).send(data);
+});
+
 router.get('/user/:id', async (req, res) => {
     let data = await dbOrders.getOrderByUserId(req.params.id);
     return res.status(data['meta'].code).send(data);
