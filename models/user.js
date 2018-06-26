@@ -29,7 +29,7 @@ const UserSchema = new Schema({
         postalCode: String
     },
     cart: [{
-        good_id: Number,
+        good_id: { type: Schema.Types.ObjectId, ref: 'Good' },
         quantity: Number,
         values: [{
             name: String,

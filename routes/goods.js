@@ -73,7 +73,7 @@ router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
 router.get('/:good_id', async (req, res, next) => {
 
     let goods = await Good.aggregate([
-        { $match : { good_id : +req.params.good_id } },
+        { $match : { _id : req.params.good_id } },
         {
             $lookup: {
                 from: "users",
@@ -208,7 +208,7 @@ router.route('/add').post(checkJWT, async (req, res, next) => {
 router.route('/delete').delete(checkJWT, (req, res, next) => {
     Good.deleteOne({
         creator_id: req.decoded.user._id,
-        good_id: req.body.good_id
+        _id: req.body.good_id
     }, (err) => {
         if (err) {
             res.json({
@@ -235,7 +235,7 @@ router.route('/delete').delete(checkJWT, (req, res, next) => {
 router.route('/update/name').put(checkJWT, (req, res, next) => {
     Good.findOneAndUpdate({
         creator_id: req.decoded.user._id,
-        good_id: req.body.good_id
+        _id: req.body.good_id
     }, {
         $set: {
             name: req.body.name
@@ -268,7 +268,7 @@ router.route('/update/name').put(checkJWT, (req, res, next) => {
 router.route('/update/price').put(checkJWT, (req, res, next) => {
     Good.findOneAndUpdate({
         creator_id: req.decoded.user._id,
-        good_id: req.body.good_id
+        _id: req.body.good_id
     }, {
         $set: {
             price: req.body.price
@@ -302,7 +302,7 @@ router.route('/update/price').put(checkJWT, (req, res, next) => {
 router.route('/update/description').put(checkJWT, (req, res, next) => {
     Good.findOneAndUpdate({
         creator_id: req.decoded.user._id,
-        good_id: req.body.good_id
+        _id: req.body.good_id
     }, {
         $set: {
             description: req.body.description
@@ -335,7 +335,7 @@ router.route('/update/description').put(checkJWT, (req, res, next) => {
 router.route('/update/short_description').put(checkJWT, (req, res, next) => {
     Good.findOneAndUpdate({
         creator_id: req.decoded.user._id,
-        good_id: req.body.good_id
+        _id: req.body.good_id
     }, {
         $set: {
             short_description: req.body.short_description
@@ -368,7 +368,7 @@ router.route('/update/short_description').put(checkJWT, (req, res, next) => {
 router.route('/update/tags').put(checkJWT, (req, res, next) => {
     Good.findOneAndUpdate({
         creator_id: req.decoded.user._id,
-        good_id: req.body.good_id
+        _id: req.body.good_id
     }, {
         $set: {
             tags: req.body.tags
@@ -401,7 +401,7 @@ router.route('/update/tags').put(checkJWT, (req, res, next) => {
 router.route('/update/type').put(checkJWT, (req, res, next) => {
     Good.findOneAndUpdate({
         creator_id: req.decoded.user._id,
-        good_id: req.body.good_id
+        _id: req.body.good_id
     }, {
         $set: {
             type: req.body.type
@@ -434,7 +434,7 @@ router.route('/update/type').put(checkJWT, (req, res, next) => {
 router.route('/update/picture').put(checkJWT, (req, res, next) => {
     Good.findOneAndUpdate({
         creator_id: req.decoded.user._id,
-        good_id: req.body.good_id
+        _id: req.body.good_id
     }, {
         $set: {
             picture: req.body.picture
