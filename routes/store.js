@@ -151,11 +151,12 @@ router.route('/update/resident').put(checkJWT, (req, res, next) => {
         }
 
 
-        if (req.body.type) store.resident_type = req.body.resident_type;
+        if (req.body.resident_type) store.resident_type = req.body.resident_type;
         if (req.body.tax_num) store.tax_num = req.body.tax_num;
         if (req.body.state_num) store.state_num = req.body.state_num;
         if (req.body.bank_type) store.bank_type = req.body.bank_type;
         if (req.body.bank_num) store.bank_num = req.body.bank_num;
+        if (req.body.goods_type) store.goods_type = req.body.goods_type;
 
         store.save();
         res.json({
