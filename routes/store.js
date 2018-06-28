@@ -135,6 +135,39 @@ router.route('/update/contacts').put(checkJWT, (req, res, next) => {
     });
 });
 
+router.route('/update/resident').put(checkJWT, (req, res, next) => {
+    Store.findOne({
+        link: req.body.link
+    }, (err, store) => {
+        if (err) {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: false,
+                    message: err.message
+                },
+                data: null
+            });
+        }
+
+        if (req.body.type) store.resident.type = req.body.type;
+        if (req.body.tax_num) store.resident.tax_num = req.body.tax_num;
+        if (req.body.state_num) store.resident.state_num = req.body.state_num;
+        if (req.body.bank_type) store.resident.bank_type = req.body.bank_type;
+        if (req.body.bank_num) store.resident.bank_num = req.body.bank_num;
+
+        store.save();
+        res.json({
+            meta: {
+                code: 200,
+                success: true,
+                message: "Successfully updated resident info"
+            },
+            data: null
+        });
+    });
+});
+
 router.route('/update/tags').put(checkJWT, (req, res, next) => {
     Store.findOneAndUpdate({
         creator_id: req.decoded.user._id,

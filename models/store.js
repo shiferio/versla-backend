@@ -14,6 +14,14 @@ const StoreSchema = new Schema({
         email: String,
         address: String,
     },
+    resident: {
+        type: String,
+        tax_num: String,
+        state_num: String,
+        bank_type: String,
+        bank_num: String
+    },
+    goods_type: string,
     rating: {
         type: Number,
         default: 0
