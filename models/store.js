@@ -21,7 +21,7 @@ const StoreSchema = new Schema({
         bank_type: String,
         bank_num: String
     },
-    goods_type: string,
+    goods_type: String,
     rating: {
         type: Number,
         default: 0
