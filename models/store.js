@@ -14,13 +14,11 @@ const StoreSchema = new Schema({
         email: String,
         address: String,
     },
-    resident: {
-        type: String,
-        tax_num: String,
-        state_num: String,
-        bank_type: String,
-        bank_num: String
-    },
+    resident_type: String,
+    tax_num: String,
+    state_num: String,
+    bank_type: String,
+    bank_num: String,
     goods_type: String,
     rating: {
         type: Number,
@@ -34,7 +32,7 @@ const StoreSchema = new Schema({
         default: 0
     },
     tags: [String],
-    creator_id: { type: Schema.Types.ObjectId, ref: 'User' },
+    creator_id: {type: Schema.Types.ObjectId, ref: 'User'},
     location: {
         lat: {
             type: Number,
@@ -45,7 +43,7 @@ const StoreSchema = new Schema({
             default: null
         }
     },
-    contact_faces: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    contact_faces: [{type: Schema.Types.ObjectId, ref: 'User'}],
     is_promoted: {
         type: Boolean,
         default: false

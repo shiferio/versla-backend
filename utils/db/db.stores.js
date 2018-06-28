@@ -142,11 +142,12 @@ module.exports = {
             store.contact_faces = [userId];
             if (storeData.name) store.name = storeData.name;
             if (storeData.link) store.link = storeData.link;
-            if (storeData.resident_type) store.resident.type = storeData.resident_type;
-            if (storeData.tax_num) store.resident.tax_num = storeData.tax_num;
-            if (storeData.state_num) store.resident.state_num = storeData.state_num;
-            if (storeData.bank_type) store.resident.bank_type = storeData.bank_type;
-            if (storeData.bank_num) store.resident.bank_num = storeData.bank_num;
+            if (storeData.resident_type) store.resident_type = storeData.resident_type;
+            if (storeData.tax_num) store.tax_num = storeData.tax_num;
+            if (storeData.state_num) store.state_num = storeData.state_num;
+            if (storeData.bank_type) store.bank_type = storeData.bank_type;
+            if (storeData.bank_num) store.bank_num = storeData.bank_num;
+            if (storeData.goods_type) store.goods_type = storeData.goods_type;
 
             store.save();
             return {

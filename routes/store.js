@@ -150,11 +150,12 @@ router.route('/update/resident').put(checkJWT, (req, res, next) => {
             });
         }
 
-        if (req.body.type) store.resident.type = req.body.type;
-        if (req.body.tax_num) store.resident.tax_num = req.body.tax_num;
-        if (req.body.state_num) store.resident.state_num = req.body.state_num;
-        if (req.body.bank_type) store.resident.bank_type = req.body.bank_type;
-        if (req.body.bank_num) store.resident.bank_num = req.body.bank_num;
+
+        if (req.body.type) store.resident_type = req.body.resident_type;
+        if (req.body.tax_num) store.tax_num = req.body.tax_num;
+        if (req.body.state_num) store.state_num = req.body.state_num;
+        if (req.body.bank_type) store.bank_type = req.body.bank_type;
+        if (req.body.bank_num) store.bank_num = req.body.bank_num;
 
         store.save();
         res.json({
