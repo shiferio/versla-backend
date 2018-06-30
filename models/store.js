@@ -33,6 +33,8 @@ const StoreSchema = new Schema({
     },
     tags: [String],
     creator_id: {type: Schema.Types.ObjectId, ref: 'User'},
+    city: {type: Schema.Types.ObjectId, ref: 'City'},
+    category: {type: Schema.Types.ObjectId, ref: 'StoreCategory'},
     location: {
         lat: {
             type: Number,

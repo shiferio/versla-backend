@@ -12,6 +12,7 @@ const UserSchema = new Schema({
         type: String,
         unique: true
     },
+    city: {type: Schema.Types.ObjectId, ref: 'City'},
     phone: String,
     first_name: String,
     last_name: String,

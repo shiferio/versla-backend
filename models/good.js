@@ -16,6 +16,7 @@ const GoodSchema = new Schema({
     tags: [String],
     creator_id: {type: Schema.Types.ObjectId, ref: 'User'},
     store_id: {type: Schema.Types.ObjectId, ref: 'Store'},
+    category: {type: Schema.Types.ObjectId, ref: 'GoodCategory'},
     params: [
         {
             name: String,
