@@ -33,6 +33,7 @@ router.get('/', (req, res) => {
 
     Good
         .find(filter, exclude)
+        .hint('goods_search')
         .skip(pageNumber > 0 ? ((pageNumber - 1) * pageSize) : 0)
         .limit(pageSize)
         .exec((err, goods) => {
