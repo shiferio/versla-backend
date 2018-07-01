@@ -42,7 +42,8 @@ router.get('/all/:pageNumber/:pageSize', (req, res) => {
     if (req.query.tags) {
         filter['tags'] = {
             '$in': req.query.tags
-                .split(new RegExp('\\s'))
+                .trim()
+                .split(/\s+/)
                 .map(tag => new RegExp(tag, 'i'))
         };
     }
@@ -102,7 +103,8 @@ router.get('/all/:pageNumber/:pageSize', (req, res) => {
  */
 router.get('/any/:pageNumber/:pageSize', (req, res) => {
     const query = (req.query.query || '')
-        .split(new RegExp('\\s'))
+        .trim()
+        .split(/\s+/)
         .map(tag => new RegExp(tag, 'i'));
 
     const filter = {
