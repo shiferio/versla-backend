@@ -3,6 +3,31 @@ const router = require('express').Router();
 const Good = require('../models/good');
 
 
+/**
+ * @api {get} /api/search/all/:pageNumber/:pageSize Search goods by all fields
+ * @apiName SearchGoodsByAllFields
+ * @apiGroup Search
+ *
+ * @apiDescription Search goods by name, tags, short and detailed description.
+ *                 There must be separate query parameter for each field.
+ *                 Found goods must be met every query parameter.
+ *
+ * @apiParam {Number} pageNumber Page Number
+ * @apiParam {Number} pageSize Page Size
+ *
+ * @apiSuccess {Object} goods Array of goods
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     meta: {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "Successfully get goods"
+ *     },
+ *     data: {
+ *      "goods": []
+ *     }
+ */
 router.get('/all/:pageNumber/:pageSize', (req, res) => {
     const filter = {};
     if (req.query.name) {
@@ -50,6 +75,31 @@ router.get('/all/:pageNumber/:pageSize', (req, res) => {
         })
 });
 
+/**
+ * @api {get} /api/search/any/:pageNumber/:pageSize?query=:query Search goods by any fields
+ * @apiName SearchGoodsByAnyFields
+ * @apiGroup Search
+ *
+ * @apiDescription Search goods by name, tags, short and detailed description.
+ *                 There is one query parameter that must be met at least in one field.
+ *
+ * @apiParam {Number} pageNumber Page Number
+ * @apiParam {Number} pageSize Page Size
+ * @apiParam {String} query One or more words by which goods will be searched
+ *
+ * @apiSuccess {Object} goods Array of goods
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     meta: {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "Successfully get goods"
+ *     },
+ *     data: {
+ *      "goods": []
+ *     }
+ */
 router.get('/any/:pageNumber/:pageSize', (req, res) => {
     const query = (req.query.query || '')
         .split(new RegExp('\\s'))
