@@ -22,8 +22,8 @@ router.get('/all/:pageNumber/:pageSize', (req, res) => {
         };
     }
 
-    const pageNumber = req.params.pageNumber;
-    const pageSize = req.params.pageSize;
+    const pageNumber = Number.parseInt(req.params.pageNumber);
+    const pageSize = Number.parseInt(req.params.pageSize);
 
     const exclude = {
         params: 0,
