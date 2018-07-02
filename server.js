@@ -33,8 +33,10 @@ const goodsRoutes = require('./routes/goods');
 const commentsRoutes = require('./routes/comment');
 const ordersRoutes = require('./routes/orders');
 const searchRoutes = require('./routes/search');
+const categoryRoutes = require('./routes/caregories');
 
 app.use('/api/accounts', userRoutes);
+app.use('/api/category', categoryRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/goods', goodsRoutes);
