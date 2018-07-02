@@ -454,8 +454,18 @@ router.route('/update/picture').put(checkJWT, (req, res, next) => {
     });
 });
 
+router.get('/category/:id', async (req, res) => {
+    let data = await dbGoods.findGoodsByCategoryId(req.params.id);
+    return res.status(data['meta'].code).send(data);
+});
+
 router.route('/update/params').put(checkJWT, async (req, res) => {
     let data = await dbGoods.updateGoodParams(req.body.good_id, req.body.params, req.decoded.user._id);
+    return res.status(data['meta'].code).send(data);
+});
+
+router.route('/update/category').put(checkJWT, async (req, res) => {
+    let data = await dbGoods.updateCategoryId(req.body);
     return res.status(data['meta'].code).send(data);
 });
 

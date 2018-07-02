@@ -98,6 +98,36 @@ module.exports = {
     },
 
     /**
+     * Find all stores of category
+     * @param id
+     * @returns {Object}
+     */
+    findStoresByCategoryId: async (id) => {
+        let stores = await Store.find().where("category").in(id).exec();
+        if (stores) {
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully get stores"
+                },
+                data: {
+                    stores: stores
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No stores with such category id'
+                },
+                data: null
+            };
+        }
+    },
+
+    /**
      * Find all stores
      * @returns {Object}
      */
@@ -177,6 +207,7 @@ module.exports = {
             if (storeData.bank_type) store.bank_type = storeData.bank_type;
             if (storeData.bank_num) store.bank_num = storeData.bank_num;
             if (storeData.goods_type) store.goods_type = storeData.goods_type;
+            if (storeData.category_id) store.category = storeData.category_id;
 
             store.save();
             return {

@@ -1,4 +1,4 @@
-const StoreCategory = require('../../models/scategory');
+const GoodCategory = require('../../models/gcategory');
 const mongoose = require('mongoose');
 
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
      * @returns {Promise<*>}
      */
     addCategory: async (data, userId) => {
-        let category = new StoreCategory();
+        let category = new GoodCategory();
 
         category.user = mongoose.Types.ObjectId(userId);
         category.name = data.name;
@@ -33,7 +33,7 @@ module.exports = {
      * @returns {Object}
      */
     getCategories: async () => {
-        let categories = await StoreCategory.find().exec();
+        let categories = await GoodCategory.find().exec();
         if (categories) {
             return {
                 meta: {

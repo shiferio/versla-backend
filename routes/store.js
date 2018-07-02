@@ -22,6 +22,11 @@ router.get('/id/:id', async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+router.get('/category/:id', async (req, res) => {
+    let data = await dbStores.findStoresByCategoryId(req.params.id);
+    return res.status(data['meta'].code).send(data);
+});
+
 router.get('/get/all', async (req, res) => {
     let data = await dbStores.findAllStores();
     return res.status(data['meta'].code).send(data);
@@ -31,7 +36,6 @@ router.get('/goods/:id', async (req, res) => {
     let data = await dbStores.findGoodsByStoreId(req.params.id);
     return res.status(data['meta'].code).send(data);
 });
-
 
 router.route('/add').post(checkJWT, async (req, res) => {
     let data = await dbStores.addStore(req.body, req.decoded.user._id);
@@ -100,6 +104,40 @@ router.route('/update/name').put(checkJWT, (req, res, next) => {
                     code: 200,
                     success: true,
                     message: "Name successfully updated"
+                },
+                data: {
+                    store: store
+                }
+            });
+        }
+    });
+});
+
+
+router.route('/update/category').put(checkJWT, (req, res, next) => {
+    Store.findOneAndUpdate({
+        creator_id: req.decoded.user._id,
+        link: req.body.link
+    }, {
+        $set: {
+            category: req.body.category_id
+        }
+    }, {new: true}, function (err, store) {
+        if (err) {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: false,
+                    message: err.message
+                },
+                data: null
+            });
+        } else {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Category successfully updated"
                 },
                 data: {
                     store: store
