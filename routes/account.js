@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const passport = require('passport');
 
 const User = require('../models/user');
 const Store = require('../models/store');
@@ -57,11 +58,13 @@ router.post('/signup', async (req, res) => {
  *      "token": "token"
  *     }
  */
-router.post('/login', async (req, res) => {
-    let data = await dbAccount.login(req.body);
-    console.log(data);
-    return res.status(data['meta'].code).send(data);
-});
+router.post(
+    '/login',
+    passport.authenticate('local', {session: false}),
+    async (req, res) => {
+        const data = req.user;
+        return res.status(data['meta'].code).send(data);
+    });
 
 /**
  * @api {get} /api/accounts/profile Get user profile
