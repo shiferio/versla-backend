@@ -22,6 +22,11 @@ router.get('/id/:id', async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+router.get('/get/all', async (req, res) => {
+    let data = await dbStores.findAllStores();
+    return res.status(data['meta'].code).send(data);
+});
+
 router.get('/goods/:id', async (req, res) => {
     let data = await dbStores.findGoodsByStoreId(req.params.id);
     return res.status(data['meta'].code).send(data);

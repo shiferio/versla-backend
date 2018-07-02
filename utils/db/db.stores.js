@@ -98,6 +98,35 @@ module.exports = {
     },
 
     /**
+     * Find all stores
+     * @returns {Object}
+     */
+    findAllStores: async () => {
+        let stores = await Store.find().exec();
+        if (stores) {
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully get stores"
+                },
+                data: {
+                    stores: stores
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No stores'
+                },
+                data: null
+            };
+        }
+    },
+
+    /**
      * Find user by id
      * @param id
      * @returns {Object}
