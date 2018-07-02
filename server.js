@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+const passport = require('passport');
+const authStrategies = require('./authentication/strategies');
+
 const config = require('./config');
 const app = express();
 
@@ -21,6 +24,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(morgan('dev'));
 app.use(cors());
+app.use(passport.initialize());
 
 const userRoutes = require('./routes/account');
 const storeRoutes = require('./routes/store');
@@ -39,6 +43,9 @@ app.use('/api/orders', ordersRoutes);
 app.use('/api/search', searchRoutes);
 
 app.use(express.static('public'));
+
+authStrategies.localStrategy();
+authStrategies.jwtStrategy();
 
 app.listen(config.port, (err) => {
     console.log('App runned on ' + config.port);
