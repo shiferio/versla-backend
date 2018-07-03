@@ -10,7 +10,7 @@ module.exports = {
     addCity: async (data) => {
         let city = new City();
 
-        city.user = data.name;
+        city.name = data.name;
         city.location = data.location;
 
         city.save();
