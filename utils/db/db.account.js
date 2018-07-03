@@ -14,6 +14,7 @@ module.exports = {
         user.password = newUser.password;
         user.email = newUser.email;
         user.phone = newUser.phone;
+        user.city = mongoose.Types.ObjectId(newUser.city);
         user.picture = user.gravatar();
 
         let existingUser = await User.findOne().where("email").in(newUser.email).exec();
@@ -107,6 +108,7 @@ module.exports = {
             if (userInfo.email) user.email = userInfo.email;
             if (userInfo.password) user.password = userInfo.password;
             if (userInfo.phone) user.phone = userInfo.phone;
+            if (userInfo.city) user.city = mongoose.Types.ObjectId(userInfo.city);
 
             user.save();
 

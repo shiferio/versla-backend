@@ -165,6 +165,7 @@ router.route('/update/contacts').put(checkJWT, (req, res, next) => {
         if (req.body.email) store.contacts.email = req.body.email;
         if (req.body.phone) store.contacts.phone = req.body.phone;
         if (req.body.address) store.contacts.address = req.body.address;
+        if (req.body.city) store.city = mongoose.Types.ObjectId(req.body.city);
 
         store.save();
         res.json({

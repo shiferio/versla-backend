@@ -208,6 +208,7 @@ module.exports = {
             if (storeData.bank_num) store.bank_num = storeData.bank_num;
             if (storeData.goods_type) store.goods_type = storeData.goods_type;
             if (storeData.category_id) store.category = storeData.category_id;
+            if (storeData.city) store.city = mongoose.Types.ObjectId(storeData.city);
 
             store.save();
             return {
