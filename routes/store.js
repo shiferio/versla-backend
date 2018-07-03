@@ -6,6 +6,7 @@ const Store = require('../models/store');
 const config = require('../config');
 const checkJWT = require('../middlewares/check-jwt.js');
 const dbStores = require('../utils/db/db.stores');
+const mongoose = require('mongoose');
 
 router.get('/list/:pageNumber/:pageSize', async (req, res) => {
     let data = await dbStores.listStoresByPages(req.params.pageNumber, req.params.pageSize);

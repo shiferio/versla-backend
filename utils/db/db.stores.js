@@ -1,6 +1,7 @@
 const Store = require('../../models/store');
 const User = require('../../models/user');
 const Good = require('../../models/good');
+const mongoose = require('mongoose');
 
 module.exports = {
     /**

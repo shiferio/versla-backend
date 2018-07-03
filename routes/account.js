@@ -8,6 +8,7 @@ const checkJWT = require('../middlewares/check-jwt.js');
 const dbAccount = require('../utils/db/db.account');
 const dbUsers = require('../utils/db/db.users');
 const dbOrders = require('../utils/db/db.order');
+const mongoose = require('mongoose');
 
 /**
  * @api {post} /api/accounts/signup User SignUp
