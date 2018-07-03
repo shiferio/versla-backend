@@ -36,7 +36,7 @@ module.exports = {
      * @returns {Object}
      */
     findUserById: async (id) => {
-        let user = await User.findOne().where("_id").in(id).exec();
+        let user = await User.findOne().where("_id").in(id).populate('city').exec();
         console.log(user);
         if (user) {
             return {
