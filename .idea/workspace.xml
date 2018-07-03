@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="900b32e1-f168-4307-94bb-8e55df0e6896" name="Default" comment="cities">
-      <change afterPath="$PROJECT_DIR$/routes/cities.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/db/db.city.js" afterDir="false" />
+    <list default="true" id="900b32e1-f168-4307-94bb-8e55df0e6896" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/caregories.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/categories.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/server.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/db/db.gcategory.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/db/db.gcategory.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/db/db.scategory.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/db/db.scategory.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/cities.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/cities.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -61,8 +56,8 @@
       <file leaf-file-name="db.city.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils/db/db.city.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-143">
-              <caret line="43" column="26" selection-start-line="43" selection-start-column="20" selection-end-line="43" selection-end-column="26" />
+            <state relative-caret-position="296">
+              <caret line="18" column="19" lean-forward="true" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
             </state>
           </provider>
         </entry>
@@ -85,7 +80,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="server.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="server.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="335">
@@ -94,11 +89,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="cities.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="cities.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/cities.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="16" column="33" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
+            <state relative-caret-position="162">
+              <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
             </state>
           </provider>
         </entry>
@@ -189,9 +184,9 @@
         <option value="$PROJECT_DIR$/routes/caregories.js" />
         <option value="$PROJECT_DIR$/utils/db/db.scategory.js" />
         <option value="$PROJECT_DIR$/utils/db/db.gcategory.js" />
+        <option value="$PROJECT_DIR$/server.js" />
         <option value="$PROJECT_DIR$/utils/db/db.city.js" />
         <option value="$PROJECT_DIR$/routes/cities.js" />
-        <option value="$PROJECT_DIR$/server.js" />
       </list>
     </option>
   </component>
@@ -373,7 +368,7 @@
       <workItem from="1530528406163" duration="1565000" />
       <workItem from="1530535107063" duration="3682000" />
       <workItem from="1530593510151" duration="221000" />
-      <workItem from="1530614267463" duration="1706000" />
+      <workItem from="1530614267463" duration="2089000" />
     </task>
     <task id="LOCAL-00001" summary="Store changes">
       <created>1528353758050</created>
@@ -494,7 +489,21 @@
       <option name="project" value="LOCAL" />
       <updated>1530538598918</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="cities">
+      <created>1530617976347</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1530617976347</updated>
+    </task>
+    <task id="LOCAL-00019" summary="fix">
+      <created>1530618302334</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1530618302334</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -506,7 +515,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="130003000" />
+    <option name="totallyTimeSpent" value="130386000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="8" y="26" width="1432" height="816" extended-state="0" />
@@ -590,7 +599,9 @@
     <MESSAGE value="Upds" />
     <MESSAGE value="Big data and cities" />
     <MESSAGE value="Team all stores" />
-    <option name="LAST_COMMIT_MESSAGE" value="Team all stores" />
+    <MESSAGE value="cities" />
+    <MESSAGE value="fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -888,20 +899,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/routes/cities.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="16" column="33" selection-start-line="16" selection-start-column="33" selection-end-line="16" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/utils/db/db.city.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-143">
-          <caret line="43" column="26" selection-start-line="43" selection-start-column="20" selection-end-line="43" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/models/user.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="199">
@@ -920,6 +917,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="335">
           <caret line="39" column="35" lean-forward="true" selection-start-line="39" selection-start-column="35" selection-end-line="39" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/db/db.city.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="296">
+          <caret line="18" column="19" lean-forward="true" selection-start-line="18" selection-start-column="19" selection-end-line="18" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routes/cities.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
         </state>
       </provider>
     </entry>

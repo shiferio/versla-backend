@@ -3,7 +3,7 @@ const checkJWT = require('../middlewares/check-jwt.js');
 
 const dbCity = require('../utils/db/db.city');
 
-router.route('/add').post(checkJWT, async (req, res) => {
+router.post('/add', async (req, res) => {
     let data = await dbCity.addCity(req.body);
     return res.status(data['meta'].code).send(data);
 });
