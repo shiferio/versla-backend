@@ -9,8 +9,13 @@ router.route('/add/good').post(checkJWT, async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
-router.route('/get/good').post(checkJWT, async (req, res) => {
+router.get('/get/good', async (req, res) => {
     let data = await dbGoodCategory.getCategories();
+    return res.status(data['meta'].code).send(data);
+});
+
+router.get('/get/good/id/:id', async (req, res) => {
+    let data = await dbGoodCategory.getCategoryById(req.params.id);
     return res.status(data['meta'].code).send(data);
 });
 
@@ -19,8 +24,13 @@ router.route('/add/store').post(checkJWT, async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
-router.route('/get/store').post(checkJWT, async (req, res) => {
+router.get('/get/store', async (req, res) => {
     let data = await dbStoreCategory.getCategories();
+    return res.status(data['meta'].code).send(data);
+});
+
+router.get('/get/store/id/:id', async (req, res) => {
+    let data = await dbStoreCategory.getCategoryById(req.params.id);
     return res.status(data['meta'].code).send(data);
 });
 

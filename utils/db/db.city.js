@@ -1,48 +1,47 @@
-const StoreCategory = require('../../models/scategory');
+const City = require('../../models/city');
 const mongoose = require('mongoose');
 
 module.exports = {
     /**
-     * Add category
-     * @param data Data of new Category
-     * @param userId Creator id
+     * Add city
+     * @param data Data of new City
      * @returns {Promise<*>}
      */
-    addCategory: async (data, userId) => {
-        let category = new StoreCategory();
+    addCity: async (data) => {
+        let city = new City();
 
-        category.user = mongoose.Types.ObjectId(userId);
-        category.name = data.name;
+        city.user = data.name;
+        city.location = data.location;
 
-        category.save();
+        city.save();
 
         return {
             meta: {
                 code: 200,
                 success: true,
-                message: "Category successfully added"
+                message: "City successfully added"
             },
             data: {
-                category: category
+                city: city
             }
         };
     },
 
     /**
-     * Get categories
+     * Get cities
      * @returns {Object}
      */
-    getCategories: async () => {
-        let categories = await StoreCategory.find().exec();
-        if (categories) {
+    getCities: async () => {
+        let cities = await City.find().exec();
+        if (cities) {
             return {
                 meta: {
                     code: 200,
                     success: true,
-                    message: "Successfully get categories"
+                    message: "Successfully get cities"
                 },
                 data: {
-                    categories: categories
+                    cities: cities
                 }
             };
         } else {
@@ -50,29 +49,28 @@ module.exports = {
                 meta: {
                     success: false,
                     code: 200,
-                    message: 'No categories'
+                    message: 'No cities'
                 },
                 data: null
             };
         }
     },
-
     /**
-     * Get category by id
-     * id category
+     * Get city by id
+     * id city
      * @returns {Object}
      */
-    getCategoryById: async (id) => {
-        let category = await StoreCategory.findOne().where("_id").in(id).exec();
-        if (category) {
+    getCityById: async (id) => {
+        let city = await City.findOne().where("_id").in(id).exec();
+        if (city) {
             return {
                 meta: {
                     code: 200,
                     success: true,
-                    message: "Successfully get category"
+                    message: "Successfully get city"
                 },
                 data: {
-                    category: category
+                    city: city
                 }
             };
         } else {
@@ -80,7 +78,7 @@ module.exports = {
                 meta: {
                     success: false,
                     code: 200,
-                    message: 'No categories'
+                    message: 'No cities'
                 },
                 data: null
             };

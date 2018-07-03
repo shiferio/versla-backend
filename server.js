@@ -33,9 +33,11 @@ const goodsRoutes = require('./routes/goods');
 const commentsRoutes = require('./routes/comment');
 const ordersRoutes = require('./routes/orders');
 const searchRoutes = require('./routes/search');
-const categoryRoutes = require('./routes/caregories');
+const categoryRoutes = require('./routes/categories');
+const cityRoutes = require('./routes/cities');
 
 app.use('/api/accounts', userRoutes);
+app.use('/api/cities', cityRoutes);
 app.use('/api/category', categoryRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/users', usersRoutes);

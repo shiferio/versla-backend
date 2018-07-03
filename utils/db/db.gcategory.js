@@ -55,5 +55,34 @@ module.exports = {
                 data: null
             };
         }
+    },
+    /**
+     * Get category by id
+     * id category
+     * @returns {Object}
+     */
+    getCategoryById: async (id) => {
+        let category = await GoodCategory.findOne().where("_id").in(id).exec();
+        if (category) {
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully get category"
+                },
+                data: {
+                    category: category
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No categories'
+                },
+                data: null
+            };
+        }
     }
 };
