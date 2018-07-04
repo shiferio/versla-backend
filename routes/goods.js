@@ -123,15 +123,15 @@ router.route('/add').post(checkJWT, async (req, res, next) => {
             }, async (err, store) => {
 
                 if (store) {
-                    console.log(store+" " + store.creator_id + " " + req.decoded.user._id);
+                    console.log(store+" " + store.creator_id + " " + req.decoded.user._id + " " + (store.creator_id === req.decoded.user._id));
                     if (store.creator_id === req.decoded.user._id) {
-                        console.log(store);
+                        console.log("ok");
                         let good = new Good();
                         good.store_id = store._id;
                         good.creator_id = req.decoded.user._id;
                         good.price = req.body.price;
                         good.name = req.body.name;
-                        //good.category = mongoose.Types.ObjectId(req.body.category);
+                        //good.category = mongoose.Types.ObjectId(req.body.category);s
                         good.picture = req.body.picture;
                         good.tags = req.body.tags;
                         good.type = req.body.type;
