@@ -123,8 +123,8 @@ router.route('/add').post(checkJWT, async (req, res, next) => {
             }, async (err, store) => {
 
                 if (store) {
-                    console.log(store+" " + store.creator_id + " " + req.decoded.user._id + " " + (store.creator_id === req.decoded.user._id));
-                    if (store.creator_id === req.decoded.user._id) {
+                    console.log(typeof store.creator_id + " " + typeof req.decoded.user._id);
+                    if (store.creator_id == req.decoded.user._id) {
                         console.log("ok");
                         let good = new Good();
                         good.store_id = store._id;
