@@ -131,6 +131,7 @@ router.route('/add').post(checkJWT, async (req, res, next) => {
                         good.creator_id = req.decoded.user._id;
                         good.price = req.body.price;
                         good.name = req.body.name;
+                        good.category = mongoose.Types.ObjectId(req.body.category);
                         good.picture = req.body.picture;
                         good.tags = req.body.tags;
                         good.type = req.body.type;
