@@ -44,7 +44,7 @@ module.exports = {
      * @returns {Object}
      */
     findStoreByName: async (link) => {
-        let store = await Store.findOne().where("link").in(link).populate('city').exec();
+        let store = await Store.findOne().where("link").in(link).populate('city').populate('category').exec();
         if (store) {
             return {
                 meta: {
