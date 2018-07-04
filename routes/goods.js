@@ -72,7 +72,7 @@ router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
 
 router.get('/:good_id', async (req, res, next) => {
 
-    let goods = await Good.find().where("_id").in(req.params.good_id).populate('creator_id').exec();
+    let goods = await Good.find().where("_id").in(req.params.good_id).populate('creator_id').populate('category').exec();
 
     if (goods) {
         res.json({
