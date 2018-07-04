@@ -124,7 +124,7 @@ router.route('/add').post(checkJWT, async (req, res, next) => {
 
                 if (store) {
                     console.log(store+"AAAA");
-                    if (store.creator_id.toString() === req.decoded.user._id) {
+                    if (mongoose.Types.ObjectId(store.creator_id) === mongoose.Types.ObjectId(req.decoded.user._id)) {
                         console.log(store);
                         let good = new Good();
                         good.store_id = store._id;
