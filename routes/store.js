@@ -121,7 +121,7 @@ router.route('/update/category').put(checkJWT, (req, res, next) => {
         link: req.body.link
     }, {
         $set: {
-            category: req.body.category_id
+            category: req.body.category
         }
     }, {new: true}, function (err, store) {
         if (err) {
