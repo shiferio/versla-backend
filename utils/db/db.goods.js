@@ -76,7 +76,7 @@ module.exports = {
     updateCategoryId: async (data) => {
         let good = await Good.findOne().where("_id").in(data.good_id).exec();
         if (good) {
-            good.category = data.category_id;
+            good.category = data.category;
             good.save();
             return {
                 meta: {
