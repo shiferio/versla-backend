@@ -28,6 +28,11 @@ router.get('/category/:id', async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+router.get('/filter', async (req, res) => {
+    let data = await dbStores.findStoresByFilters(req.body);
+    return res.status(data['meta'].code).send(data);
+});
+
 router.get('/get/all', async (req, res) => {
     let data = await dbStores.findAllStores();
     return res.status(data['meta'].code).send(data);

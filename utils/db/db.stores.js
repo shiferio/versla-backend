@@ -188,6 +188,44 @@ module.exports = {
     },
 
     /**
+     * Find all stores of filter
+     * @param filter
+     * @returns {Object}
+     */
+    findStoresByFilters: async (filter) => {
+        let stores;
+        if (filter.category && filter.city) {
+            stores = await Store.find().where("category").in(filter.category).where("city").in(filter.city).exec();
+        } else if (filter.city) {
+            stores = await Store.find().where("city").in(filter.city).exec();
+        } else if (filter.category) {
+            stores = await Store.find().where("category").in(filter.category).exec();
+        }
+
+        if (stores) {
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully get goods"
+                },
+                data: {
+                    stores: stores
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No stores with such filters'
+                },
+                data: null
+            };
+        }
+    },
+
+    /**
      * Add store
      * @param storeData Data of new Store
      * @param userId Creator id

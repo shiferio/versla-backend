@@ -132,6 +132,7 @@ router.route('/add').post(checkJWT, async (req, res, next) => {
                         good.price = req.body.price;
                         good.name = req.body.name;
                         if (req.body.category) good.category = mongoose.Types.ObjectId(req.body.category);
+                        if (req.body.city) good.city = mongoose.Types.ObjectId(req.body.city);
                         good.picture = req.body.picture;
                         good.tags = req.body.tags;
                         good.type = req.body.type;
@@ -455,8 +456,46 @@ router.route('/update/picture').put(checkJWT, (req, res, next) => {
     });
 });
 
+router.route('/update/city').put(checkJWT, (req, res, next) => {
+    Good.findOneAndUpdate({
+        creator_id: req.decoded.user._id,
+        _id: req.body.good_id
+    }, {
+        $set: {
+            city: req.body.city
+        }
+    }, {new: true}, function (err, good) {
+        if (err) {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: false,
+                    message: err.message
+                },
+                data: null
+            });
+        } else {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Good successfully updated"
+                },
+                data: {
+                    good: good
+                }
+            });
+        }
+    });
+});
+
 router.get('/category/:id', async (req, res) => {
     let data = await dbGoods.findGoodsByCategoryId(req.params.id);
+    return res.status(data['meta'].code).send(data);
+});
+
+router.get('/filter', async (req, res) => {
+    let data = await dbGoods.findGoodsByFilters(req.body);
     return res.status(data['meta'].code).send(data);
 });
 

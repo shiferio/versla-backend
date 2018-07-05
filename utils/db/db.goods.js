@@ -128,4 +128,46 @@ module.exports = {
             };
         }
     },
+
+    /**
+     * Find all goods of filter
+     * @param filter
+     * @returns {Object}
+     */
+    findGoodsByFilters: async (filter) => {
+        let goods;
+        if (filter.category && filter.store) {
+            goods = await Good.find().where("category").in(filter.category).where("store_id").in(filter.store).exec();
+        } else if (filter.category && filter.city) {
+            goods = await Good.find().where("category").in(filter.category).where("city").in(filter.city).exec();
+        } else if (filter.store) {
+            goods = await Good.find().where("store_id").in(filter.store).exec();
+        } else if (filter.city) {
+            goods = await Good.find().where("city").in(filter.city).exec();
+        } else if (filter.category) {
+            goods = await Good.find().where("category").in(filter.category).exec();
+        }
+
+        if (goods) {
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully get goods"
+                },
+                data: {
+                    goods: goods
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No goods with such category id'
+                },
+                data: null
+            };
+        }
+    }
 };
