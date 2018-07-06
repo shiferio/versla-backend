@@ -1,6 +1,8 @@
 const Store = require('../../models/store');
 const User = require('../../models/user');
 const Good = require('../../models/good');
+const GoodRate = require('../../models/goodrate');
+const _ = require('underscore-node');
 
 module.exports = {
     /**
@@ -24,6 +26,72 @@ module.exports = {
                     good: good
                 }
             };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No goods with such id'
+                },
+                data: null
+            };
+        }
+    },
+    /**
+     * Update good rating
+     * @param rate rating
+     * @param good_id good id
+     * @param user_id user id
+     * @returns {Promise<*>}
+     */
+    updateGoodRating: async (rate, good_id, user_id) => {
+        let goodrate = await GoodRate.findOne().where("good").in(good_id).where("user").in(user_id).exec();
+        let good = await Good.findOne().where("_id").in(good_id).exec();
+        if (good) {
+            if (goodrate) {
+                await goodrate.value = +rate;
+                await goodrate.save();
+                let goodrates = await GoodRate.find().where("good").in(good_id).exec();
+                let sumRates = await _.reduce(goodrates, function (memo, goodrate) {
+                    return memo + goodrate.value;
+                }, 0);
+                good.rating = await sumRates / +(goodrates.length);
+                await good.save();
+
+                return {
+                    meta: {
+                        code: 200,
+                        success: true,
+                        message: "Rate successfully updated"
+                    },
+                    data: {
+                        good: good
+                    }
+                };
+            } else {
+                let newrate = new GoodRate();
+                newrate.value = +rate;
+                newrate.user = user_id;
+                newrate.good = good_id;
+                await newrate.save();
+                let goodrates = await GoodRate.find().where("good").in(good_id).exec();
+                let sumRates = await _.reduce(goodrates, function (memo, goodrate) {
+                    return memo + goodrate.value;
+                }, 0);
+                good.rating = await sumRates / +(goodrates.length);
+                await good.save();
+
+                return {
+                    meta: {
+                        code: 200,
+                        success: true,
+                        message: "Rate successfully updated"
+                    },
+                    data: {
+                        good: good
+                    }
+                };
+            }
         } else {
             return {
                 meta: {

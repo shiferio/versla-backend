@@ -489,6 +489,11 @@ router.route('/update/city').put(checkJWT, (req, res, next) => {
     });
 });
 
+router.route('/update/rating').put(checkJWT, async (req, res) => {
+    let data = await dbGoods.updateGoodRating(req.body.rate, req.body.good, req.decoded.user._id);
+    return res.status(data['meta'].code).send(data);
+});
+
 router.get('/category/:id', async (req, res) => {
     let data = await dbGoods.findGoodsByCategoryId(req.params.id);
     return res.status(data['meta'].code).send(data);
