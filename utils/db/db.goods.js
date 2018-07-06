@@ -45,6 +45,7 @@ module.exports = {
      * @returns {Promise<*>}
      */
     updateGoodRating: async (rate, good_id, user_id) => {
+        console.log("RATE INN " + rate);
         let goodrate = await GoodRate.findOne().where("good").in(good_id).where("user").in(user_id).exec();
         let good = await Good.findOne().where("_id").in(good_id).exec();
         if (good) {

@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="900b32e1-f168-4307-94bb-8e55df0e6896" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/utils/db/db.comment.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/db/db.comment.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/db/db.goods.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/db/db.goods.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -25,11 +26,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="db.goods.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="db.goods.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/utils/db/db.goods.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="414">
-              <caret line="41" column="25" lean-forward="true" selection-start-line="41" selection-start-column="25" selection-end-line="41" selection-end-column="25" />
+            <state relative-caret-position="203">
+              <caret line="47" column="40" selection-start-line="47" selection-start-column="40" selection-end-line="47" selection-end-column="40" />
             </state>
           </provider>
         </entry>
@@ -70,11 +71,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="db.comment.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="db.comment.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils/db/db.comment.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="36">
-              <caret line="2" column="26" selection-start-line="2" selection-start-column="26" selection-end-line="2" selection-end-column="26" />
+            <state relative-caret-position="342">
+              <caret line="23" column="34" selection-start-line="23" selection-start-column="34" selection-end-line="23" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -190,9 +191,9 @@
         <option value="$PROJECT_DIR$/models/goodrates.js" />
         <option value="$PROJECT_DIR$/models/goodrate.js" />
         <option value="$PROJECT_DIR$/routes/goods.js" />
-        <option value="$PROJECT_DIR$/utils/db/db.goods.js" />
         <option value="$PROJECT_DIR$/routes/comment.js" />
         <option value="$PROJECT_DIR$/utils/db/db.comment.js" />
+        <option value="$PROJECT_DIR$/utils/db/db.goods.js" />
       </list>
     </option>
   </component>
@@ -381,7 +382,7 @@
       <workItem from="1530706691041" duration="5464000" />
       <workItem from="1530725251532" duration="596000" />
       <workItem from="1530789107795" duration="2820000" />
-      <workItem from="1530862859350" duration="4579000" />
+      <workItem from="1530862859350" duration="4929000" />
     </task>
     <task id="LOCAL-00001" summary="Store changes">
       <created>1528353758050</created>
@@ -647,7 +648,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="146823000" />
+    <option name="totallyTimeSpent" value="147173000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="819" extended-state="6" />
@@ -1045,13 +1046,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/utils/db/db.goods.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="414">
-          <caret line="41" column="25" lean-forward="true" selection-start-line="41" selection-start-column="25" selection-end-line="41" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/routes/comment.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="54">
@@ -1061,8 +1055,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/utils/db/db.comment.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="36">
-          <caret line="2" column="26" selection-start-line="2" selection-start-column="26" selection-end-line="2" selection-end-column="26" />
+        <state relative-caret-position="342">
+          <caret line="23" column="34" selection-start-line="23" selection-start-column="34" selection-end-line="23" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/utils/db/db.goods.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="203">
+          <caret line="47" column="40" selection-start-line="47" selection-start-column="40" selection-end-line="47" selection-end-column="40" />
         </state>
       </provider>
     </entry>

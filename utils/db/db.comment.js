@@ -20,6 +20,7 @@ module.exports = {
 
         if (commentData.type === 1) {
             if (commentData.good_id) comment.good_id = mongoose.Types.ObjectId(commentData.good_id);
+            console.log(commentData.rating);
             await dbGoods.updateGoodRating(commentData.rating, commentData.good_id, userId);
         } else if (commentData.type === 2) {
             if (commentData.comment_id) comment.comment_id = mongoose.Types.ObjectId(commentData.comment_id);
