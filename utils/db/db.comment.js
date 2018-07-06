@@ -1,6 +1,6 @@
 const Comment = require('../../models/comment');
 const mongoose = require('mongoose');
-const dbGoods = require('../utils/db/db.goods');
+const dbGoods = require('./db.goods');
 
 module.exports = {
     /**
