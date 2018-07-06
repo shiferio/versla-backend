@@ -49,13 +49,13 @@ module.exports = {
         let good = await Good.findOne().where("_id").in(good_id).exec();
         if (good) {
             if (goodrate) {
-                await goodrate.value = +rate;
+                goodrate.value = +rate;
                 await goodrate.save();
                 let goodrates = await GoodRate.find().where("good").in(good_id).exec();
-                let sumRates = await _.reduce(goodrates, function (memo, goodrate) {
+                let sumRates =  _.reduce(goodrates, function (memo, goodrate) {
                     return memo + goodrate.value;
                 }, 0);
-                good.rating = await sumRates / +(goodrates.length);
+                good.rating = sumRates / +(goodrates.length);
                 await good.save();
 
                 return {
@@ -75,10 +75,10 @@ module.exports = {
                 newrate.good = good_id;
                 await newrate.save();
                 let goodrates = await GoodRate.find().where("good").in(good_id).exec();
-                let sumRates = await _.reduce(goodrates, function (memo, goodrate) {
+                let sumRates = _.reduce(goodrates, function (memo, goodrate) {
                     return memo + goodrate.value;
                 }, 0);
-                good.rating = await sumRates / +(goodrates.length);
+                good.rating = sumRates / +(goodrates.length);
                 await good.save();
 
                 return {
