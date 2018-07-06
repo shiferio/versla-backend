@@ -1,5 +1,7 @@
 const Comment = require('../../models/comment');
 const mongoose = require('mongoose');
+const dbGoods = require('../utils/db/db.goods');
+
 module.exports = {
     /**
      * Add comment
@@ -14,14 +16,16 @@ module.exports = {
         if (commentData.text) comment.text = commentData.text;
         if (commentData.title) comment.title = commentData.title;
         if (commentData.type) comment.type = commentData.type;
+        if (commentData.rating) comment.rating = commentData.rating;
 
         if (commentData.type === 1) {
             if (commentData.good_id) comment.good_id = mongoose.Types.ObjectId(commentData.good_id);
+            await dbGoods.updateGoodRating(commentData.rating, commentData.good_id, userId);
         } else if (commentData.type === 2) {
             if (commentData.comment_id) comment.comment_id = mongoose.Types.ObjectId(commentData.comment_id);
         }
 
-        comment.save();
+        await comment.save();
 
         return {
             meta: {
