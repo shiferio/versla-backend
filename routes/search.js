@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const qs = require('qs');
 
 const Good = require('../models/good');
 
@@ -107,7 +108,9 @@ router.get('/any/:pageNumber/:pageSize', (req, res) => {
         .split(/\s+/)
         .map(tag => new RegExp(tag, 'i'));
 
-    const filter = {
+    const filter = qs.parse(req.query['filter']);
+
+    let db_filter = {
         '$or': [
             { name: { '$in': query } },
             { description: { '$in': query } },
@@ -115,6 +118,8 @@ router.get('/any/:pageNumber/:pageSize', (req, res) => {
             { tags: { '$in': query } }
         ]
     };
+
+    db_filter = Object.assign(db_filter, filter);
 
     const pageNumber = Number.parseInt(req.params.pageNumber);
     const pageSize = Number.parseInt(req.params.pageSize);
@@ -126,7 +131,7 @@ router.get('/any/:pageNumber/:pageSize', (req, res) => {
     };
 
     Good
-        .find(filter, exclude)
+        .find(db_filter, exclude)
         .hint('goods_search')
         .skip(pageNumber > 0 ? ((pageNumber - 1) * pageSize) : 0)
         .limit(pageSize)
