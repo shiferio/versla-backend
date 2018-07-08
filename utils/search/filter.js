@@ -33,6 +33,18 @@ function build(query, filter) {
         };
     }
 
+    if (filter['min_price']) {
+        db_filter['price'] = {
+            '$gte': Number.parseInt(filter['min_price'])
+        }
+    }
+
+    if (filter['max_price']) {
+        db_filter['price'] = {
+            '$lte': Number.parseInt(filter['max_price'])
+        }
+    }
+
     return db_filter;
 }
 
