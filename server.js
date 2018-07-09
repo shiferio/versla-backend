@@ -35,7 +35,9 @@ const ordersRoutes = require('./routes/orders');
 const searchRoutes = require('./routes/search');
 const categoryRoutes = require('./routes/categories');
 const cityRoutes = require('./routes/cities');
+const subscribeRoutes = require('./routes/subscribers');
 
+app.use('/api/subscription', subscribeRoutes);
 app.use('/api/accounts', userRoutes);
 app.use('/api/cities', cityRoutes);
 app.use('/api/category', categoryRoutes);
