@@ -34,7 +34,7 @@ router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
     let pageNumber = parseInt(req.params.pageNumber);
     let pageSize = parseInt(req.params.pageSize);
 
-    Good.find({}).skip(pageNumber > 0 ? ((pageNumber - 1) * pageSize) : 0).limit(
+    Good.find({is_available:true}).skip(pageNumber > 0 ? ((pageNumber - 1) * pageSize) : 0).limit(
         pageSize).exec((err, goods) => {
         res.json({
             meta: {
@@ -72,7 +72,7 @@ router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
 
 router.get('/:good_id', async (req, res, next) => {
 
-    let goods = await Good.find().where("_id").in(req.params.good_id).populate('creator_id').populate('category').exec();
+    let goods = await Good.find().where("_id").in(req.params.good_id).where("is_available").in(true).populate('creator_id').populate('category').exec();
 
     if (goods) {
         res.json({
