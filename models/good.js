@@ -1,13 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const autoIncrement = require('mongoose-plugin-autoinc').autoIncrement;
-
 
 const GoodSchema = new Schema({
-    good_id: {
-        type: Number,
-        unique: true
-    },
     price: Number,
     name: String,
     description: String,
@@ -42,8 +36,6 @@ const GoodSchema = new Schema({
         default: Date.now
     }
 });
-
-GoodSchema.plugin(autoIncrement, {model: 'Good', field: 'good_id', startAt: 1, incrementBy: 1});
 
 
 module.exports = mongoose.model('Good', GoodSchema);

@@ -37,20 +37,7 @@ const UserSchema = new Schema({
             name: String,
             value: String
         }]
-    }],
-    orders: [{
-        good_id: Number,
-        quantity: Number,
-        values: [{
-            name: String,
-            value: String
-        }],
-        price: Number,
-        date: {
-            type: Date,
-            default: Date.now
-        }
-    }],
+    }]
     created: {
         type: Date,
         default: Date.now

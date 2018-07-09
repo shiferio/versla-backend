@@ -112,7 +112,6 @@ router.get('/any/:pageNumber/:pageSize', async (req, res) => {
     const pageSize = Number.parseInt(req.params.pageSize);
 
     const exclude = {
-        good_id: 0,
         __v: 0
     };
 

@@ -18,13 +18,14 @@ module.exports = {
         user.city = mongoose.Types.ObjectId(newUser.city);
         user.picture = user.gravatar();
 
-        let existingUser = await User.findOne().where("email").in(newUser.email).exec();
-        if (existingUser) {
+        let existingPhoneUser = await User.findOne().where("phone").in(newUser.phone).exec();
+        let existingEmailUser = await User.findOne().where("email").in(newUser.email).exec();
+        if (existingPhoneUser || existingEmailUser) {
             return {
                 meta: {
                     success: false,
                     code: 503,
-                    message: 'Account with that email is already exists'
+                    message: 'Account with that email or phone is already exists'
                 },
                 data: null
             };
@@ -54,7 +55,7 @@ module.exports = {
      * @returns {Object}
      */
     login: async userData => {
-        let user = await User.findOne().where("email").in(userData.email).exec();
+        let user = await User.findOne().where("phone").in(userData.phone).exec();
 
         if (!user) {
             return {
