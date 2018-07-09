@@ -16,7 +16,7 @@ function build(query, filter) {
             { description: { '$in': query } },
             { short_description: { '$in': query } },
             { tags: { '$in': query } }
-        ]
+        ], is_available: true
     };
 
     if (filter['category']) {

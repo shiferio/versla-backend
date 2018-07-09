@@ -74,7 +74,7 @@ module.exports = {
      * @returns {Object}
      */
     findGoodsByStoreId: async (id) => {
-        let goods = await Good.find().where("store_id").in(id).exec();
+        let goods = await Good.find().where("store_id").in(id).where("is_available").in(true).exec();
         if (goods) {
             return {
                 meta: {
