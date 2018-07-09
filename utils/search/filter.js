@@ -27,6 +27,10 @@ function build(query, filter) {
         db_filter['city'] = new ObjectId(filter['city']);
     }
 
+    if (filter['store']) {
+        db_filter['store_id'] = new ObjectId(filter['store']);
+    }
+
     if (filter['rating']) {
         db_filter['rating'] = {
             '$gte': Number.parseInt(filter['rating'])
