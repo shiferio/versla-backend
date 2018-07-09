@@ -72,9 +72,9 @@ router.get('/list/:pageNumber/:pageSize', (req, res, next) => {
 
 router.get('/:good_id', async (req, res, next) => {
 
-    let goods = await Good.find().where("_id").in(req.params.good_id).where("is_available").in(true).populate('creator_id').populate('category').exec();
+    let good = await Good.findOne().where("_id").in(req.params.good_id).where("is_available").in(true).populate('creator_id').populate('category').exec();
 
-    if (goods) {
+    if (good) {
         res.json({
             meta: {
                 code: 200,
@@ -82,7 +82,18 @@ router.get('/:good_id', async (req, res, next) => {
                 message: "Successfully get good"
             },
             data: {
-                good: goods[0]
+                good: good
+            }
+         });
+    } else {
+        res.json({
+            meta: {
+                code: 200,
+                success: true,
+                message: "Can't get good"
+            },
+            data: {
+                good: null
             }
         });
     }
