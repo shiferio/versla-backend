@@ -88,7 +88,7 @@ router.get('/all/:pageNumber/:pageSize', (req, res) => {
  * @apiParam {Number} pageNumber Page Number
  * @apiParam {Number} pageSize Page Size
  * @apiParam {String} query One or more words by which goods will be searched
- * @apiParam {Object} filter JSON object that specifies category, city and rating
+ * @apiParam {Object} filter JSON object that specifies category, city, store and rating
  *
  * @apiSuccess {Object} goods Array of goods
  * @apiSuccess {Number} total Total count of goods satisfies query
@@ -112,8 +112,6 @@ router.get('/any/:pageNumber/:pageSize', async (req, res) => {
     const pageSize = Number.parseInt(req.params.pageSize);
 
     const exclude = {
-        params: 0,
-        creator_id: 0,
         good_id: 0,
         __v: 0
     };
