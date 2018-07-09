@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="900b32e1-f168-4307-94bb-8e55df0e6896" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/db/db.stores.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/db/db.stores.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/search/filter.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/search/filter.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/goods.js" beforeDir="false" afterPath="$PROJECT_DIR$/routes/goods.js" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -54,11 +53,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="goods.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="goods.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/goods.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="40" column="26" lean-forward="true" selection-start-line="40" selection-start-column="26" selection-end-line="40" selection-end-column="26" />
+            <state relative-caret-position="187">
+              <caret line="92" column="69" selection-start-line="92" selection-start-column="69" selection-end-line="92" selection-end-column="69" />
             </state>
           </provider>
         </entry>
@@ -90,11 +89,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="filter.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="filter.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/utils/search/filter.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="15" column="26" selection-start-line="15" selection-start-column="26" selection-end-line="15" selection-end-column="26" />
+            <state relative-caret-position="144">
+              <caret line="8" column="42" lean-forward="true" selection-start-line="8" selection-start-column="42" selection-end-line="8" selection-end-column="42" />
             </state>
           </provider>
         </entry>
@@ -196,9 +195,9 @@
         <option value="$PROJECT_DIR$/utils/db/db.subscriber.js" />
         <option value="$PROJECT_DIR$/routes/subscribers.js" />
         <option value="$PROJECT_DIR$/server.js" />
-        <option value="$PROJECT_DIR$/routes/goods.js" />
         <option value="$PROJECT_DIR$/utils/db/db.stores.js" />
         <option value="$PROJECT_DIR$/utils/search/filter.js" />
+        <option value="$PROJECT_DIR$/routes/goods.js" />
       </list>
     </option>
   </component>
@@ -392,7 +391,7 @@
       <workItem from="1530904125572" duration="808000" />
       <workItem from="1530947856656" duration="626000" />
       <workItem from="1530963852127" duration="557000" />
-      <workItem from="1531120905839" duration="2016000" />
+      <workItem from="1531120905839" duration="2262000" />
     </task>
     <task id="LOCAL-00001" summary="Store changes">
       <created>1528353758050</created>
@@ -660,7 +659,21 @@
       <option name="project" value="LOCAL" />
       <updated>1531127051708</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="good view">
+      <created>1531127279395</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1531127279395</updated>
+    </task>
+    <task id="LOCAL-00040" summary="good view">
+      <created>1531127451983</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1531127451983</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -672,7 +685,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="152239000" />
+    <option name="totallyTimeSpent" value="152485000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="8" y="23" width="1432" height="819" extended-state="0" />
@@ -1066,13 +1079,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/routes/goods.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="40" column="26" lean-forward="true" selection-start-line="40" selection-start-column="26" selection-end-line="40" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/routes/store.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="197">
@@ -1096,8 +1102,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/utils/search/filter.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="15" column="26" selection-start-line="15" selection-start-column="26" selection-end-line="15" selection-end-column="26" />
+        <state relative-caret-position="144">
+          <caret line="8" column="42" lean-forward="true" selection-start-line="8" selection-start-column="42" selection-end-line="8" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routes/goods.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="92" column="69" selection-start-line="92" selection-start-column="69" selection-end-line="92" selection-end-column="69" />
         </state>
       </provider>
     </entry>
