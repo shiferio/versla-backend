@@ -11,12 +11,12 @@ module.exports = {
 
     localStrategy: () => {
         passport.use(new LocalStrategy({
-                usernameField: 'email',
+                usernameField: 'phone',
                 passwordField: 'password'
             },
             async (username, password, done) => {
                 const data = await dbAccount.login({
-                    email: username,
+                    phone: username,
                     password: password
                 });
                 return done(null, data);
