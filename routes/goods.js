@@ -88,6 +88,24 @@ router.get('/:good_id', async (req, res, next) => {
     }
 });
 
+router.get('/cart/:good_id', async (req, res, next) => {
+
+    let goods = await Good.find().where("_id").in(req.params.good_id).where("is_available").in(true).populate('creator_id').populate('category').exec();
+
+    if (goods) {
+        res.json({
+            meta: {
+                code: 200,
+                success: true,
+                message: "Successfully get good"
+            },
+            data: {
+                good: goods[0]
+            }
+        });
+    }
+});
+
 /**
  * @api {post} /api/goods/add Add good
  * @apiName Add good
