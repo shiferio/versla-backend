@@ -36,6 +36,8 @@ const searchRoutes = require('./routes/search');
 const categoryRoutes = require('./routes/categories');
 const cityRoutes = require('./routes/cities');
 const subscribeRoutes = require('./routes/subscribers');
+const errorRoutes = require('./routes/errors');
+const featureRoutes = require('./routes/features');
 
 app.use('/api/subscription', subscribeRoutes);
 app.use('/api/accounts', userRoutes);
@@ -47,6 +49,8 @@ app.use('/api/goods', goodsRoutes);
 app.use('/api/comments', commentsRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/features', featureRoutes);
+app.use('/api/errors', errorRoutes);
 
 app.use(express.static('public'));
 
