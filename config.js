@@ -1,5 +1,5 @@
 module.exports = {
-    database: 'mongodb://owner:pwd222@ds159110.mlab.com:59110/versla_db',
+    database: 'mongodb://versler:versla88@ds235251.mlab.com:35251/versla',
     port: 3030,
     secret: "versla27052017"
 };
