@@ -34,7 +34,7 @@ const mongoose = require('mongoose');
  *     }
  */
 router.post('/signup', async (req, res) => {
-    let data = await dbAccount.signUp(req.body);
+    let data = await dbAccount.signUp(req.body, req);
     return res.status(data['meta'].code).send(data);
 });
 

@@ -6,6 +6,9 @@ const OrderSchema = new Schema({
     store: { type: Schema.Types.ObjectId, ref: 'Store' },
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     quantity: Number,
+    payment_type: Number, // 1 - оплата лично продавцу, 2 - оплата онлайн
+    delivery: Boolean, // true - нужна, false - нет
+    delivery_address: String,
     values: [{
         name: String,
         value: String

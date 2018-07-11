@@ -7,9 +7,10 @@ module.exports = {
     /**
      * SignUp user
      * @param newUser Brand new user data
+     * @param req Request
      * @returns {Object}
      */
-    signUp: async newUser => {
+    signUp: async (newUser, req) => {
         let user = new User();
         user.login = newUser.login;
         user.password = newUser.password;
