@@ -38,6 +38,7 @@ const cityRoutes = require('./routes/cities');
 const subscribeRoutes = require('./routes/subscribers');
 const errorRoutes = require('./routes/errors');
 const featureRoutes = require('./routes/features');
+const jointPurchaseRoutes = require('./routes/jointpurchases');
 
 app.use('/api/subscription', subscribeRoutes);
 app.use('/api/accounts', userRoutes);
@@ -51,6 +52,7 @@ app.use('/api/orders', ordersRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/features', featureRoutes);
 app.use('/api/errors', errorRoutes);
+app.use('/api/jointpurchases', jointPurchaseRoutes);
 
 app.use(express.static('public'));
 
