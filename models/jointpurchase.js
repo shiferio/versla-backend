@@ -26,7 +26,11 @@ const JointPurchaseSchema = new Schema({
     history: [
         {
             parameter: String,
-            value: Object
+            value: Object,
+            date: {
+                type: Date,
+                default: Date.now
+            }
         }
     ],
     participants: [
