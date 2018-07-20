@@ -123,6 +123,35 @@ describe('Joint purchases', function () {
                         done();
                     })
             });
+
+            it('It should add record into history during update', function (done) {
+                const body = {
+                    id: purchaseId,
+                    value: 'Test name'
+                };
+
+                chai.request(url)
+                    .put('/api/jointpurchases/update/name')
+                    .set('Authorization', creatorToken)
+                    .send(body)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.meta.success.should.be.eql(true);
+
+                        res.body.should.have.property('data');
+                        res.body.data.should.have.property('purchase');
+                        res.body.data.purchase.should.have.property('history');
+
+                        const history = res.body.data.purchase.history;
+                        history.should.have.lengthOf(2); // we update field in the 'it' section above
+                        history[1].should.have.property('parameter');
+                        history[1].parameter.should.equal('name');
+                        history[1].should.have.property('value');
+                        history[1].value.should.equal('Test name');
+
+                        done();
+                    })
+            })
         });
 
         describe('Update unmodifiable field', () => {
