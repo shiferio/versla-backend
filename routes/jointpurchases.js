@@ -25,7 +25,7 @@ router.route('/add').post(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/get/:id Get Joint purchase by ID
+ * @api {get} /api/jointpurchases/get/:id Get Joint purchase by ID
  * @apiName Get Joint purchase
  * @apiGroup Joint purchases
  *
