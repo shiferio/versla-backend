@@ -64,6 +64,25 @@ describe('Joint purchases', function () {
                 });
         });
 
+        it('It should get purchase by ID', function (done) {
+            chai.request(url)
+                .get(`/api/jointpurchases/get/${purchaseId}`)
+                .set('Authorization', creatorToken)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+
+                    res.body.should.have.property('data');
+                    res.body.data.should.have.property('purchase');
+
+                    const purchase = res.body.data.purchase;
+                    purchase.should.have.property('_id');
+                    purchase._id.should.equal(purchaseId);
+
+                    done();
+                });
+        });
+
         after(async function (done) {
             // Clean up database
             await mongoose.connect(config.database);
