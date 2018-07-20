@@ -13,25 +13,28 @@ const url = `http://localhost:${config.port}`;
 chai.use(chaiHttp);
 chai.should();
 
-describe('Joint purchases', () => {
-    let token = '';
-    let purchaseId = '';
+describe('Joint purchases', function () {
+    let creatorToken = '';
 
-    before((done) => {
+    before(function (done) {
         // Create test user
         chai.request(url)
             .post('/api/accounts/signup')
             .send({
+                login: 'test',
                 phone: 'test_phone',
+                email: 'test@email.test',
                 password: '123456'
             })
             .end((err, res) => {
-                token = res.body.data.token;
+                creatorToken = res.body.data.token;
                 done();
             })
     });
 
     describe('Add new purchase', function () {
+        let purchaseId = '';
+
         it('It should add new purchase', function (done) {
             const purchaseInfo = {
                 "name": "Name",
@@ -47,7 +50,7 @@ describe('Joint purchases', () => {
             };
             chai.request(url)
                 .post('/api/jointpurchases/add')
-                .set('Authorization', token)
+                .set('Authorization', creatorToken)
                 .send(purchaseInfo)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -60,62 +63,237 @@ describe('Joint purchases', () => {
                     done();
                 });
         });
-    });
 
-    describe('Update modifiable field', () => {
-        it('It should update name', function (done) {
-            const body = {
-                id: purchaseId,
-                value: 'New name'
-            };
-
-            chai.request(url)
-                .put('/api/jointpurchases/update/name')
-                .set('Authorization', token)
-                .send(body)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.data.should.have.property('purchase');
-                    res.body.data.should.not.be.eql(null);
-                    res.body.meta.success.should.be.eql(true);
-                    res.body.data.purchase.name.should.be.eql('New name');
-
-                    done();
-                })
-        });
-    });
-
-    describe('Update unmodifiable field', () => {
-        it('It should update name', function (done) {
-            const body = {
-                id: purchaseId,
-                value: 'New name'
-            };
-
-            chai.request(url)
-                .put('/api/jointpurchases/update/history')
-                .set('Authorization', token)
-                .send(body)
-                .end((err, res) => {
-                    res.should.have.status(404);
-
-                    done();
-                })
-        });
-    });
-
-    after(function (done) {
-        // Clean up database
-        mongoose.connect(config.database, async () => {
+        after(async function (done) {
+            // Clean up database
+            await mongoose.connect(config.database);
             await JointPurchase.remove({
                 _id: purchaseId
             }).exec();
 
-            await User.remove({
-                phone: 'test_phone'
+            done();
+        })
+    });
+
+    describe('Update fields', function () {
+        let purchaseId = '';
+
+        before(async function (done) {
+            // Create new purchase
+            const purchaseInfo = {
+                "name": "Test purchase",
+                "picture": "http://via.placeholder.com/350x150",
+                "category_id": "5b50669194263e1bb3ae430a",
+                "address": "Kirov City",
+                "volume": 5,
+                "price_per_unit": 50,
+                "measurement_unit_id": "5b50669194263e1bb3ae430a",
+                "date": Date.UTC(2018, 1, 1),
+                "state": 0,
+                "payment_type": 0
+            };
+            const res = await chai.request(url)
+                .post('/api/jointpurchases/add')
+                .set('Authorization', creatorToken)
+                .send(purchaseInfo);
+            purchaseId = res.body.data.purchase._id;
+
+            done();
+        });
+
+        describe('Update modifiable field', () => {
+            it('It should update name', function (done) {
+                const body = {
+                    id: purchaseId,
+                    value: 'New name'
+                };
+
+                chai.request(url)
+                    .put('/api/jointpurchases/update/name')
+                    .set('Authorization', creatorToken)
+                    .send(body)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.meta.success.should.be.eql(true);
+
+                        res.body.should.have.property('data');
+                        res.body.data.should.have.property('purchase');
+                        res.body.data.purchase.name.should.be.eql('New name');
+
+                        done();
+                    })
+            });
+        });
+
+        describe('Update unmodifiable field', () => {
+            it('It should not update name', function (done) {
+                const body = {
+                    id: purchaseId,
+                    value: 'New name'
+                };
+
+                chai.request(url)
+                    .put('/api/jointpurchases/update/history')
+                    .set('Authorization', creatorToken)
+                    .send(body)
+                    .end((err, res) => {
+                        res.should.have.status(404);
+
+                        done();
+                    })
+            });
+        });
+
+        after(async function (done) {
+            // Clean up database
+            await mongoose.connect(config.database);
+            await JointPurchase.remove({
+                _id: purchaseId
             }).exec();
 
             done();
         })
+    });
+
+    describe('Black list manipulations', function () {
+        let anotherToken = '';
+        let userId = '';
+        let purchaseId = '';
+
+        before(async function (done) {
+            // Create another test user
+            let res = await chai.request(url)
+                .post('/api/accounts/signup')
+                .send({
+                    login: 'another',
+                    phone: 'another_phone',
+                    email: 'another@email.another',
+                    password: '123456'
+                });
+            anotherToken = res.body.data.token;
+
+            res = await chai.request(url)
+                .get('/api/accounts/profile')
+                .set('Authorization', anotherToken);
+            userId = res.body.data.user._id;
+
+            // Create new purchase
+            const purchaseInfo = {
+                "name": "Test purchase",
+                "picture": "http://via.placeholder.com/350x150",
+                "category_id": "5b50669194263e1bb3ae430a",
+                "address": "Kirov City",
+                "volume": 5,
+                "price_per_unit": 50,
+                "measurement_unit_id": "5b50669194263e1bb3ae430a",
+                "date": Date.UTC(2018, 1, 1),
+                "state": 0,
+                "payment_type": 0
+            };
+            res = await chai.request(url)
+                .post('/api/jointpurchases/add')
+                .set('Authorization', creatorToken)
+                .send(purchaseInfo);
+            purchaseId = res.body.data.purchase._id;
+
+            done();
+        });
+
+        it('It should add user to black list', function (done) {
+            const data = {
+                id: purchaseId,
+                user_id: userId
+            };
+
+            chai.request(url)
+                .put('/api/jointpurchases/black_list')
+                .set('Authorization', creatorToken)
+                .send(data)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+
+                    res.body.should.have.property('data');
+                    res.body.data.should.have.property('purchase');
+
+                    const list = res.body.data.purchase.black_list;
+                    list.length.should.be.eql(1);
+                    list[0].should.be.eql(userId);
+
+                    done();
+                })
+        });
+
+        it('It should not add user to black list twice', function (done) {
+            const data = {
+                id: purchaseId,
+                user_id: userId
+            };
+
+            chai.request(url)
+                .put('/api/jointpurchases/black_list')
+                .set('Authorization', creatorToken)
+                .send(data)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+
+                    res.body.data.should.not.be.eql(null);
+                    res.body.data.should.have.property('purchase');
+
+                    const list = res.body.data.purchase.black_list;
+                    list.length.should.be.eql(1);
+                    list[0].should.be.eql(userId);
+
+                    done();
+                })
+        });
+
+        it('It should remove user from black list', function (done) {
+            const data = {
+                id: purchaseId,
+                user_id: userId
+            };
+
+            chai.request(url)
+                .delete('/api/jointpurchases/black_list')
+                .set('Authorization', creatorToken)
+                .send(data)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+
+                    res.body.data.should.not.be.eql(null);
+                    res.body.data.should.have.property('purchase');
+
+                    const list = res.body.data.purchase.black_list;
+                    list.length.should.be.eql(0);
+
+                    done();
+                })
+        });
+
+        after(async function (done) {
+            // Clean up database
+            await mongoose.connect(config.database);
+            await User.remove({
+                _id: userId
+            }).exec();
+            await JointPurchase.remove({
+                _id: purchaseId
+            }).exec();
+
+            done();
+        })
+    });
+
+    after(async function (done) {
+        // Clean up database
+        await mongoose.connect(config.database);
+        await User.remove({
+            phone: 'test_phone'
+        }).exec();
+
+        done();
     })
 });
