@@ -1,5 +1,4 @@
 const JointPurchase = require('../../models/jointpurchase');
-const MeasurementUnit = require('../../models/measurementunit');
 const mongoose = require('mongoose');
 
 module.exports = {
@@ -155,6 +154,108 @@ module.exports = {
                     code: 500,
                     success: false,
                     message: "Error during purchase update"
+                },
+                data: null
+            }
+        }
+    },
+
+    addUserToBlackList: async (purchaseId, userId, creatorId) => {
+        try {
+            const purchase = await JointPurchase
+                .findOneAndUpdate({
+                    _id: purchaseId,
+                    creator: creatorId
+                }, {
+                    '$addToSet': {
+                        black_list: userId.toString()
+                    }
+                }, {
+                    'new': true
+                })
+                .populate('category')
+                .populate('creator')
+                .populate('measurement_unit')
+                .exec();
+
+            if (purchase) {
+                return {
+                    meta: {
+                        code: 200,
+                        success: true,
+                        message: "Successfully added user to black list"
+                    },
+                    data: {
+                        purchase: purchase
+                    }
+                };
+            } else {
+                return {
+                    meta: {
+                        code: 404,
+                        success: true,
+                        message: "Can't add user to black list"
+                    },
+                    data: null
+                };
+            }
+        } catch (err) {
+            return {
+                meta: {
+                    code: 500,
+                    success: false,
+                    message: "Error during black list update"
+                },
+                data: null
+            }
+        }
+    },
+
+    removeUserFromBlackList: async (purchaseId, userId, creatorId) => {
+        try {
+            const purchase = await JointPurchase
+                .findOneAndUpdate({
+                    _id: purchaseId,
+                    creator: creatorId
+                }, {
+                    '$pull': {
+                        black_list: userId.toString()
+                    }
+                }, {
+                    'new': true
+                })
+                .populate('category')
+                .populate('creator')
+                .populate('measurement_unit')
+                .exec();
+
+            if (purchase) {
+                return {
+                    meta: {
+                        code: 200,
+                        success: true,
+                        message: "Successfully removed user from black list"
+                    },
+                    data: {
+                        purchase: purchase
+                    }
+                };
+            } else {
+                return {
+                    meta: {
+                        code: 404,
+                        success: true,
+                        message: "Can't remove user from black list"
+                    },
+                    data: null
+                };
+            }
+        } catch (err) {
+            return {
+                meta: {
+                    code: 500,
+                    success: false,
+                    message: "Error during black list update"
                 },
                 data: null
             }

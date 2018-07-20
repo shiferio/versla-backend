@@ -216,4 +216,38 @@ router.route('/update/payment_type').put(checkJWT, async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+/**
+ * @api {put} /api/jointpurchases/black_list Add user to black list
+ * @apiName Add user to black list
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {String} user_id ID of user to be banned
+ */
+router.route('/black_list').put(checkJWT, async (req, res) => {
+    const data = await dbJointPurchases.addUserToBlackList(
+        req.body.id,
+        req.body.user_id,
+        req.decoded.user._id
+    );
+    return res.status(data['meta'].code).send(data);
+});
+
+/**
+ * @api {delete} /api/jointpurchases/black_list Remove user from black list
+ * @apiName Remove user from black list
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {String} user_id ID of user to be removed
+ */
+router.route('/black_list').delete(checkJWT, async (req, res) => {
+    const data = await dbJointPurchases.removeUserFromBlackList(
+        req.body.id,
+        req.body.user_id,
+        req.decoded.user._id
+    );
+    return res.status(data['meta'].code).send(data);
+});
+
 module.exports = router;
