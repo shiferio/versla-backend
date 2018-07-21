@@ -10,6 +10,7 @@ const dbJointPurchases = require('../utils/db/db.Jointpurchase');
  *
  * @apiParam {String} name
  * @apiParam {String} picture
+ * @apiParam {String} description
  * @apiParam {ObjectID} category_id
  * @apiParam {String} address
  * @apiParam {Number} volume
@@ -37,7 +38,7 @@ router.get('/get/:id', async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/update/name Update name of joint purchase
+ * @api {put} /api/jointpurchases/update/name Update name of joint purchase
  * @apiName Update Joint purchase's name
  * @apiGroup Joint purchases
  *
@@ -55,7 +56,7 @@ router.route('/update/name').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/update/picture Update picture of joint purchase
+ * @api {put} /api/jointpurchases/update/picture Update picture of joint purchase
  * @apiName Update Joint purchase's picture
  * @apiGroup Joint purchases
  *
@@ -73,7 +74,7 @@ router.route('/update/picture').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/update/description Update description of joint purchase
+ * @api {put} /api/jointpurchases/update/description Update description of joint purchase
  * @apiName Update Joint purchase's description
  * @apiGroup Joint purchases
  *
@@ -91,7 +92,7 @@ router.route('/update/description').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/update/category Update category of joint purchase
+ * @api {put} /api/jointpurchases/update/category Update category of joint purchase
  * @apiName Update Joint purchase's category
  * @apiGroup Joint purchases
  *
@@ -109,7 +110,7 @@ router.route('/update/category').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/update/address Update address of joint purchase
+ * @api {put} /api/jointpurchases/update/address Update address of joint purchase
  * @apiName Update Joint purchase's address
  * @apiGroup Joint purchases
  *
@@ -127,7 +128,7 @@ router.route('/update/address').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/update/volume Update volume of joint purchase
+ * @api {put} /api/jointpurchases/update/volume Update volume of joint purchase
  * @apiName Update Joint purchase's volume
  * @apiGroup Joint purchases
  *
@@ -145,7 +146,7 @@ router.route('/update/volume').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/update/price_per_unit Update price per unit of joint purchase
+ * @api {put} /api/jointpurchases/update/price_per_unit Update price per unit of joint purchase
  * @apiName Update Joint purchase's price per unit
  * @apiGroup Joint purchases
  *
@@ -163,7 +164,7 @@ router.route('/update/price_per_unit').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/update/measurement_unit Update measurement unit of joint purchase
+ * @api {put} /api/jointpurchases/update/measurement_unit Update measurement unit of joint purchase
  * @apiName Update Joint purchase's measurement unit
  * @apiGroup Joint purchases
  *
@@ -181,7 +182,7 @@ router.route('/update/measurement_unit').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/update/state Update state of joint purchase
+ * @api {put} /api/jointpurchases/update/state Update state of joint purchase
  * @apiName Update Joint purchase's state
  * @apiGroup Joint purchases
  *
@@ -199,7 +200,7 @@ router.route('/update/state').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {post} /api/jointpurchases/update/payment_type Update payment type of joint purchase
+ * @api {put} /api/jointpurchases/update/payment_type Update payment type of joint purchase
  * @apiName Update Joint purchase's payment type
  * @apiGroup Joint purchases
  *
