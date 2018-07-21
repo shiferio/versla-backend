@@ -250,4 +250,57 @@ router.route('/black_list').delete(checkJWT, async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+/**
+ * @api {put} /api/jointpurchases/public Manipulate purchase's visibility
+ * @apiName Manipulate purchase's visibility
+ * @apiGroup Joint purchases
+ * @apiDescription Purchase can be visible for all (including non-registered users)
+ * or only for users from white list
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {Boolean} public New purchase's visibility (true - for all, false - for users from white list)
+ */
+router.route('/public').put(checkJWT, async (req, res) => {
+    const data = await dbJointPurchases.updatePublicState(
+        req.body.id,
+        req.body.public,
+        req.decoded.user._id
+    );
+    return res.status(data['meta'].code).send(data);
+});
+
+/**
+ * @api {put} /api/jointpurchases/white_list Add user to white list
+ * @apiName Add user to white list
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {String} user_id ID of user to be flavoured
+ */
+router.route('/white_list').put(checkJWT, async (req, res) => {
+    const data = await dbJointPurchases.addUserToWhiteList(
+        req.body.id,
+        req.body.user_id,
+        req.decoded.user._id
+    );
+    return res.status(data['meta'].code).send(data);
+});
+
+/**
+ * @api {delete} /api/jointpurchases/white_list Remove user from white list
+ * @apiName Remove user from white list
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {String} user_id ID of user to be removed
+ */
+router.route('/white_list').delete(checkJWT, async (req, res) => {
+    const data = await dbJointPurchases.removeUserFromWhiteList(
+        req.body.id,
+        req.body.user_id,
+        req.decoded.user._id
+    );
+    return res.status(data['meta'].code).send(data);
+});
+
 module.exports = router;

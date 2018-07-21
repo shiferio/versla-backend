@@ -335,6 +335,361 @@ describe('Joint purchases', function () {
         })
     });
 
+    describe('Visibility manipulations', function () {
+        let purchaseId = '';
+
+        before(async function (done) {
+            // Create new purchase
+            const purchaseInfo = {
+                "name": "Test purchase",
+                "picture": "http://via.placeholder.com/350x150",
+                "category_id": "5b50669194263e1bb3ae430a",
+                "address": "Kirov City",
+                "volume": 5,
+                "price_per_unit": 50,
+                "measurement_unit_id": "5b50669194263e1bb3ae430a",
+                "date": Date.UTC(2018, 1, 1),
+                "state": 0,
+                "payment_type": 0
+            };
+            const res = await chai.request(url)
+                .post('/api/jointpurchases/add')
+                .set('Authorization', creatorToken)
+                .send(purchaseInfo);
+            purchaseId = res.body.data.purchase._id;
+
+            done();
+        });
+
+        it('Purchase should be visible for all by default', function (done) {
+            chai.request(url)
+                .get(`/api/jointpurchases/get/${purchaseId}`)
+                .set('Authorization', creatorToken)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+
+                    res.body.should.have.property('data');
+                    res.body.data.should.have.property('purchase');
+
+                    const purchase = res.body.data.purchase;
+                    purchase.should.have.property('is_public');
+                    purchase.is_public.should.equal(true);
+
+                    done();
+                });
+        });
+
+        it('It should make purchase visible only for specified users', function (done) {
+            chai.request(url)
+                .put(`/api/jointpurchases/public`)
+                .set('Authorization', creatorToken)
+                .send({
+                    id: purchaseId,
+                    public: false
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+
+                    res.body.should.have.property('data');
+                    res.body.data.should.have.property('purchase');
+
+                    const purchase = res.body.data.purchase;
+                    purchase.should.have.property('is_public');
+                    purchase.is_public.should.equal(false);
+
+                    done();
+                });
+        });
+
+        it('It should make purchase visible for all users', function (done) {
+            chai.request(url)
+                .put(`/api/jointpurchases/public`)
+                .set('Authorization', creatorToken)
+                .send({
+                    id: purchaseId,
+                    public: true
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+
+                    res.body.should.have.property('data');
+                    res.body.data.should.have.property('purchase');
+
+                    const purchase = res.body.data.purchase;
+                    purchase.should.have.property('is_public');
+                    purchase.is_public.should.equal(true);
+
+                    done();
+                });
+        });
+
+        after(async function (done) {
+            // Clean up database
+            await mongoose.connect(config.database);
+            await JointPurchase.remove({
+                _id: purchaseId
+            }).exec();
+
+            done();
+        })
+    });
+
+    describe('White list manipulations', function () {
+        let anotherToken = '';
+        let userId = '';
+        let purchaseId = '';
+
+        before(async function (done) {
+            // Create another test user
+            let res = await chai.request(url)
+                .post('/api/accounts/signup')
+                .send({
+                    login: 'another',
+                    phone: 'another_phone',
+                    email: 'another@email.another',
+                    password: '123456'
+                });
+            anotherToken = res.body.data.token;
+
+            res = await chai.request(url)
+                .get('/api/accounts/profile')
+                .set('Authorization', anotherToken);
+            userId = res.body.data.user._id;
+
+            // Create new purchase
+            const purchaseInfo = {
+                "name": "Test purchase",
+                "picture": "http://via.placeholder.com/350x150",
+                "category_id": "5b50669194263e1bb3ae430a",
+                "address": "Kirov City",
+                "volume": 5,
+                "price_per_unit": 50,
+                "measurement_unit_id": "5b50669194263e1bb3ae430a",
+                "date": Date.UTC(2018, 1, 1),
+                "state": 0,
+                "payment_type": 0
+            };
+            res = await chai.request(url)
+                .post('/api/jointpurchases/add')
+                .set('Authorization', creatorToken)
+                .send(purchaseInfo);
+            purchaseId = res.body.data.purchase._id;
+
+            // Set 'public' to false
+            await chai.request(url)
+                .put(`/api/jointpurchases/public`)
+                .set('Authorization', creatorToken)
+                .send({
+                    id: purchaseId,
+                    public: false
+                });
+
+            done();
+        });
+
+        it('It should add user to white list', function (done) {
+            chai.request(url)
+                .put('/api/jointpurchases/white_list')
+                .set('Authorization', creatorToken)
+                .send({
+                    id: purchaseId,
+                    user_id: userId
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+
+                    res.body.should.have.property('data');
+                    res.body.data.should.have.property('purchase');
+
+                    const list = res.body.data.purchase.white_list;
+                    list.length.should.be.eql(1);
+                    list[0].should.be.eql(userId);
+
+                    done();
+                })
+        });
+
+        it('It should not add user to white list twice', function (done) {
+            const data = {
+                id: purchaseId,
+                user_id: userId
+            };
+
+            chai.request(url)
+                .put('/api/jointpurchases/white_list')
+                .set('Authorization', creatorToken)
+                .send(data)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+
+                    res.body.data.should.not.be.eql(null);
+                    res.body.data.should.have.property('purchase');
+
+                    const list = res.body.data.purchase.white_list;
+                    list.length.should.be.eql(1);
+                    list[0].should.be.eql(userId);
+
+                    done();
+                })
+        });
+
+        it('It should remove user from white list', function (done) {
+            chai.request(url)
+                .delete('/api/jointpurchases/white_list')
+                .set('Authorization', creatorToken)
+                .send({
+                    id: purchaseId,
+                    user_id: userId
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.meta.success.should.be.eql(true);
+
+                    res.body.data.should.not.be.eql(null);
+                    res.body.data.should.have.property('purchase');
+
+                    const list = res.body.data.purchase.white_list;
+                    list.should.have.lengthOf(0);
+
+                    done();
+                })
+        });
+
+        describe('Reset white list when visibility is updated', function () {
+            beforeEach(async function (done) {
+                // Set 'public' to false
+                await chai.request(url)
+                    .put(`/api/jointpurchases/public`)
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        public: false
+                    });
+
+                // Add user to white list
+                const data = {
+                    id: purchaseId,
+                    user_id: userId
+                };
+                await chai.request(url)
+                    .put('/api/jointpurchases/white_list')
+                    .set('Authorization', creatorToken)
+                    .send(data);
+                done();
+            });
+
+            it('It should clear white list when public is set to true', function (done) {
+                chai.request(url)
+                    .put(`/api/jointpurchases/public`)
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        public: true
+                    })
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.meta.success.should.be.eql(true);
+
+                        res.body.should.have.property('data');
+                        res.body.data.should.have.property('purchase');
+
+                        const purchase = res.body.data.purchase;
+                        purchase.should.have.property('white_list');
+                        purchase.white_list.should.have.lengthOf(0);
+
+                        done();
+                    });
+            });
+
+            it('It should clear white list when public is set to false', function (done) {
+                chai.request(url)
+                    .put(`/api/jointpurchases/public`)
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        public: false
+                    })
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.meta.success.should.be.eql(true);
+
+                        res.body.should.have.property('data');
+                        res.body.data.should.have.property('purchase');
+
+                        const purchase = res.body.data.purchase;
+                        purchase.should.have.property('white_list');
+                        purchase.white_list.should.have.lengthOf(0);
+
+                        done();
+                    });
+            })
+        });
+
+        describe('Forbid white list manipulations when public is set to true', function () {
+            before(async function (done) {
+                // Set 'public' to true
+                await chai.request(url)
+                    .put(`/api/jointpurchases/public`)
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        public: true
+                    });
+                done();
+            });
+
+            it('It should not add user to white list', function (done) {
+                chai.request(url)
+                    .put('/api/jointpurchases/white_list')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        user_id: userId
+                    })
+                    .end((err, res) => {
+                        res.should.not.have.status(200);
+                        res.body.meta.success.should.be.eql(false);
+
+                        done();
+                    })
+            });
+
+            it('It should not remove user from white list', function (done) {
+                chai.request(url)
+                    .delete('/api/jointpurchases/white_list')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        user_id: userId
+                    })
+                    .end((err, res) => {
+                        res.should.not.have.status(200);
+                        res.body.meta.success.should.be.eql(false);
+
+                        done();
+                    })
+            })
+        });
+
+        after(async function (done) {
+            // Clean up database
+            await mongoose.connect(config.database);
+            await User.remove({
+                _id: userId
+            }).exec();
+            await JointPurchase.remove({
+                _id: purchaseId
+            }).exec();
+
+            done();
+        })
+    });
+
     after(async function (done) {
         // Clean up database
         await mongoose.connect(config.database);

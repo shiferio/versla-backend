@@ -65,7 +65,7 @@ module.exports = {
                     }
                 };
             } else {
-                    throw new CodeError("No purchase with such ID", 404);
+                throw new CodeError("No purchase with such ID", 404);
             }
         } catch (err) {
             const code = err.statusCode || 500;
@@ -232,6 +232,146 @@ module.exports = {
         } catch (err) {
             const code = err.statusCode || 500;
             const message = err.message || "Error during black list update";
+            return {
+                meta: {
+                    code: code,
+                    success: false,
+                    message: message
+                },
+                data: null
+            };
+        }
+    },
+
+    updatePublicState: async (purchaseId, publicState, creatorId) => {
+        try {
+            const purchase = await JointPurchase
+                .findOneAndUpdate({
+                    _id: purchaseId,
+                    creator: creatorId
+                }, {
+                    '$set': {
+                        'is_public': publicState,
+                        'white_list': []
+                    }
+                }, {
+                    'new': true
+                })
+                .populate('category')
+                .populate('creator')
+                .populate('measurement_unit')
+                .exec();
+            if (purchase) {
+                return {
+                    meta: {
+                        code: 200,
+                        success: true,
+                        message: "Successfully updated public state"
+                    },
+                    data: {
+                        purchase: purchase
+                    }
+                };
+            } else {
+                throw new CodeError("Can't update public state", 404);
+            }
+        } catch (err) {
+            const code = err.statusCode || 500;
+            const message = err.message || "Error during public state update";
+            return {
+                meta: {
+                    code: code,
+                    success: false,
+                    message: message
+                },
+                data: null
+            };
+        }
+    },
+
+    addUserToWhiteList: async (purchaseId, userId, creatorId) => {
+        try {
+            const purchase = await JointPurchase
+                .findOneAndUpdate({
+                    _id: purchaseId,
+                    creator: creatorId,
+                    is_public: false
+                }, {
+                    '$addToSet': {
+                        white_list: userId.toString()
+                    }
+                }, {
+                    'new': true
+                })
+                .populate('category')
+                .populate('creator')
+                .populate('measurement_unit')
+                .exec();
+
+            if (purchase) {
+                return {
+                    meta: {
+                        code: 200,
+                        success: true,
+                        message: "Successfully added user to white list"
+                    },
+                    data: {
+                        purchase: purchase
+                    }
+                };
+            } else {
+                throw new CodeError("Can't add user to white list", 404);
+            }
+        } catch (err) {
+            const code = err.statusCode || 500;
+            const message = err.message || "Error during white list update";
+            return {
+                meta: {
+                    code: code,
+                    success: false,
+                    message: message
+                },
+                data: null
+            };
+        }
+    },
+
+    removeUserFromWhiteList: async (purchaseId, userId, creatorId) => {
+        try {
+            const purchase = await JointPurchase
+                .findOneAndUpdate({
+                    _id: purchaseId,
+                    creator: creatorId,
+                    is_public: false
+                }, {
+                    '$pull': {
+                        white_list: userId.toString()
+                    }
+                }, {
+                    'new': true
+                })
+                .populate('category')
+                .populate('creator')
+                .populate('measurement_unit')
+                .exec();
+
+            if (purchase) {
+                return {
+                    meta: {
+                        code: 200,
+                        success: true,
+                        message: "Successfully removed user from white list"
+                    },
+                    data: {
+                        purchase: purchase
+                    }
+                };
+            } else {
+                throw new CodeError("Can't remove user from white list", 404);
+            }
+        } catch (err) {
+            const code = err.statusCode || 500;
+            const message = err.message || "Error during white list update";
             return {
                 meta: {
                     code: code,
