@@ -1,5 +1,6 @@
 const JointPurchase = require('../../models/jointpurchase');
 const mongoose = require('mongoose');
+const CodeError = require('../code-error');
 
 module.exports = {
     addPurchase: async (data, userId) => {
@@ -64,21 +65,16 @@ module.exports = {
                     }
                 };
             } else {
-                return {
-                    meta: {
-                        code: 404,
-                        success: true,
-                        message: "No purchase with such ID"
-                    },
-                    data: null
-                };
+                    throw new CodeError("No purchase with such ID", 404);
             }
         } catch (err) {
+            const code = err.statusCode || 500;
+            const message = err.message || "Error during purchase search";
             return {
                 meta: {
-                    code: 500,
+                    code: code,
                     success: false,
-                    message: "Error during purchase search"
+                    message: message
                 },
                 data: null
             }
@@ -139,24 +135,19 @@ module.exports = {
                     }
                 };
             } else {
-                return {
-                    meta: {
-                        code: 404,
-                        success: true,
-                        message: "Can't update purchase"
-                    },
-                    data: null
-                };
+                throw new CodeError("Can't update purchase", 404);
             }
         } catch (err) {
+            const code = err.statusCode || 500;
+            const message = err.message || "Error during purchase update";
             return {
                 meta: {
-                    code: 500,
+                    code: code,
                     success: false,
-                    message: "Error during purchase update"
+                    message: message
                 },
                 data: null
-            }
+            };
         }
     },
 
@@ -190,24 +181,19 @@ module.exports = {
                     }
                 };
             } else {
-                return {
-                    meta: {
-                        code: 404,
-                        success: true,
-                        message: "Can't add user to black list"
-                    },
-                    data: null
-                };
+                throw new CodeError("Can't add user to black list", 404);
             }
         } catch (err) {
+            const code = err.statusCode || 500;
+            const message = err.message || "Error during black list update";
             return {
                 meta: {
-                    code: 500,
+                    code: code,
                     success: false,
-                    message: "Error during black list update"
+                    message: message
                 },
                 data: null
-            }
+            };
         }
     },
 
@@ -241,24 +227,19 @@ module.exports = {
                     }
                 };
             } else {
-                return {
-                    meta: {
-                        code: 404,
-                        success: true,
-                        message: "Can't remove user from black list"
-                    },
-                    data: null
-                };
+                throw new CodeError("Can't remove user from black list", 404);
             }
         } catch (err) {
+            const code = err.statusCode || 500;
+            const message = err.message || "Error during black list update";
             return {
                 meta: {
-                    code: 500,
+                    code: code,
                     success: false,
-                    message: "Error during black list update"
+                    message: message
                 },
                 data: null
-            }
+            };
         }
     }
 };
