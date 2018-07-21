@@ -53,7 +53,7 @@ module.exports = {
                     }
                 };
             } else {
-                throw new CodeError("No purchase with such ID", 404);
+                throw new CodeError("No unit with such ID", 404);
             }
         } catch (err) {
             const code = err.statusCode || 500;
