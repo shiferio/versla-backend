@@ -11,44 +11,63 @@ const chaiHttp = require('chai-http');
 const url = `http://localhost:${config.port}`;
 
 chai.use(chaiHttp);
-chai.should();
+const should = chai.should();
+
+const DEFAULT_PURCHASE_INFO = {
+    "name": "Test purchase",
+    "picture": "http://via.placeholder.com/350x150",
+    "description": "Some description",
+    "category_id": "5b50669194263e1bb3ae430a",
+    "address": "Kirov City",
+    "volume": 5,
+    "min_volume": 1,
+    "price_per_unit": 50,
+    "measurement_unit_id": "5b50669194263e1bb3ae430a",
+    "date": Date.UTC(2018, 1, 1),
+    "state": 0,
+    "payment_type": 0
+};
+
+async function createPurchase(token, overwritten = {}) {
+    const purchaseInfo = Object.assign({}, DEFAULT_PURCHASE_INFO);
+    Object.assign(purchaseInfo, overwritten);
+
+    const res = await chai.request(url)
+        .post('/api/jointpurchases/add')
+        .set('Authorization', token)
+        .send(purchaseInfo);
+    return res.body.data.purchase._id;
+}
+
+async function createUser(overwritten = {}) {
+    const userInfo = {
+        login: 'test',
+        phone: 'test_phone',
+        email: 'test@email.test',
+        password: '123456'
+    };
+    Object.assign(userInfo, overwritten);
+
+    const res = await chai.request(url)
+        .post('/api/accounts/signup')
+        .send(userInfo);
+    return res.body.data.token;
+}
 
 describe('Joint purchases', function () {
     let creatorToken = '';
 
-    before(function (done) {
+    before(async function (done) {
         // Create test user
-        chai.request(url)
-            .post('/api/accounts/signup')
-            .send({
-                login: 'test',
-                phone: 'test_phone',
-                email: 'test@email.test',
-                password: '123456'
-            })
-            .end((err, res) => {
-                creatorToken = res.body.data.token;
-                done();
-            })
+        creatorToken = await createUser();
+        done();
     });
 
     describe('Add new purchase', function () {
         let purchaseId = '';
 
         it('It should add new purchase', function (done) {
-            const purchaseInfo = {
-                "name": "Name",
-                "picture": "http://via.placeholder.com/350x150",
-                "description": "Some description",
-                "category_id": "5b50669194263e1bb3ae430a",
-                "address": "Kirov City",
-                "volume": 5,
-                "price_per_unit": 50,
-                "measurement_unit_id": "5b50669194263e1bb3ae430a",
-                "date": Date.UTC(2018, 1, 1),
-                "state": 0,
-                "payment_type": 0
-            };
+            const purchaseInfo = Object.assign({}, DEFAULT_PURCHASE_INFO);
             chai.request(url)
                 .post('/api/jointpurchases/add')
                 .set('Authorization', creatorToken)
@@ -100,24 +119,7 @@ describe('Joint purchases', function () {
 
         before(async function (done) {
             // Create new purchase
-            const purchaseInfo = {
-                "name": "Test purchase",
-                "picture": "http://via.placeholder.com/350x150",
-                "description": "Some description",
-                "category_id": "5b50669194263e1bb3ae430a",
-                "address": "Kirov City",
-                "volume": 5,
-                "price_per_unit": 50,
-                "measurement_unit_id": "5b50669194263e1bb3ae430a",
-                "date": Date.UTC(2018, 1, 1),
-                "state": 0,
-                "payment_type": 0
-            };
-            const res = await chai.request(url)
-                .post('/api/jointpurchases/add')
-                .set('Authorization', creatorToken)
-                .send(purchaseInfo);
-            purchaseId = res.body.data.purchase._id;
+            purchaseId = await createPurchase(creatorToken);
 
             done();
         });
@@ -212,40 +214,20 @@ describe('Joint purchases', function () {
 
         before(async function (done) {
             // Create another test user
-            let res = await chai.request(url)
-                .post('/api/accounts/signup')
-                .send({
-                    login: 'another',
-                    phone: 'another_phone',
-                    email: 'another@email.another',
-                    password: '123456'
-                });
-            anotherToken = res.body.data.token;
+            anotherToken = await createUser({
+                login: 'another',
+                phone: 'another_phone',
+                email: 'another@email.another',
+                password: '123456'
+            });
 
-            res = await chai.request(url)
+            const res = await chai.request(url)
                 .get('/api/accounts/profile')
                 .set('Authorization', anotherToken);
             userId = res.body.data.user._id;
 
             // Create new purchase
-            const purchaseInfo = {
-                "name": "Test purchase",
-                "picture": "http://via.placeholder.com/350x150",
-                "description": "Some description",
-                "category_id": "5b50669194263e1bb3ae430a",
-                "address": "Kirov City",
-                "volume": 5,
-                "price_per_unit": 50,
-                "measurement_unit_id": "5b50669194263e1bb3ae430a",
-                "date": Date.UTC(2018, 1, 1),
-                "state": 0,
-                "payment_type": 0
-            };
-            res = await chai.request(url)
-                .post('/api/jointpurchases/add')
-                .set('Authorization', creatorToken)
-                .send(purchaseInfo);
-            purchaseId = res.body.data.purchase._id;
+            purchaseId = await createPurchase(creatorToken);
 
             done();
         });
@@ -343,24 +325,7 @@ describe('Joint purchases', function () {
 
         before(async function (done) {
             // Create new purchase
-            const purchaseInfo = {
-                "name": "Test purchase",
-                "picture": "http://via.placeholder.com/350x150",
-                "description": "Some description",
-                "category_id": "5b50669194263e1bb3ae430a",
-                "address": "Kirov City",
-                "volume": 5,
-                "price_per_unit": 50,
-                "measurement_unit_id": "5b50669194263e1bb3ae430a",
-                "date": Date.UTC(2018, 1, 1),
-                "state": 0,
-                "payment_type": 0
-            };
-            const res = await chai.request(url)
-                .post('/api/jointpurchases/add')
-                .set('Authorization', creatorToken)
-                .send(purchaseInfo);
-            purchaseId = res.body.data.purchase._id;
+            purchaseId = await createPurchase(creatorToken);
 
             done();
         });
@@ -448,40 +413,20 @@ describe('Joint purchases', function () {
 
         before(async function (done) {
             // Create another test user
-            let res = await chai.request(url)
-                .post('/api/accounts/signup')
-                .send({
-                    login: 'another',
-                    phone: 'another_phone',
-                    email: 'another@email.another',
-                    password: '123456'
-                });
-            anotherToken = res.body.data.token;
+            anotherToken = await createUser({
+                login: 'another',
+                phone: 'another_phone',
+                email: 'another@email.another',
+                password: '123456'
+            });
 
-            res = await chai.request(url)
+            const res = await chai.request(url)
                 .get('/api/accounts/profile')
                 .set('Authorization', anotherToken);
             userId = res.body.data.user._id;
 
             // Create new purchase
-            const purchaseInfo = {
-                "name": "Test purchase",
-                "picture": "http://via.placeholder.com/350x150",
-                "description": "Some description",
-                "category_id": "5b50669194263e1bb3ae430a",
-                "address": "Kirov City",
-                "volume": 5,
-                "price_per_unit": 50,
-                "measurement_unit_id": "5b50669194263e1bb3ae430a",
-                "date": Date.UTC(2018, 1, 1),
-                "state": 0,
-                "payment_type": 0
-            };
-            res = await chai.request(url)
-                .post('/api/jointpurchases/add')
-                .set('Authorization', creatorToken)
-                .send(purchaseInfo);
-            purchaseId = res.body.data.purchase._id;
+            purchaseId = await createPurchase(creatorToken);
 
             // Set 'public' to false
             await chai.request(url)
