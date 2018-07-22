@@ -21,6 +21,7 @@ module.exports = {
             .checkArgument(data.category_id.length === 24, 'INVALID ID')
             .shouldBeString(data.address, 'MISSED ADDRESS')
             .shouldBeNumber(data.volume, 'MISSED VOLUME')
+            .shouldBeNumber(data.min_volume, 'MISSED MINIMUM VOLUME')
             .shouldBeNumber(data.price_per_unit, 'MISSED PRICE')
             .shouldBeString(data.measurement_unit_id, 'MISSED MEASURE')
             .checkArgument(data.measurement_unit_id.length === 24, 'INVALID ID')
@@ -36,6 +37,8 @@ module.exports = {
             creator: userId,
             address: data.address,
             volume: data.volume,
+            min_volume: data.min_volume,
+            remaining_volume: data.volume,
             price_per_unit: data.price_per_unit,
             measurement_unit: mongoose.Types.ObjectId(data.measurement_unit_id),
             date: data.date,
@@ -254,6 +257,114 @@ module.exports = {
             return purchase;
         } else {
             throw new Error('NOT REMOVED');
+        }
+    },
+
+    joinWithPurchase: async (purchaseId, userId, volume) => {
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(purchaseId, 'MISSED USER ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeNumber(volume, 'MISSED VOLUME')
+            .checkArgument(volume > 0, 'INVALID VOLUME');
+
+        const purchase = await JointPurchase.findById(purchaseId);
+
+        pre
+            .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
+            .checkArgument(purchase.min_volume <= volume, 'VOLUME IS LESSER THAN MINIMUM')
+            .checkArgument(purchase.remaining_volume >= volume, 'TOO MUCH VOLUME')
+            .checkArgument(
+                purchase.black_list.indexOf(userId.toString()) === -1 &&
+                (purchase.is_public || purchase.white_list.indexOf(userId.toString()) !== -1),
+                'ACCESS DENIED'
+            )
+            .checkArgument(
+                purchase.participants.findIndex(p => p.user.toString() === userId.toString()) === -1,
+                'ALREADY JOINT'
+            );
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                min_volume: {'$lte': volume},
+                remaining_volume: {'$gte': volume},
+                'participants.user': {'$nin': [userId]},
+                black_list: {'$nin': [userId.toString()]},
+                '$or': [
+                    {is_public: true},
+                    {white_list: {'$in': userId.toString()}}
+                ]
+            }, {
+                '$inc': {
+                    remaining_volume: -volume
+                },
+                '$push': {
+                    participants: {
+                        user: userId,
+                        volume: volume
+                    }
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new CodeError('NOT JOINT');
+        }
+    },
+
+    detachFromThePurchase: async (purchaseId, userId) => {
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(purchaseId, 'MISSED USER ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+
+        const purchase = await JointPurchase.findById(purchaseId);
+
+        pre
+            .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
+            .checkArgument(
+                purchase.participants.findIndex(p => p.user.equals(userId) !== -1),
+                'NOT JOINT'
+            );
+
+        const index = purchase
+            .participants
+            .findIndex(p => p.user.equals(userId));
+        const volume = purchase.participants[index].volume;
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                'participants.user': userId
+            }, {
+                '$pull': {
+                    participants: {
+                        user: userId
+                    }
+                },
+                '$inc': {
+                    remaining_volume: volume
+                }
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT DETACHED');
         }
     }
 };

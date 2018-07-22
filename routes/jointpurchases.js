@@ -676,4 +676,76 @@ router.route('/white_list').delete(checkJWT, async (req, res) => {
     }
 });
 
+/**
+ * @api {put} /api/jointpurchases/participants Join user to purchase
+ * @apiName Join user to purchase
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {Number} volume Volume user want to buy
+ */
+router.route('/participants').put(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.joinWithPurchase(
+            req.body.id,
+            req.decoded.user._id,
+            req.body.volume
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'JOINT'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
+ * @api {delete} /api/jointpurchases/participants Detach user from purchase
+ * @apiName Detach user from purchase
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ */
+router.route('/participants').delete(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.detachFromThePurchase(
+            req.body.id,
+            req.decoded.user._id,
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'DETACHED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
 module.exports = router;

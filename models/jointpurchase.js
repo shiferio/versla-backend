@@ -15,6 +15,8 @@ const JointPurchaseSchema = new Schema({
     },
     address: String,
     volume: Number,
+    min_volume: Number,
+    remaining_volume: Number,
     price_per_unit: Number,
     measurement_unit: {
         type: Schema.Types.ObjectId,
