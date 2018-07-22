@@ -1,9 +1,33 @@
 const JointPurchase = require('../../models/jointpurchase');
 const mongoose = require('mongoose');
 const CodeError = require('../code-error');
+const pre = require('preconditions').singleton();
+
+const MODIFIABLE_FIELDS = [
+    'name', 'picture', 'description', 'category',
+    'address', 'volume', 'price_per_unit', 'measurement_unit',
+    'state', 'payment_type'
+];
 
 module.exports = {
+    MODIFIABLE_FIELDS: MODIFIABLE_FIELDS,
+
     addPurchase: async (data, userId) => {
+        pre
+            .shouldBeString(data.name, 'MISSED NAME')
+            .shouldBeString(data.picture, 'MISSED PICTURE')
+            .shouldBeString(data.description, 'MISSED DESCRIPTION')
+            .shouldBeString(data.category_id, 'MISSED CATEGORY')
+            .checkArgument(data.category_id.length === 24, 'INVALID ID')
+            .shouldBeString(data.address, 'MISSED ADDRESS')
+            .shouldBeNumber(data.volume, 'MISSED VOLUME')
+            .shouldBeNumber(data.price_per_unit, 'MISSED PRICE')
+            .shouldBeString(data.measurement_unit_id, 'MISSED MEASURE')
+            .checkArgument(data.measurement_unit_id.length === 24, 'INVALID ID')
+            .shouldBeDefined(data.date, 'MISSED DATE')
+            .shouldBeNumber(data.state, 'MISSED STATE')
+            .shouldBeNumber(data.payment_type, 'MISSED PAYMENT TYPE');
+
         const purchase = new JointPurchase({
             name: data.name,
             picture: data.picture,
@@ -19,367 +43,217 @@ module.exports = {
             payment_type: data.payment_type
         });
 
-        try {
-            await purchase.save();
+        await purchase.save();
 
-            return {
-                meta: {
-                    code: 200,
-                    success: true,
-                    message: "Joint purchase successfully added"
-                },
-                data: {
-                    purchase: purchase
-                }
-            }
-        } catch (err) {
-            return {
-                meta: {
-                    code: 500,
-                    success: false,
-                    message: "Error during purchase adding"
-                },
-                data: null
-            }
-        }
+        return purchase;
     },
 
     getPurchaseById: async (purchaseId) => {
-        try {
-            const purchase = await JointPurchase
-                .findOne({_id: purchaseId})
-                .populate('category')
-                .populate('creator')
-                .populate('measurement_unit')
-                .exec();
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
 
-            if (purchase) {
-                return {
-                    meta: {
-                        code: 200,
-                        success: true,
-                        message: "Successfully get purchase"
-                    },
-                    data: {
-                        purchase: purchase
-                    }
-                };
-            } else {
-                throw new CodeError("No purchase with such ID", 404);
-            }
-        } catch (err) {
-            const code = err.statusCode || 500;
-            const message = err.message || "Error during purchase search";
-            return {
-                meta: {
-                    code: code,
-                    success: false,
-                    message: message
-                },
-                data: null
-            }
+        const purchase = await JointPurchase
+            .findOne({_id: purchaseId})
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (purchase) {
+            return purchase
+        } else {
+            throw new Error('NO SUCH PURCHASE');
         }
     },
 
     updateField: async (name, value, purchaseId, userId) => {
-        const modifiable = [
-            'name', 'picture', 'description', 'category',
-            'address', 'volume', 'price_per_unit', 'measurement_unit',
-            'state', 'payment_type'
-        ];
-
-        if (modifiable.indexOf(name) === -1) {
-            return {
-                meta: {
-                    code: 405,
-                    success: false,
-                    message: "Field is not modifiable"
-                },
-                data: null
-            }
-        }
+        pre
+            .shouldBeDefined(name, 'MISSED FIELD NAME')
+            .shouldBeDefined(value, 'MISSED FIELD VALUE')
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .checkArgument(MODIFIABLE_FIELDS.indexOf(name) !== -1, 'UNMODIFIABLE FIELD');
 
         const setOp = {};
         setOp[name] = value;
 
-        try {
-            const purchase = await JointPurchase
-                .findOneAndUpdate({
-                    _id: purchaseId,
-                    creator: userId
-                }, {
-                    '$set': setOp,
-                    '$push': {
-                        history: {
-                            parameter: name,
-                            value: value
-                        }
+        const purchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: userId
+            }, {
+                '$set': setOp,
+                '$push': {
+                    history: {
+                        parameter: name,
+                        value: value
                     }
-                }, {
-                    'new': true
-                })
-                .populate('category')
-                .populate('creator')
-                .populate('measurement_unit')
-                .exec();
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
 
-            if (purchase) {
-                return {
-                    meta: {
-                        code: 200,
-                        success: true,
-                        message: "Successfully updated purchase"
-                    },
-                    data: {
-                        purchase: purchase
-                    }
-                };
-            } else {
-                throw new CodeError("Can't update purchase", 404);
-            }
-        } catch (err) {
-            const code = err.statusCode || 500;
-            const message = err.message || "Error during purchase update";
-            return {
-                meta: {
-                    code: code,
-                    success: false,
-                    message: message
-                },
-                data: null
-            };
+        if (purchase) {
+            return purchase;
+        } else {
+            throw new Error('NOT UPDATED');
         }
     },
 
     addUserToBlackList: async (purchaseId, userId, creatorId) => {
-        try {
-            const purchase = await JointPurchase
-                .findOneAndUpdate({
-                    _id: purchaseId,
-                    creator: creatorId
-                }, {
-                    '$addToSet': {
-                        black_list: userId.toString()
-                    }
-                }, {
-                    'new': true
-                })
-                .populate('category')
-                .populate('creator')
-                .populate('measurement_unit')
-                .exec();
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(purchaseId, 'MISSED USER ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
 
-            if (purchase) {
-                return {
-                    meta: {
-                        code: 200,
-                        success: true,
-                        message: "Successfully added user to black list"
-                    },
-                    data: {
-                        purchase: purchase
-                    }
-                };
-            } else {
-                throw new CodeError("Can't add user to black list", 404);
-            }
-        } catch (err) {
-            const code = err.statusCode || 500;
-            const message = err.message || "Error during black list update";
-            return {
-                meta: {
-                    code: code,
-                    success: false,
-                    message: message
-                },
-                data: null
-            };
+        const purchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: creatorId
+            }, {
+                '$addToSet': {
+                    black_list: userId.toString()
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (purchase) {
+            return purchase;
+        } else {
+            throw new Error('NOT ADDED');
         }
     },
 
     removeUserFromBlackList: async (purchaseId, userId, creatorId) => {
-        try {
-            const purchase = await JointPurchase
-                .findOneAndUpdate({
-                    _id: purchaseId,
-                    creator: creatorId
-                }, {
-                    '$pull': {
-                        black_list: userId.toString()
-                    }
-                }, {
-                    'new': true
-                })
-                .populate('category')
-                .populate('creator')
-                .populate('measurement_unit')
-                .exec();
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(purchaseId, 'MISSED USER ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
 
-            if (purchase) {
-                return {
-                    meta: {
-                        code: 200,
-                        success: true,
-                        message: "Successfully removed user from black list"
-                    },
-                    data: {
-                        purchase: purchase
-                    }
-                };
-            } else {
-                throw new CodeError("Can't remove user from black list", 404);
-            }
-        } catch (err) {
-            const code = err.statusCode || 500;
-            const message = err.message || "Error during black list update";
-            return {
-                meta: {
-                    code: code,
-                    success: false,
-                    message: message
-                },
-                data: null
-            };
+        const purchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: creatorId
+            }, {
+                '$pull': {
+                    black_list: userId.toString()
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (purchase) {
+            return purchase;
+        } else {
+            throw new Error('NOT REMOVED');
         }
     },
 
     updatePublicState: async (purchaseId, publicState, creatorId) => {
-        try {
-            const purchase = await JointPurchase
-                .findOneAndUpdate({
-                    _id: purchaseId,
-                    creator: creatorId
-                }, {
-                    '$set': {
-                        'is_public': publicState,
-                        'white_list': []
-                    }
-                }, {
-                    'new': true
-                })
-                .populate('category')
-                .populate('creator')
-                .populate('measurement_unit')
-                .exec();
-            if (purchase) {
-                return {
-                    meta: {
-                        code: 200,
-                        success: true,
-                        message: "Successfully updated public state"
-                    },
-                    data: {
-                        purchase: purchase
-                    }
-                };
-            } else {
-                throw new CodeError("Can't update public state", 404);
-            }
-        } catch (err) {
-            const code = err.statusCode || 500;
-            const message = err.message || "Error during public state update";
-            return {
-                meta: {
-                    code: code,
-                    success: false,
-                    message: message
-                },
-                data: null
-            };
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeBoolean(publicState, 'MISSED STATE');
+
+        const purchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: creatorId
+            }, {
+                '$set': {
+                    'is_public': publicState,
+                    'white_list': []
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (purchase) {
+            return purchase;
+        } else {
+            throw new Error('NOT UPDATED');
         }
     },
 
     addUserToWhiteList: async (purchaseId, userId, creatorId) => {
-        try {
-            const purchase = await JointPurchase
-                .findOneAndUpdate({
-                    _id: purchaseId,
-                    creator: creatorId,
-                    is_public: false
-                }, {
-                    '$addToSet': {
-                        white_list: userId.toString()
-                    }
-                }, {
-                    'new': true
-                })
-                .populate('category')
-                .populate('creator')
-                .populate('measurement_unit')
-                .exec();
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(purchaseId, 'MISSED USER ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
 
-            if (purchase) {
-                return {
-                    meta: {
-                        code: 200,
-                        success: true,
-                        message: "Successfully added user to white list"
-                    },
-                    data: {
-                        purchase: purchase
-                    }
-                };
-            } else {
-                throw new CodeError("Can't add user to white list", 404);
-            }
-        } catch (err) {
-            const code = err.statusCode || 500;
-            const message = err.message || "Error during white list update";
-            return {
-                meta: {
-                    code: code,
-                    success: false,
-                    message: message
-                },
-                data: null
-            };
+        const purchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: creatorId,
+                is_public: false
+            }, {
+                '$addToSet': {
+                    white_list: userId.toString()
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (purchase) {
+            return purchase;
+        } else {
+            throw new Error('NOT ADDED');
         }
     },
 
     removeUserFromWhiteList: async (purchaseId, userId, creatorId) => {
-        try {
-            const purchase = await JointPurchase
-                .findOneAndUpdate({
-                    _id: purchaseId,
-                    creator: creatorId,
-                    is_public: false
-                }, {
-                    '$pull': {
-                        white_list: userId.toString()
-                    }
-                }, {
-                    'new': true
-                })
-                .populate('category')
-                .populate('creator')
-                .populate('measurement_unit')
-                .exec();
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(purchaseId, 'MISSED USER ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
 
-            if (purchase) {
-                return {
-                    meta: {
-                        code: 200,
-                        success: true,
-                        message: "Successfully removed user from white list"
-                    },
-                    data: {
-                        purchase: purchase
-                    }
-                };
-            } else {
-                throw new CodeError("Can't remove user from white list", 404);
-            }
-        } catch (err) {
-            const code = err.statusCode || 500;
-            const message = err.message || "Error during white list update";
-            return {
-                meta: {
-                    code: code,
-                    success: false,
-                    message: message
-                },
-                data: null
-            };
+        const purchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: creatorId,
+                is_public: false
+            }, {
+                '$pull': {
+                    white_list: userId.toString()
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (purchase) {
+            return purchase;
+        } else {
+            throw new Error('NOT REMOVED');
         }
     }
 };

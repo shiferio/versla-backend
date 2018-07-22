@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const checkJWT = require('../middlewares/check-jwt.js');
+const pre = require('preconditions').singleton();
 
 const dbJointPurchases = require('../utils/db/db.Jointpurchase');
 
@@ -21,8 +22,28 @@ const dbJointPurchases = require('../utils/db/db.Jointpurchase');
  * @apiParam {Number} payment_type
  */
 router.route('/add').post(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.addPurchase(req.body, req.decoded.user._id);
-    return res.status(data['meta'].code).send(data);
+    try {
+        const purchase = await dbJointPurchases.addPurchase(req.body, req.decoded.user._id);
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'PURCHASE ADDED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -33,8 +54,28 @@ router.route('/add').post(checkJWT, async (req, res) => {
  * @apiParam {String} id Purchase ID
  */
 router.get('/get/:id', async (req, res) => {
-    const data = await dbJointPurchases.getPurchaseById(req.params.id);
-    return res.status(data['meta'].code).send(data);
+    try {
+        const purchase = await dbJointPurchases.getPurchaseById(req.params.id);
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'PURCHASE FOUND'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -46,13 +87,35 @@ router.get('/get/:id', async (req, res) => {
  * @apiParam {String} value New purchase name
  */
 router.route('/update/name').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updateField(
-        'name',
-        req.body.value,
-        req.body.id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        pre.shouldBeString(req.body.value, 'MISSED NAME');
+
+        const purchase = await dbJointPurchases.updateField(
+            'name',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -64,13 +127,35 @@ router.route('/update/name').put(checkJWT, async (req, res) => {
  * @apiParam {String} value New purchase picture url
  */
 router.route('/update/picture').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updateField(
-        'picture',
-        req.body.value,
-        req.body.id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        pre.shouldBeString(req.body.value, 'MISSED PICTURE');
+
+        const purchase = await dbJointPurchases.updateField(
+            'picture',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -82,13 +167,35 @@ router.route('/update/picture').put(checkJWT, async (req, res) => {
  * @apiParam {String} value New purchase description
  */
 router.route('/update/description').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updateField(
-        'description',
-        req.body.value,
-        req.body.id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        pre.shouldBeString(req.body.value, 'MISSED DESCRIPTION');
+
+        const purchase = await dbJointPurchases.updateField(
+            'description',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -100,13 +207,37 @@ router.route('/update/description').put(checkJWT, async (req, res) => {
  * @apiParam {String} value New purchase category ID
  */
 router.route('/update/category').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updateField(
-        'category',
-        req.body.value,
-        req.body.id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        pre
+            .shouldBeString(req.body.value, 'MISSED CATEGORY')
+            .checkArgument(req.body.value.length === 24, 'INVALID ID');
+
+        const purchase = await dbJointPurchases.updateField(
+            'category',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -118,13 +249,36 @@ router.route('/update/category').put(checkJWT, async (req, res) => {
  * @apiParam {String} value New purchase address
  */
 router.route('/update/address').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updateField(
-        'address',
-        req.body.value,
-        req.body.id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        pre
+            .shouldBeString(req.body.value, 'MISSED ADDRESS');
+
+        const purchase = await dbJointPurchases.updateField(
+            'address',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -136,13 +290,37 @@ router.route('/update/address').put(checkJWT, async (req, res) => {
  * @apiParam {Number} value New purchase volume
  */
 router.route('/update/volume').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updateField(
-        'volume',
-        req.body.value,
-        req.body.id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        pre
+            .shouldBeNumber(req.body.value, 'MISSED VOLUME')
+            .checkArgument(req.body.value > 0, 'INVALID VOLUME');
+
+        const purchase = await dbJointPurchases.updateField(
+            'volume',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -154,13 +332,37 @@ router.route('/update/volume').put(checkJWT, async (req, res) => {
  * @apiParam {Number} value New purchase price per unit
  */
 router.route('/update/price_per_unit').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updateField(
-        'price_per_unit',
-        req.body.value,
-        req.body.id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        pre
+            .shouldBeNumber(req.body.value, 'MISSED PRICE')
+            .checkArgument(req.body.value > 0, 'INVALID PRICE');
+
+        const purchase = await dbJointPurchases.updateField(
+            'price_per_unit',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -172,13 +374,37 @@ router.route('/update/price_per_unit').put(checkJWT, async (req, res) => {
  * @apiParam {String} value New purchase measurement unit ID
  */
 router.route('/update/measurement_unit').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updateField(
-        'measurement_unit',
-        req.body.value,
-        req.body.id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        pre
+            .shouldBeString(req.body.value, 'MISSED MEASURE')
+            .checkArgument(req.body.value.length === 24, 'INVALID ID');
+
+        const purchase = await dbJointPurchases.updateField(
+            'measurement_unit',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -190,13 +416,36 @@ router.route('/update/measurement_unit').put(checkJWT, async (req, res) => {
  * @apiParam {Number} value New purchase state
  */
 router.route('/update/state').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updateField(
-        'state',
-        req.body.value,
-        req.body.id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        pre
+            .shouldBeNumber(req.body.value, 'MISSED STATE');
+
+        const purchase = await dbJointPurchases.updateField(
+            'state',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -208,13 +457,36 @@ router.route('/update/state').put(checkJWT, async (req, res) => {
  * @apiParam {Number} value New payment type
  */
 router.route('/update/payment_type').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updateField(
-        'payment_type',
-        req.body.value,
-        req.body.id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        pre
+            .shouldBeNumber(req.body.value, 'MISSED PAYMENT TYPE');
+
+        const purchase = await dbJointPurchases.updateField(
+            'payment_type',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -226,12 +498,32 @@ router.route('/update/payment_type').put(checkJWT, async (req, res) => {
  * @apiParam {String} user_id ID of user to be banned
  */
 router.route('/black_list').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.addUserToBlackList(
-        req.body.id,
-        req.body.user_id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        const purchase = await dbJointPurchases.addUserToBlackList(
+            req.body.id,
+            req.body.user_id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'ADDED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -243,12 +535,32 @@ router.route('/black_list').put(checkJWT, async (req, res) => {
  * @apiParam {String} user_id ID of user to be removed
  */
 router.route('/black_list').delete(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.removeUserFromBlackList(
-        req.body.id,
-        req.body.user_id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        const purchase = await dbJointPurchases.removeUserFromBlackList(
+            req.body.id,
+            req.body.user_id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'REMOVED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -262,12 +574,32 @@ router.route('/black_list').delete(checkJWT, async (req, res) => {
  * @apiParam {Boolean} public New purchase's visibility (true - for all, false - for users from white list)
  */
 router.route('/public').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.updatePublicState(
-        req.body.id,
-        req.body.public,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        const purchase = await dbJointPurchases.updatePublicState(
+            req.body.id,
+            req.body.public,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -279,12 +611,32 @@ router.route('/public').put(checkJWT, async (req, res) => {
  * @apiParam {String} user_id ID of user to be flavoured
  */
 router.route('/white_list').put(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.addUserToWhiteList(
-        req.body.id,
-        req.body.user_id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        const purchase = await dbJointPurchases.addUserToWhiteList(
+            req.body.id,
+            req.body.user_id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'ADDED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -296,12 +648,32 @@ router.route('/white_list').put(checkJWT, async (req, res) => {
  * @apiParam {String} user_id ID of user to be removed
  */
 router.route('/white_list').delete(checkJWT, async (req, res) => {
-    const data = await dbJointPurchases.removeUserFromWhiteList(
-        req.body.id,
-        req.body.user_id,
-        req.decoded.user._id
-    );
-    return res.status(data['meta'].code).send(data);
+    try {
+        const purchase = await dbJointPurchases.removeUserFromWhiteList(
+            req.body.id,
+            req.body.user_id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'REMOVED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 module.exports = router;

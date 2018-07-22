@@ -39,6 +39,7 @@ describe('Joint purchases', function () {
             const purchaseInfo = {
                 "name": "Name",
                 "picture": "http://via.placeholder.com/350x150",
+                "description": "Some description",
                 "category_id": "5b50669194263e1bb3ae430a",
                 "address": "Kirov City",
                 "volume": 5,
@@ -102,6 +103,7 @@ describe('Joint purchases', function () {
             const purchaseInfo = {
                 "name": "Test purchase",
                 "picture": "http://via.placeholder.com/350x150",
+                "description": "Some description",
                 "category_id": "5b50669194263e1bb3ae430a",
                 "address": "Kirov City",
                 "volume": 5,
@@ -229,6 +231,7 @@ describe('Joint purchases', function () {
             const purchaseInfo = {
                 "name": "Test purchase",
                 "picture": "http://via.placeholder.com/350x150",
+                "description": "Some description",
                 "category_id": "5b50669194263e1bb3ae430a",
                 "address": "Kirov City",
                 "volume": 5,
@@ -343,6 +346,7 @@ describe('Joint purchases', function () {
             const purchaseInfo = {
                 "name": "Test purchase",
                 "picture": "http://via.placeholder.com/350x150",
+                "description": "Some description",
                 "category_id": "5b50669194263e1bb3ae430a",
                 "address": "Kirov City",
                 "volume": 5,
@@ -463,6 +467,7 @@ describe('Joint purchases', function () {
             const purchaseInfo = {
                 "name": "Test purchase",
                 "picture": "http://via.placeholder.com/350x150",
+                "description": "Some description",
                 "category_id": "5b50669194263e1bb3ae430a",
                 "address": "Kirov City",
                 "volume": 5,
