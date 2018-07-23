@@ -57,6 +57,8 @@ async function createUser(overwritten = {}) {
 describe('Joint purchases', function () {
     let creatorToken = '';
 
+    this.timeout(5000);
+
     before(async function (done) {
         // Create test user
         creatorToken = await createUser();
@@ -974,7 +976,6 @@ describe('Joint purchases', function () {
                 let creatorId = '';
 
                 before(async function (done) {
-                    this.timeout(5000);
                     // Create another test user
                     anotherToken = await createUser({
                         login: 'another',
