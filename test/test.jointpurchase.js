@@ -640,6 +640,369 @@ describe('Joint purchases', function () {
         })
     });
 
+    describe('Purchase participants', function () {
+        describe('Join to purchase', function () {
+            let purchaseId = '';
+
+            before(async function (done) {
+                // Create new purchase
+                purchaseId = await createPurchase(creatorToken, {
+                    volume: 10
+                });
+
+                done();
+            });
+
+            it('It should join to purchase', function (done) {
+                chai.request(url)
+                    .put('/api/jointpurchases/participants')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        volume: 1
+                    })
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.meta.success.should.be.eql(true);
+
+                        const purchase = res.body.data.purchase;
+                        purchase.remaining_volume.should.equal(9);
+                        purchase.participants.should.have.lengthOf(1);
+
+                        done();
+                    })
+            });
+
+            after(async function (done) {
+                // Clean up database
+                await mongoose.connect(config.database);
+                await JointPurchase.remove({
+                    _id: purchaseId
+                }).exec();
+
+                done();
+            })
+        });
+
+        describe('Joining to purchase twice', function () {
+            let purchaseId = '';
+
+            before(async function (done) {
+                // Create new purchase
+                purchaseId = await createPurchase(creatorToken, {
+                    volume: 10
+                });
+                // Join to it
+                await chai.request(url)
+                    .put('/api/jointpurchases/participants')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        volume: 1
+                    });
+
+                done();
+            });
+
+            it('It should not join to purchase twice', function (done) {
+                chai.request(url)
+                    .put('/api/jointpurchases/participants')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        volume: 1
+                    })
+                    .end((err, res) => {
+                        should.exist(err);
+
+                        done();
+                    })
+            });
+
+            after(async function (done) {
+                // Clean up database
+                await mongoose.connect(config.database);
+                await JointPurchase.remove({
+                    _id: purchaseId
+                }).exec();
+
+                done();
+            })
+        });
+
+        describe('Volume control', function () {
+            let anotherToken = '';
+            let userId = '';
+            let purchaseId = '';
+
+            beforeEach(async function (done) {
+                // Create new purchase
+                purchaseId = await createPurchase(creatorToken, {
+                    volume: 10,
+                    min_volume: 3
+                });
+
+                // Create another test user
+                anotherToken = await createUser({
+                    login: 'another',
+                    phone: 'another_phone',
+                    email: 'another@email.another',
+                    password: '123456'
+                });
+
+                const res = await chai.request(url)
+                    .get('/api/accounts/profile')
+                    .set('Authorization', anotherToken);
+                userId = res.body.data.user._id;
+
+                // Join to purchase
+                await chai.request(url)
+                    .put('/api/jointpurchases/participants')
+                    .set('Authorization', anotherToken)
+                    .send({
+                        id: purchaseId,
+                        volume: 3
+                    });
+
+                done();
+            });
+
+            it('It should not join when volume is lesser than minimum', function (done) {
+                chai.request(url)
+                    .put('/api/jointpurchases/participants')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        volume: 1
+                    })
+                    .end((err, res) => {
+                        should.exist(err);
+
+                        done();
+                    })
+            });
+
+            it('It should not join when volume is more than available', function (done) {
+                chai.request(url)
+                    .put('/api/jointpurchases/participants')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        volume: 8
+                    })
+                    .end((err, res) => {
+                        should.exist(err);
+
+                        done();
+                    })
+            });
+
+            afterEach(async function (done) {
+                // Clean up database
+                await mongoose.connect(config.database);
+                await User.remove({
+                    _id: userId
+                }).exec();
+                await JointPurchase.remove({
+                    _id: purchaseId
+                }).exec();
+
+                done();
+            })
+        });
+
+        describe('Access control', function () {
+            let purchaseId = '';
+
+            before(async function (done) {
+                // Create new purchase
+                purchaseId = await createPurchase(creatorToken, {
+                    volume: 10
+                });
+
+                done();
+            });
+
+            describe('Black list control', function () {
+                let anotherToken = '';
+                let userId = '';
+
+                before(async function (done) {
+                    // Create another test user
+                    anotherToken = await createUser({
+                        login: 'another',
+                        phone: 'another_phone',
+                        email: 'another@email.another',
+                        password: '123456'
+                    });
+
+                    const res = await chai.request(url)
+                        .get('/api/accounts/profile')
+                        .set('Authorization', anotherToken);
+                    userId = res.body.data.user._id;
+
+                    // Add user to black list
+                    await chai.request(url)
+                        .put('/api/jointpurchases/black_list')
+                        .set('Authorization', creatorToken)
+                        .send({
+                            id: purchaseId,
+                            user_id: userId
+                        });
+
+                    done();
+                });
+
+                it('It should not add banned user', function (done) {
+                    chai.request(url)
+                        .put('/api/jointpurchases/participants')
+                        .set('Authorization', anotherToken)
+                        .send({
+                            id: purchaseId,
+                            volume: 1
+                        })
+                        .end((err, res) => {
+                            should.exist(err);
+
+                            done();
+                        })
+                });
+
+                after(async function (done) {
+                    // Remove user from black list
+                    await chai.request(url)
+                        .delete('/api/jointpurchases/black_list')
+                        .set('Authorization', creatorToken)
+                        .send({
+                            id: purchaseId,
+                            user_id: userId
+                        });
+
+                    // Clean up database
+                    await mongoose.connect(config.database);
+                    await User.remove({
+                        _id: userId
+                    }).exec();
+
+                    done();
+                })
+            });
+
+            describe('White list control', function () {
+                let anotherToken = '';
+                let userId = '';
+                let creatorId = '';
+
+                before(async function (done) {
+                    this.timeout(5000);
+                    // Create another test user
+                    anotherToken = await createUser({
+                        login: 'another',
+                        phone: 'another_phone',
+                        email: 'another@email.another',
+                        password: '123456'
+                    });
+
+                    let res = await chai.request(url)
+                        .get('/api/accounts/profile')
+                        .set('Authorization', anotherToken);
+                    userId = res.body.data.user._id;
+
+                    // Get creator user id
+                    res = await chai.request(url)
+                        .get('/api/accounts/profile')
+                        .set('Authorization', creatorToken);
+                    creatorId = res.body.data.user._id;
+
+                    // Add user to white list
+                    await chai.request(url)
+                        .put('/api/jointpurchases/public')
+                        .set('Authorization', creatorToken)
+                        .send({
+                            id: purchaseId,
+                            public: false
+                        });
+
+                    await chai.request(url)
+                        .put('/api/jointpurchases/white_list')
+                        .set('Authorization', creatorToken)
+                        .send({
+                            id: purchaseId,
+                            user_id: creatorId
+                        });
+
+                    done();
+                });
+
+                it('It should add flavoured user', function (done) {
+                    chai.request(url)
+                        .put('/api/jointpurchases/participants')
+                        .set('Authorization', creatorToken)
+                        .send({
+                            id: purchaseId,
+                            volume: 1
+                        })
+                        .end((err, res) => {
+                            should.not.exist(err);
+
+                            res.should.have.status(200);
+                            res.body.meta.success.should.be.eql(true);
+
+                            const purchase = res.body.data.purchase;
+                            purchase.remaining_volume.should.equal(9);
+                            purchase.participants.should.have.lengthOf(1);
+
+                            done();
+                        })
+                });
+
+                it('It should not add non-flavoured user', function (done) {
+                    chai.request(url)
+                        .put('/api/jointpurchases/participants')
+                        .set('Authorization', anotherToken)
+                        .send({
+                            id: purchaseId,
+                            volume: 1
+                        })
+                        .end((err, res) => {
+                            should.exist(err);
+
+                            done();
+                        })
+                });
+
+                after(async function (done) {
+                    // Remove user from white list
+                    await chai.request(url)
+                        .put('/api/jointpurchases/public')
+                        .set('Authorization', creatorToken)
+                        .send({
+                            id: purchaseId,
+                            public: true
+                        });
+
+                    // Clean up database
+                    await mongoose.connect(config.database);
+                    await User.remove({
+                        _id: userId
+                    }).exec();
+
+                    done();
+                })
+            });
+
+            after(async function (done) {
+                // Clean up database
+                await mongoose.connect(config.database);
+                await JointPurchase.remove({
+                    _id: purchaseId
+                }).exec();
+
+                done();
+            })
+        })
+    });
+
     after(async function (done) {
         // Clean up database
         await mongoose.connect(config.database);
