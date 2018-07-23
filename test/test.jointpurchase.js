@@ -84,6 +84,29 @@ describe('Joint purchases', function () {
                 });
         });
 
+        after(async function (done) {
+            // Clean up database
+            await mongoose.connect(config.database);
+            await JointPurchase.remove({
+                _id: purchaseId
+            }).exec();
+
+            done();
+        })
+    });
+
+    describe('Get purchase by ID', function () {
+        let purchaseId = '';
+
+        before(async function (done) {
+            // Create new purchase
+            purchaseId = await createPurchase(creatorToken, {
+                name: 'Some long name'
+            });
+
+            done();
+        });
+
         it('It should get purchase by ID', function (done) {
             chai.request(url)
                 .get(`/api/jointpurchases/get/${purchaseId}`)
@@ -98,6 +121,7 @@ describe('Joint purchases', function () {
                     const purchase = res.body.data.purchase;
                     purchase.should.have.property('_id');
                     purchase._id.should.equal(purchaseId);
+                    purchase.name.should.equal('Some long name');
 
                     done();
                 });
@@ -117,7 +141,7 @@ describe('Joint purchases', function () {
     describe('Update fields', function () {
         let purchaseId = '';
 
-        before(async function (done) {
+        beforeEach(async function (done) {
             // Create new purchase
             purchaseId = await createPurchase(creatorToken);
 
@@ -166,11 +190,11 @@ describe('Joint purchases', function () {
                         res.body.data.purchase.should.have.property('history');
 
                         const history = res.body.data.purchase.history;
-                        history.should.have.lengthOf(2); // we update field in the 'it' section above
-                        history[1].should.have.property('parameter');
-                        history[1].parameter.should.equal('name');
-                        history[1].should.have.property('value');
-                        history[1].value.should.equal('Test name');
+                        history.should.have.lengthOf(1);
+                        history[0].should.have.property('parameter');
+                        history[0].parameter.should.equal('name');
+                        history[0].should.have.property('value');
+                        history[0].value.should.equal('Test name');
 
                         done();
                     })
@@ -196,7 +220,7 @@ describe('Joint purchases', function () {
             });
         });
 
-        after(async function (done) {
+        afterEach(async function (done) {
             // Clean up database
             await mongoose.connect(config.database);
             await JointPurchase.remove({
@@ -212,7 +236,7 @@ describe('Joint purchases', function () {
         let userId = '';
         let purchaseId = '';
 
-        before(async function (done) {
+        beforeEach(async function (done) {
             // Create another test user
             anotherToken = await createUser({
                 login: 'another',
@@ -257,56 +281,84 @@ describe('Joint purchases', function () {
                 })
         });
 
-        it('It should not add user to black list twice', function (done) {
-            const data = {
-                id: purchaseId,
-                user_id: userId
-            };
+        describe('Adding user to black list twice', function () {
+            beforeEach(async function (done) {
+                // Add user to black list
+                await chai.request(url)
+                    .put('/api/jointpurchases/black_list')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        user_id: userId
+                    });
+                done();
+            });
 
-            chai.request(url)
-                .put('/api/jointpurchases/black_list')
-                .set('Authorization', creatorToken)
-                .send(data)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.meta.success.should.be.eql(true);
+            it('It should not add user to black list twice', function (done) {
+                const data = {
+                    id: purchaseId,
+                    user_id: userId
+                };
 
-                    res.body.data.should.not.be.eql(null);
-                    res.body.data.should.have.property('purchase');
+                chai.request(url)
+                    .put('/api/jointpurchases/black_list')
+                    .set('Authorization', creatorToken)
+                    .send(data)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.meta.success.should.be.eql(true);
 
-                    const list = res.body.data.purchase.black_list;
-                    list.length.should.be.eql(1);
-                    list[0].should.be.eql(userId);
+                        res.body.data.should.not.be.eql(null);
+                        res.body.data.should.have.property('purchase');
 
-                    done();
-                })
+                        const list = res.body.data.purchase.black_list;
+                        list.length.should.be.eql(1);
+                        list[0].should.be.eql(userId);
+
+                        done();
+                    })
+            });
         });
 
-        it('It should remove user from black list', function (done) {
-            const data = {
-                id: purchaseId,
-                user_id: userId
-            };
+        describe('Removing user from black list', function () {
+            beforeEach(async function (done) {
+                // Add user to black list
+                await chai.request(url)
+                    .put('/api/jointpurchases/black_list')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        user_id: userId
+                    });
+                done();
+            });
 
-            chai.request(url)
-                .delete('/api/jointpurchases/black_list')
-                .set('Authorization', creatorToken)
-                .send(data)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.meta.success.should.be.eql(true);
+            it('It should remove user from black list', function (done) {
+                const data = {
+                    id: purchaseId,
+                    user_id: userId
+                };
 
-                    res.body.data.should.not.be.eql(null);
-                    res.body.data.should.have.property('purchase');
+                chai.request(url)
+                    .delete('/api/jointpurchases/black_list')
+                    .set('Authorization', creatorToken)
+                    .send(data)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.meta.success.should.be.eql(true);
 
-                    const list = res.body.data.purchase.black_list;
-                    list.length.should.be.eql(0);
+                        res.body.data.should.not.be.eql(null);
+                        res.body.data.should.have.property('purchase');
 
-                    done();
-                })
+                        const list = res.body.data.purchase.black_list;
+                        list.length.should.be.eql(0);
+
+                        done();
+                    })
+            });
         });
 
-        after(async function (done) {
+        afterEach(async function (done) {
             // Clean up database
             await mongoose.connect(config.database);
             await User.remove({
@@ -323,7 +375,7 @@ describe('Joint purchases', function () {
     describe('Visibility manipulations', function () {
         let purchaseId = '';
 
-        before(async function (done) {
+        beforeEach(async function (done) {
             // Create new purchase
             purchaseId = await createPurchase(creatorToken);
 
@@ -395,7 +447,7 @@ describe('Joint purchases', function () {
                 });
         });
 
-        after(async function (done) {
+        afterEach(async function (done) {
             // Clean up database
             await mongoose.connect(config.database);
             await JointPurchase.remove({
@@ -411,7 +463,7 @@ describe('Joint purchases', function () {
         let userId = '';
         let purchaseId = '';
 
-        before(async function (done) {
+        beforeEach(async function (done) {
             // Create another test user
             anotherToken = await createUser({
                 login: 'another',
@@ -463,51 +515,79 @@ describe('Joint purchases', function () {
                 })
         });
 
-        it('It should not add user to white list twice', function (done) {
-            const data = {
-                id: purchaseId,
-                user_id: userId
-            };
+        describe('Adding user to white list twice', function () {
+            beforeEach(async function (done) {
+                // Add user to white list
+                await chai.request(url)
+                    .put('/api/jointpurchases/black_list')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        user_id: userId
+                    });
+                done();
+            });
 
-            chai.request(url)
-                .put('/api/jointpurchases/white_list')
-                .set('Authorization', creatorToken)
-                .send(data)
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.meta.success.should.be.eql(true);
-
-                    res.body.data.should.not.be.eql(null);
-                    res.body.data.should.have.property('purchase');
-
-                    const list = res.body.data.purchase.white_list;
-                    list.length.should.be.eql(1);
-                    list[0].should.be.eql(userId);
-
-                    done();
-                })
-        });
-
-        it('It should remove user from white list', function (done) {
-            chai.request(url)
-                .delete('/api/jointpurchases/white_list')
-                .set('Authorization', creatorToken)
-                .send({
+            it('It should not add user to white list twice', function (done) {
+                const data = {
                     id: purchaseId,
                     user_id: userId
-                })
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.meta.success.should.be.eql(true);
+                };
 
-                    res.body.data.should.not.be.eql(null);
-                    res.body.data.should.have.property('purchase');
+                chai.request(url)
+                    .put('/api/jointpurchases/white_list')
+                    .set('Authorization', creatorToken)
+                    .send(data)
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.meta.success.should.be.eql(true);
 
-                    const list = res.body.data.purchase.white_list;
-                    list.should.have.lengthOf(0);
+                        res.body.data.should.not.be.eql(null);
+                        res.body.data.should.have.property('purchase');
 
-                    done();
-                })
+                        const list = res.body.data.purchase.white_list;
+                        list.length.should.be.eql(1);
+                        list[0].should.be.eql(userId);
+
+                        done();
+                    })
+            });
+        });
+
+        describe('Removing user from white list', function () {
+            beforeEach(async function (done) {
+                // Add user to white list
+                await chai.request(url)
+                    .put('/api/jointpurchases/black_list')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        user_id: userId
+                    });
+                done();
+            });
+
+            it('It should remove user from white list', function (done) {
+                chai.request(url)
+                    .delete('/api/jointpurchases/white_list')
+                    .set('Authorization', creatorToken)
+                    .send({
+                        id: purchaseId,
+                        user_id: userId
+                    })
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.body.meta.success.should.be.eql(true);
+
+                        res.body.data.should.not.be.eql(null);
+                        res.body.data.should.have.property('purchase');
+
+                        const list = res.body.data.purchase.white_list;
+                        list.should.have.lengthOf(0);
+
+                        done();
+                    })
+            });
         });
 
         describe('Reset white list when visibility is updated', function () {
@@ -581,7 +661,7 @@ describe('Joint purchases', function () {
         });
 
         describe('Forbid white list manipulations when public is set to true', function () {
-            before(async function (done) {
+            beforeEach(async function (done) {
                 // Set 'public' to true
                 await chai.request(url)
                     .put(`/api/jointpurchases/public`)
@@ -626,7 +706,7 @@ describe('Joint purchases', function () {
             })
         });
 
-        after(async function (done) {
+        afterEach(async function (done) {
             // Clean up database
             await mongoose.connect(config.database);
             await User.remove({
