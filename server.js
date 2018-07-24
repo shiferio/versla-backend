@@ -40,6 +40,7 @@ const errorRoutes = require('./routes/errors');
 const featureRoutes = require('./routes/features');
 const jointPurchaseRoutes = require('./routes/jointpurchases');
 const measurementUnitRoutes = require('./routes/measurementunits');
+const chatRoutes = require('./routes/chats');
 
 app.use('/api/subscription', subscribeRoutes);
 app.use('/api/accounts', userRoutes);
@@ -55,6 +56,7 @@ app.use('/api/features', featureRoutes);
 app.use('/api/errors', errorRoutes);
 app.use('/api/jointpurchases', jointPurchaseRoutes);
 app.use('/api/measurementunits', measurementUnitRoutes);
+app.use('/api/chats', chatRoutes);
 
 app.use(express.static('public'));
 
