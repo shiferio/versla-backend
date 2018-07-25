@@ -5,10 +5,11 @@ module.exports = {
     getChatOrCreate: async (fromUserId, toUserId) => {
         pre
             .shouldBeString(toUserId, 'MISSED USER ID')
-            .checkArgument(toUserId.length === 24, 'INVALID ID');
+            .checkArgument(toUserId.length === 24, 'INVALID ID')
+            .checkArgument(toUserId !== fromUserId.toString(), 'IDs ARE THE SAME');
 
-        const updateInfo = await Chat
-            .updateOne({
+        const chat = await Chat
+            .findOneAndUpdate({
                 participants: {
                     '$all': [
                         {'$elemMatch': {'$eq': fromUserId.toString()}},
@@ -17,16 +18,14 @@ module.exports = {
                     '$size': 2
                 }
             }, {
-                '$set': {
+                '$setOnInsert': {
                     participants: [fromUserId.toString(), toUserId]
                 }
             }, {
-                'upsert': true
+                'upsert': true,
+                'new': true
             })
             .exec();
-
-        const chat = await Chat
-            .findById(updateInfo.upserted[0]._id);
 
         if (chat) {
             return chat;
