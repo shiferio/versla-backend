@@ -104,4 +104,35 @@ router.route('/history/:id').get(checkJWT, async (req, res) => {
     }
 });
 
+/**
+ * @api {get} /api/chat/id Get chat information by ID
+ * @apiName Get chat information
+ * @apiGroup Chats
+ */
+router.route('/id/:id').get(checkJWT, async (req, res) => {
+    try {
+        const chat = await dbChat.getChatById(req.params.id);
+
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'FOUND'
+            },
+            data: {
+                chat: chat
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
 module.exports = router;

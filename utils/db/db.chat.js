@@ -48,5 +48,21 @@ module.exports = {
         } else {
             return [];
         }
+    },
+
+    getChatById: async (chatId) => {
+        pre
+            .shouldBeString(chatId, 'MISSED CHAT ID')
+            .checkArgument(chatId.length === 24, 'INVALID ID');
+
+        const chat = await Chat
+            .findById(chatId)
+            .exec();
+
+        if (chat) {
+            return chat;
+        } else {
+            throw new Error('NO SUCH CHAT');
+        }
     }
 };
