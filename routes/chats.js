@@ -2,6 +2,7 @@ const router = require('express').Router();
 const checkJWT = require('../middlewares/check-jwt.js');
 
 const dbChat = require('../utils/db/db.chat');
+const dbChatMessage = require('../utils/db/db.chatmessage');
 
 /**
  * @api {post} /api/chat/new Open chat with specified user
@@ -58,6 +59,37 @@ router.route('/all').get(checkJWT, async (req, res) => {
             },
             data: {
                 chats: chats
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
+ * @api {get} /api/chat/history Get chat history by chat ID
+ * @apiName Get chat history
+ * @apiGroup Chats
+ */
+router.route('/history/:id').get(checkJWT, async (req, res) => {
+    try {
+        const history = await dbChatMessage.getChatHistory(req.params.id);
+
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'FOUND'
+            },
+            data: {
+                history: history
             }
         })
     } catch (error) {
