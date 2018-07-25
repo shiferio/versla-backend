@@ -141,7 +141,11 @@ describe('Chats', function () {
     after(async function (done) {
         // Clean up database
         await mongoose.connect(config.database);
-        await User.remove({}).exec();
+        await User.remove({
+            _id: {
+                '$in': [creatorId, anotherId]
+            }
+        }).exec();
 
         done();
     })

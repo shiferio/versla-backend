@@ -26,6 +26,7 @@
     "passport-local": "^1.0.0",
     "preconditions": "^2.2.1",
     "qs": "^6.5.2",
+    "socket.io": "^2.1.1",
     "underscore-node": "^0.1.2"
   },
   "devDependencies": {
