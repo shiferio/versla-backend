@@ -37,5 +37,24 @@ module.exports = {
         } else {
             return [];
         }
+    },
+
+    markMessagesAsSeen: async (chatId, userId) => {
+        pre
+            .shouldBeString(chatId, 'MISSED CHAT ID')
+            .checkArgument(chatId.length === 24, 'INVALID ID');
+
+        await ChatMessage
+            .updateMany({
+                chat: mongoose.Types.ObjectId(chatId),
+                seen: {
+                    '$nin': userId.toString()
+                }
+            }, {
+                '$addToSet': {
+                    seen: userId.toString()
+                }
+            })
+            .exec();
     }
 };
