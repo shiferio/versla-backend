@@ -15,6 +15,7 @@ const dbJointPurchases = require('../utils/db/db.Jointpurchase');
  * @apiParam {ObjectID} category_id
  * @apiParam {String} address
  * @apiParam {Number} volume
+ * @apiParam {Number} min_volume
  * @apiParam {Number} price_per_unit
  * @apiParam {ObjectID} measurement_unit_id
  * @apiParam {Date} date
