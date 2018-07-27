@@ -4,7 +4,7 @@ const checkJWT = require('../middlewares/check-jwt.js');
 const dbMeasurementUnit = require('../utils/db/db.measurementunit');
 
 /**
- * @api {post} /api/measurementunit/add Add Measurement unit
+ * @api {post} /api/measurementunits/add Add Measurement unit
  * @apiName Add Measurement unit
  * @apiGroup Measurement units
  *
@@ -16,7 +16,7 @@ router.route('/add').post(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {get} /api/measurementunit/get/:id Get Measurement unit by ID
+ * @api {get} /api/measurementunits/get/:id Get Measurement unit by ID
  * @apiName Get Measurement unit
  * @apiGroup Measurement units
  *
@@ -28,7 +28,7 @@ router.get('/get/:id', async (req, res) => {
 });
 
 /**
- * @api {get} /api/measurementunit/get/:id Get all Measurement units
+ * @api {get} /api/measurementunits/get Get all Measurement units
  * @apiName Get Measurement units
  * @apiGroup Measurement units
  */
