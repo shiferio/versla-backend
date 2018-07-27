@@ -9,8 +9,17 @@ const MODIFIABLE_FIELDS = [
     'state', 'payment_type'
 ];
 
+const PURCHASE_STATES = {
+    CREATED: 0,
+    OPENED: 1,
+    SATURATED: 2,
+    CLOSED: 3
+};
+
 module.exports = {
     MODIFIABLE_FIELDS: MODIFIABLE_FIELDS,
+
+    PURCHASE_STATES: PURCHASE_STATES,
 
     addPurchase: async (data, userId) => {
         pre

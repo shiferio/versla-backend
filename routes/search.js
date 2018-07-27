@@ -1,7 +1,8 @@
 const router = require('express').Router();
-const {buildForGoods} = require('../utils/search/filter');
+const {buildForGoods, buildForPurchases} = require('../utils/search/filter');
 
 const Good = require('../models/good');
+const JointPurchase = require('../models/jointpurchase');
 
 
 /**
@@ -147,6 +148,61 @@ router.get('/any/:pageNumber/:pageSize', async (req, res) => {
             },
             data: {
                 goods: goods,
+                total: total
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            meta: {
+                code: 500,
+                success: false,
+                message: "Unexpected error"
+            },
+            data: null
+        });
+    }
+});
+
+router.get('/jointpurchases/:pageNumber/:pageSize', async (req, res) => {
+    const db_filter = buildForPurchases(req.query['query'], req.query['filter']);
+
+    const pageNumber = Number.parseInt(req.params.pageNumber);
+    const pageSize = Number.parseInt(req.params.pageSize);
+
+    const exclude = {
+        __v: 0
+    };
+
+    try {
+        const skip = pageNumber > 0 ? ((pageNumber - 1) * pageSize) : 0;
+        const limit = pageSize;
+
+        const purchases = await JointPurchase
+            .find(
+                db_filter,
+                exclude,
+                {
+                    limit: limit,
+                    skip: skip
+                }
+            )
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+        const total = await JointPurchase
+            .count(db_filter)
+            .exec();
+
+        res.json({
+            meta: {
+                code: 200,
+                success: true,
+                message: "Successfully get purchases"
+            },
+            data: {
+                purchases: purchases,
                 total: total
             }
         });
