@@ -2,7 +2,7 @@ const qs = require('qs');
 const ObjectId = require('mongoose').Types.ObjectId;
 
 
-function build(query, filter) {
+function buildForGoods(query, filter) {
     query = (query || '')
         .trim()
         .split(/\s+/)
@@ -50,5 +50,5 @@ function build(query, filter) {
 }
 
 module.exports = {
-    build: build
+    buildForGoods: buildForGoods
 };

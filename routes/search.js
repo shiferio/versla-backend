@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const {build} = require('../utils/search/filter');
+const {buildForGoods} = require('../utils/search/filter');
 
 const Good = require('../models/good');
 
@@ -106,7 +106,7 @@ router.get('/all/:pageNumber/:pageSize', (req, res) => {
  *     }
  */
 router.get('/any/:pageNumber/:pageSize', async (req, res) => {
-    const db_filter = build(req.query['query'], req.query['filter']);
+    const db_filter = buildForGoods(req.query['query'], req.query['filter']);
 
     const pageNumber = Number.parseInt(req.params.pageNumber);
     const pageSize = Number.parseInt(req.params.pageSize);
