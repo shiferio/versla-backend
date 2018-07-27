@@ -23,8 +23,8 @@ const JointPurchaseSchema = new Schema({
         ref: 'MeasurementUnit'
     },
     date: Date,
-    state: Number,
-    payment_type: Number,
+    state: Number, // 0 - created (no participants), 1 - opened, 2 - saturated, 3 - closed
+    payment_type: Number, // 0 - via site, 1 - to creator's bank card, 2 - when delivered
     history: [
         {
             parameter: String,
