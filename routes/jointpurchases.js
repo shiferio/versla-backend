@@ -296,8 +296,7 @@ router.route('/update/volume').put(checkJWT, async (req, res) => {
             .shouldBeNumber(req.body.value, 'MISSED VOLUME')
             .checkArgument(req.body.value > 0, 'INVALID VOLUME');
 
-        const purchase = await dbJointPurchases.updateField(
-            'volume',
+        const purchase = await dbJointPurchases.updateVolume(
             req.body.value,
             req.body.id,
             req.decoded.user._id

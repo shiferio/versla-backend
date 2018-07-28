@@ -117,6 +117,59 @@ module.exports = {
         }
     },
 
+    updateVolume: async (volume, purchaseId, userId) => {
+        pre
+            .shouldBeDefined(volume, 'MISSED FIELD VALUE')
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+
+        const purchase = await JointPurchase.findById(purchaseId);
+
+        if (!purchase) {
+            throw new Error('NO SUCH PURCHASE');
+        }
+
+        const oldVolume = purchase.volume;
+        const remainingVolume = purchase.remaining_volume;
+        const usedVolume = oldVolume - remainingVolume;
+        if (volume < usedVolume) {
+            throw new Error('LESSER THAN USED');
+        }
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: userId,
+                volume: oldVolume,
+                remaining_volume: remainingVolume
+            }, {
+                '$set': {
+                    volume: volume
+                },
+                '$inc': {
+                    remaining_volume: volume - oldVolume
+                },
+                '$push': {
+                    history: {
+                        parameter: 'volume',
+                        value: volume
+                    }
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT UPDATED');
+        }
+    },
+
     addUserToBlackList: async (purchaseId, userId, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
