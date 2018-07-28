@@ -342,7 +342,7 @@ module.exports = {
         pre
             .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
             .checkArgument(
-                purchase.participants.findIndex(p => p.user.equals(userId) !== -1),
+                purchase.participants.findIndex(p => p.user.equals(userId)) !== -1,
                 'NOT JOINT'
             );
 
@@ -364,6 +364,8 @@ module.exports = {
                 '$inc': {
                     remaining_volume: volume
                 }
+            }, {
+                'new': true
             })
             .populate('category')
             .populate('creator')
