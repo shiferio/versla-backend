@@ -748,4 +748,41 @@ router.route('/participants').delete(checkJWT, async (req, res) => {
     }
 });
 
+/**
+ * @api {delete} /api/jointpurchases/payments/approve Approve user payment
+ * @apiName Approve user payment
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} user_id ID of user which payment has to be approved
+ * @apiParam {String} id Purchase ID
+ */
+router.route('/payments/approve').put(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.approveUserPayment(
+            req.body.id,
+            req.body.user_id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'APPROVED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
 module.exports = router;

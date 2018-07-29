@@ -429,5 +429,45 @@ module.exports = {
         } else {
             throw new Error('NOT DETACHED');
         }
+    },
+
+    approveUserPayment: async (purchaseId, userId, creatorId) => {
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(purchaseId, 'MISSED USER ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+
+        const purchase = await JointPurchase.findById(purchaseId);
+
+        pre
+            .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
+            .checkArgument(
+                purchase.participants.findIndex(p => p.user.equals(userId)) !== -1,
+                'NOT JOINT'
+            );
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: mongoose.Types.ObjectId(creatorId),
+                'participants.user': userId
+            }, {
+                '$set': {
+                    'participants.$.paid': true
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT APPROVED');
+        }
     }
 };
