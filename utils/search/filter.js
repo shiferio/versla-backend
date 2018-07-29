@@ -63,7 +63,7 @@ function buildForPurchases(query, filter) {
             { description: { '$in': query } }
         ],
         state: {
-            '$in': [0, 1, 2]
+            '$in': [0, 1]
         }
     };
 

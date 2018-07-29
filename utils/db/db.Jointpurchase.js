@@ -11,9 +11,8 @@ const MODIFIABLE_FIELDS = [
 
 const PURCHASE_STATES = {
     CREATED: 0,
-    OPENED: 1,
-    SATURATED: 2,
-    CLOSED: 3
+    COLLECTED: 1,
+    CLOSED: 2
 };
 
 module.exports = {

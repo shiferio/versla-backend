@@ -23,7 +23,7 @@ const JointPurchaseSchema = new Schema({
         ref: 'MeasurementUnit'
     },
     date: Date,
-    state: Number, // 0 - created (no participants), 1 - opened, 2 - saturated, 3 - closed
+    state: Number, // 0 - created, 1 - orders collected, 2 - closed
     payment_type: Number, // 0 - via site, 1 - to creator's bank card, 2 - when delivered
     history: [
         {
@@ -41,7 +41,11 @@ const JointPurchaseSchema = new Schema({
                 type: Schema.Types.ObjectId,
                 ref: 'User'
             },
-            volume: Number
+            volume: Number,
+            paid: {
+                type: Boolean,
+                default: false
+            }
         }
     ],
     black_list: {    // Array of documents contains ONLY IDs of users as STRINGS
