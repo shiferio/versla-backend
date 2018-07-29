@@ -91,5 +91,35 @@ module.exports = {
                 data: null
             };
         }
+    },
+
+    /**
+     * Get orders by store_id
+     * @param store_id
+     * @returns {Object}
+     */
+    getOrdersByStoreId: async (store_id) => {
+        let orders = await Order.find().where("store").in(store_id).populate('user').populate('good').exec();
+        if (orders) {
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Successfully get orders"
+                },
+                data: {
+                    orders: orders
+                }
+            };
+        } else {
+            return {
+                meta: {
+                    success: false,
+                    code: 200,
+                    message: 'No orders with such user id'
+                },
+                data: null
+            };
+        }
     }
 };
