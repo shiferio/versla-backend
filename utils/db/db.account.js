@@ -35,7 +35,7 @@ module.exports = {
                 data: null
             };
         } else {
-            user.save();
+            await user.save();
             let token = jwt.sign({
                 user: user
             }, config.secret, {

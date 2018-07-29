@@ -3,12 +3,17 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const chatSockets = require('./web-sockets/chats');
 
 const passport = require('passport');
 const authStrategies = require('./authentication/strategies');
 
 const config = require('./config');
 const app = express();
+
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+chatSockets.initialize(io);
 
 mongoose.connect(config.database, (err) => {
     if (err) {
@@ -40,6 +45,7 @@ const errorRoutes = require('./routes/errors');
 const featureRoutes = require('./routes/features');
 const jointPurchaseRoutes = require('./routes/jointpurchases');
 const measurementUnitRoutes = require('./routes/measurementunits');
+const chatRoutes = require('./routes/chats');
 
 app.use('/api/subscription', subscribeRoutes);
 app.use('/api/accounts', userRoutes);
@@ -55,12 +61,13 @@ app.use('/api/features', featureRoutes);
 app.use('/api/errors', errorRoutes);
 app.use('/api/jointpurchases', jointPurchaseRoutes);
 app.use('/api/measurementunits', measurementUnitRoutes);
+app.use('/api/chats', chatRoutes);
 
 app.use(express.static('public'));
 
 authStrategies.localStrategy();
 authStrategies.jwtStrategy();
 
-app.listen(config.port, (err) => {
+server.listen(config.port, (err) => {
     console.log('App runned on ' + config.port);
 });
