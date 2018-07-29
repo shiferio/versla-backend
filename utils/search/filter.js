@@ -89,6 +89,18 @@ function buildForPurchases(query, filter) {
     }
     */
 
+    if (filter['date']) {
+        const date = filter['date'];
+
+        const day = Number.parseInt(date.slice(0, 2));
+        const month = Number.parseInt(date.slice(2, 4)) - 1;
+        const year = Number.parseInt(date.slice(4, 8));
+
+        db_filter['date'] = {
+            '$gte': new Date(year, month, day)
+        };
+    }
+
     if (filter['min_price']) {
         db_filter['price_per_unit'] = {};
         db_filter['price_per_unit']['$gte'] = Number.parseInt(filter['min_price'])
