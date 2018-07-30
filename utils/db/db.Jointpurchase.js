@@ -51,7 +51,8 @@ module.exports = {
             measurement_unit: mongoose.Types.ObjectId(data.measurement_unit_id),
             date: data.date,
             state: data.state,
-            payment_type: data.payment_type
+            payment_type: data.payment_type,
+            payment_info: data.payment_info
         });
 
         await purchase.save();

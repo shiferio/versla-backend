@@ -25,6 +25,7 @@ const JointPurchaseSchema = new Schema({
     date: Date,
     state: Number, // 0 - created, 1 - orders collected, 2 - closed
     payment_type: Number, // 0 - via site, 1 - to creator's bank card, 2 - when delivered
+    payment_info: String, // for bank card
     history: [
         {
             parameter: String,
