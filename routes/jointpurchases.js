@@ -817,4 +817,36 @@ router.route('/owner').get(checkJWT, async (req, res) => {
     }
 });
 
+/**
+ * @api {get} /api/jointpurchases/orders Get list of purchase orders of the given user
+ * @apiName List of Joint purchases orders
+ * @apiGroup Joint purchases
+ */
+router.route('/orders').get(checkJWT, async (req, res) => {
+    try {
+        const purchases = await dbJointPurchases.getPurchaseOrders(
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'FETCHED'
+            },
+            data: {
+                purchases: purchases
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
 module.exports = router;
