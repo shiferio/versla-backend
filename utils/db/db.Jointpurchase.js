@@ -469,5 +469,22 @@ module.exports = {
         } else {
             throw new Error('NOT APPROVED');
         }
+    },
+
+    getUserPurchases: async (creatorId) => {
+        const purchases = await JointPurchase
+            .find({
+                creator: creatorId
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (purchases) {
+            return purchases;
+        } else {
+            return [];
+        }
     }
 };
