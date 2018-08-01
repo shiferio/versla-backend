@@ -848,4 +848,40 @@ router.route('/orders').get(checkJWT, async (req, res) => {
     }
 });
 
+/**
+ * @api {delete} /api/jointpurchases/deliveries/approve Approve delivery to user
+ * @apiName Approve delivery
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} user_id ID of user which wants to approve delivery
+ * @apiParam {String} id Purchase ID
+ */
+router.route('/deliveries/approve').put(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.approveDelivery(
+            req.body.id,
+            req.body.user_id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'APPROVED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
 module.exports = router;

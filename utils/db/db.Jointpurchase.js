@@ -504,5 +504,44 @@ module.exports = {
         } else {
             throw new Error('NOT APPROVED');
         }
+    },
+
+    approveDelivery: async (purchaseId, userId) => {
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(purchaseId, 'MISSED USER ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+
+        const purchase = await JointPurchase.findById(purchaseId);
+
+        pre
+            .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
+            .checkArgument(
+                purchase.participants.findIndex(p => p.user.equals(userId)) !== -1,
+                'NOT JOINT'
+            );
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                'participants.user': userId
+            }, {
+                '$set': {
+                    'participants.$.delivered': true
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT APPROVED');
+        }
     }
 };
