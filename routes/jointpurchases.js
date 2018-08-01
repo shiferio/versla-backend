@@ -448,6 +448,47 @@ router.route('/update/payment_type').put(checkJWT, async (req, res) => {
 });
 
 /**
+ * @api {put} /api/jointpurchases/update/payment_info Update payment info of joint purchase
+ * @apiName Update Joint purchase's payment info
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {String} value Payment info
+ */
+router.route('/update/payment_info').put(checkJWT, async (req, res) => {
+    try {
+        pre
+            .shouldBeString(req.body.value, 'MISSED PAYMENT INFO');
+
+        const purchase = await dbJointPurchases.updateField(
+            'payment_info',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
  * @api {put} /api/jointpurchases/black_list Add user to black list
  * @apiName Add user to black list
  * @apiGroup Joint purchases
