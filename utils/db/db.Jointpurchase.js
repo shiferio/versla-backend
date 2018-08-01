@@ -5,7 +5,7 @@ const pre = require('preconditions').singleton();
 
 const MODIFIABLE_FIELDS = [
     'name', 'picture', 'description', 'category',
-    'address', 'volume', 'price_per_unit', 'measurement_unit',
+    'address', 'volume', 'measurement_unit',
     'state', 'payment_type'
 ];
 
