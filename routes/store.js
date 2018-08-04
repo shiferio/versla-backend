@@ -6,6 +6,7 @@ const Store = require('../models/store');
 const config = require('../config');
 const checkJWT = require('../middlewares/check-jwt.js');
 const dbStores = require('../utils/db/db.stores');
+const dbOrders = require('../utils/db/db.order');
 const mongoose = require('mongoose');
 
 router.get('/list/:pageNumber/:pageSize', async (req, res) => {
@@ -30,6 +31,11 @@ router.get('/category/:id', async (req, res) => {
 
 router.get('/filter', async (req, res) => {
     let data = await dbStores.findStoresByFilters(req.body);
+    return res.status(data['meta'].code).send(data);
+});
+
+router.get('/orders/:id', async (req, res) => {
+    let data = await dbOrders.getOrdersByStoreId(req.params.id);
     return res.status(data['meta'].code).send(data);
 });
 
