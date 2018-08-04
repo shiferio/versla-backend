@@ -14,6 +14,19 @@ router.get('/get/good', async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+router.get('/get/good/tree', async (req, res) => {
+    let data = await dbGoodCategory.getCategoryTree();
+    return res.json({
+        meta: {
+            status: 200,
+            success: true
+        },
+        data: {
+            categories: data
+        }
+    })
+});
+
 router.get('/get/good/id/:id', async (req, res) => {
     let data = await dbGoodCategory.getCategoryById(req.params.id);
     return res.status(data['meta'].code).send(data);

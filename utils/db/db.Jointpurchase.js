@@ -2,6 +2,7 @@ const JointPurchase = require('../../models/jointpurchase');
 const mongoose = require('mongoose');
 const CodeError = require('../code-error');
 const pre = require('preconditions').singleton();
+const {Comparator} = require('../search/filter');
 
 const MODIFIABLE_FIELDS = [
     'name', 'picture', 'description', 'category',
@@ -543,5 +544,37 @@ module.exports = {
         } else {
             throw new Error('NOT APPROVED');
         }
+    },
+    findByFilter: async (filter, skip, limit, order) => {
+        const purchases = await JointPurchase
+            .find(
+                filter,
+                { __v: 0 },
+                {
+                    limit: limit,
+                    skip: skip
+                }
+            )
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+        const total = await JointPurchase
+            .count(filter)
+            .exec();
+
+        if (order) {
+            const cmp = new Comparator((a, b) => {
+                const keyA = a.category._id.toString();
+                const keyB = b.category._id.toString();
+                return order.get(keyA) < order.get(keyB);
+            });
+            purchases.sort((a, b) => cmp.compare(a, b));
+        }
+
+        return {
+            purchases,
+            total
+        };
     }
 };

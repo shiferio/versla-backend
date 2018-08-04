@@ -1,8 +1,10 @@
 const router = require('express').Router();
-const {buildForGoods, buildForPurchases} = require('../utils/search/filter');
+const {buildForGoods, PurchaseFilterBuilder} = require('../utils/search/filter');
 
 const Good = require('../models/good');
-const JointPurchase = require('../models/jointpurchase');
+const dbJointPurchase = require('../utils/db/db.Jointpurchase');
+const {getSubcategories} = require('../utils/db/db.gcategory');
+const qs = require('qs');
 
 
 /**
@@ -165,54 +167,46 @@ router.get('/any/:pageNumber/:pageSize', async (req, res) => {
 });
 
 router.get('/jointpurchases/:pageNumber/:pageSize', async (req, res) => {
-    const db_filter = buildForPurchases(req.query['query'], req.query['filter']);
+    const filter = qs.parse(req.query['filter']);
+    let categoriesData = {};
+
+    const builder = new PurchaseFilterBuilder()
+        .text(req.query['query'])
+        .price(filter['min_price'], filter['max_price']);
+
+    if (filter['volume']) builder.volume(filter['volume']);
+    if (filter['min_volume']) builder.minVolume(filter['min_volume']);
+    if (filter['date']) builder.date(filter['date']);
+    if (filter['category']) {
+        categoriesData = await getSubcategories(filter['category']);
+        builder.category(categoriesData['categories']);
+    }
 
     const pageNumber = Number.parseInt(req.params.pageNumber);
     const pageSize = Number.parseInt(req.params.pageSize);
-
-    const exclude = {
-        __v: 0
-    };
 
     try {
         const skip = pageNumber > 0 ? ((pageNumber - 1) * pageSize) : 0;
         const limit = pageSize;
 
-        const purchases = await JointPurchase
-            .find(
-                db_filter,
-                exclude,
-                {
-                    limit: limit,
-                    skip: skip
-                }
-            )
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
-            .exec();
-        const total = await JointPurchase
-            .count(db_filter)
-            .exec();
+        const data = await dbJointPurchase
+            .findByFilter(builder.build(), skip, limit, categoriesData['order']);
 
         res.json({
             meta: {
                 code: 200,
                 success: true,
-                message: "Successfully get purchases"
+                message: 'FOUND'
             },
-            data: {
-                purchases: purchases,
-                total: total
-            }
+            data: data
         });
     } catch (error) {
-        console.error(error);
+        console.error(error.message);
         res.status(500).json({
             meta: {
                 code: 500,
                 success: false,
-                message: "Unexpected error"
+                message: error.message || 'UNKNOWN ERROR'
             },
             data: null
         });
