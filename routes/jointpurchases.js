@@ -886,4 +886,43 @@ router.route('/deliveries/approve').put(checkJWT, async (req, res) => {
     }
 });
 
+/**
+ * @api {put} /api/jointpurchases/sent/update Update user order sent state
+ * @apiName Update user order sent state
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} user_id ID of user which order sent has to be updated
+ * @apiParam {String} id Purchase ID
+ * @apiParam {Boolean} state Order sent state
+ */
+router.route('/sent/update').put(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.updateUserOrderSent(
+            req.body.id,
+            req.body.user_id,
+            req.body.state,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
 module.exports = router;

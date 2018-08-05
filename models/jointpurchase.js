@@ -50,6 +50,10 @@ const JointPurchaseSchema = new Schema({
             delivered: {
                 type: Boolean,
                 default: false
+            },
+            sent: {
+                type: Boolean,
+                default: false
             }
         }
     ],

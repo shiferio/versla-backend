@@ -489,6 +489,56 @@ module.exports = {
         }
     },
 
+    updateUserOrderSent: async (purchaseId, userId, state, creatorId) => {
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(purchaseId, 'MISSED USER ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeBoolean(state, 'MISSED STATE');
+
+        const purchase = await JointPurchase.findById(purchaseId);
+
+        pre
+            .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
+            .checkArgument(
+                purchase.participants.findIndex(p => p.user.equals(userId)) !== -1,
+                'NOT JOINT'
+            );
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: mongoose.Types.ObjectId(creatorId),
+                'participants.user': userId
+            }, {
+                '$set': {
+                    'participants.$.sent': state
+                },
+                '$push': {
+                    history: {
+                        parameter: 'participants.sent',
+                        value: {
+                            user: userId,
+                            state: state
+                        }
+                    }
+                }
+            }, {
+                'new': true
+            })
+            .populate('category')
+            .populate('creator')
+            .populate('measurement_unit')
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT APPROVED');
+        }
+    },
+
     getUserPurchases: async (creatorId) => {
         const purchases = await JointPurchase
             .find({
