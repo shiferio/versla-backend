@@ -439,12 +439,13 @@ module.exports = {
         }
     },
 
-    approveUserPayment: async (purchaseId, userId, creatorId) => {
+    updateUserPayment: async (purchaseId, userId, state, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
             .shouldBeString(purchaseId, 'MISSED USER ID')
-            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeBoolean(state, 'MISSED STATE');
 
         const purchase = await JointPurchase.findById(purchaseId);
 
@@ -462,7 +463,16 @@ module.exports = {
                 'participants.user': userId
             }, {
                 '$set': {
-                    'participants.$.paid': true
+                    'participants.$.paid': state
+                },
+                '$push': {
+                    history: {
+                        parameter: 'participants.paid',
+                        value: {
+                            user: userId,
+                            state: state
+                        }
+                    }
                 }
             }, {
                 'new': true

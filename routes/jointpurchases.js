@@ -748,25 +748,27 @@ router.route('/participants').delete(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {delete} /api/jointpurchases/payments/approve Approve user payment
- * @apiName Approve user payment
+ * @api {put} /api/jointpurchases/payments/update Update user payment state
+ * @apiName Update user payment state
  * @apiGroup Joint purchases
  *
  * @apiParam {String} user_id ID of user which payment has to be approved
  * @apiParam {String} id Purchase ID
+ * @apiParam {Boolean} state Payment state
  */
-router.route('/payments/approve').put(checkJWT, async (req, res) => {
+router.route('/payments/update').put(checkJWT, async (req, res) => {
     try {
-        const purchase = await dbJointPurchases.approveUserPayment(
+        const purchase = await dbJointPurchases.updateUserPayment(
             req.body.id,
             req.body.user_id,
+            req.body.state,
             req.decoded.user._id
         );
         return res.status(200).send({
             meta: {
                 code: 200,
                 success: true,
-                message: 'APPROVED'
+                message: 'UPDATED'
             },
             data: {
                 purchase: purchase
