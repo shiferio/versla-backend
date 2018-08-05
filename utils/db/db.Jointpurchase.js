@@ -53,7 +53,13 @@ module.exports = {
             date: data.date,
             state: data.state,
             payment_type: data.payment_type,
-            payment_info: data.payment_info
+            payment_info: data.payment_info,
+            history: [
+                {
+                    parameter: 'state',
+                    value: data.state
+                }
+            ]
         });
 
         await purchase.save();
