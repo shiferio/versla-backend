@@ -681,7 +681,7 @@ router.route('/white_list').delete(checkJWT, async (req, res) => {
  * @apiGroup Joint purchases
  *
  * @apiParam {String} id Purchase ID
- * @apiParam {Number} volume Volume user want to buy
+ * @apiParam {Number} volume Volume user want to order
  */
 router.route('/participants').put(checkJWT, async (req, res) => {
     try {
@@ -752,7 +752,7 @@ router.route('/participants').delete(checkJWT, async (req, res) => {
  * @apiName Update user payment state
  * @apiGroup Joint purchases
  *
- * @apiParam {String} user_id ID of user which payment has to be approved
+ * @apiParam {String} user_id ID of user which payment has to be updated
  * @apiParam {String} id Purchase ID
  * @apiParam {Boolean} state Payment state
  */
@@ -851,24 +851,26 @@ router.route('/orders').get(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {delete} /api/jointpurchases/deliveries/approve Approve delivery to user
- * @apiName Approve delivery
+ * @api {put} /api/jointpurchases/deliveries/update Update delivery status of the user's order
+ * @apiName Update delivery status
  * @apiGroup Joint purchases
  *
- * @apiParam {String} user_id ID of user which wants to approve delivery
+ * @apiParam {String} user_id ID of user which wants to update delivery status
  * @apiParam {String} id Purchase ID
+ * @apiParam {Boolean} state
  */
-router.route('/deliveries/approve').put(checkJWT, async (req, res) => {
+router.route('/deliveries/update').put(checkJWT, async (req, res) => {
     try {
-        const purchase = await dbJointPurchases.approveDelivery(
+        const purchase = await dbJointPurchases.updateUserDelivery(
             req.body.id,
-            req.body.user_id
+            req.body.user_id,
+            req.body.state
         );
         return res.status(200).send({
             meta: {
                 code: 200,
                 success: true,
-                message: 'APPROVED'
+                message: 'UPDATED'
             },
             data: {
                 purchase: purchase
@@ -887,13 +889,13 @@ router.route('/deliveries/approve').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {put} /api/jointpurchases/sent/update Update user order sent state
- * @apiName Update user order sent state
+ * @api {put} /api/jointpurchases/sent/update Update user's order 'is sent' state
+ * @apiName Update user's order 'is sent' state
  * @apiGroup Joint purchases
  *
- * @apiParam {String} user_id ID of user which order sent has to be updated
+ * @apiParam {String} user_id ID of user which order 'is sent' state has to be updated
  * @apiParam {String} id Purchase ID
- * @apiParam {Boolean} state Order sent state
+ * @apiParam {Boolean} state 'is sent' state
  */
 router.route('/sent/update').put(checkJWT, async (req, res) => {
     try {

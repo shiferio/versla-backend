@@ -130,7 +130,10 @@ module.exports = {
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID');
 
-        const purchase = await JointPurchase.findById(purchaseId);
+        const purchase = await JointPurchase
+            .findOne({_id: purchaseId})
+            .populate('measurement_unit')
+            .exec();
 
         if (!purchase) {
             throw new Error('NO SUCH PURCHASE');
@@ -159,7 +162,10 @@ module.exports = {
                 '$push': {
                     history: {
                         parameter: 'volume',
-                        value: volume
+                        value: {
+                            volume: volume,
+                            measurement_unit: purchase.measurement_unit.name
+                        }
                     }
                 }
             }, {
@@ -485,7 +491,7 @@ module.exports = {
         if (updatedPurchase) {
             return updatedPurchase;
         } else {
-            throw new Error('NOT APPROVED');
+            throw new Error('NOT UPDATED');
         }
     },
 
@@ -535,7 +541,7 @@ module.exports = {
         if (updatedPurchase) {
             return updatedPurchase;
         } else {
-            throw new Error('NOT APPROVED');
+            throw new Error('NOT UPDATED');
         }
     },
 
@@ -569,11 +575,11 @@ module.exports = {
         if (purchases) {
             return purchases;
         } else {
-            throw new Error('NOT APPROVED');
+            return [];
         }
     },
 
-    approveDelivery: async (purchaseId, userId) => {
+    updateUserDelivery: async (purchaseId, userId, state) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
@@ -595,7 +601,16 @@ module.exports = {
                 'participants.user': userId
             }, {
                 '$set': {
-                    'participants.$.delivered': true
+                    'participants.$.delivered': state
+                },
+                '$push': {
+                    history: {
+                        parameter: 'participants.delivered',
+                        value: {
+                            user: userId,
+                            state: state
+                        }
+                    }
                 }
             }, {
                 'new': true
@@ -608,9 +623,10 @@ module.exports = {
         if (updatedPurchase) {
             return updatedPurchase;
         } else {
-            throw new Error('NOT APPROVED');
+            throw new Error('NOT UPDATED');
         }
     },
+
     findByFilter: async (filter, skip, limit, order) => {
         const purchases = await JointPurchase
             .find(
