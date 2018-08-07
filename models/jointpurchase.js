@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const autopopulate = require('mongoose-autopopulate');
 const Schema = mongoose.Schema;
 
 const JointPurchaseSchema = new Schema({
@@ -7,11 +8,13 @@ const JointPurchaseSchema = new Schema({
     description: String,
     category: {
         type: Schema.Types.ObjectId,
-        ref: 'GoodCategory'
+        ref: 'GoodCategory',
+        autopopulate: true
     },
     creator: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        autopopulate: true
     },
     address: String,
     volume: Number,
@@ -20,7 +23,8 @@ const JointPurchaseSchema = new Schema({
     price_per_unit: Number,
     measurement_unit: {
         type: Schema.Types.ObjectId,
-        ref: 'MeasurementUnit'
+        ref: 'MeasurementUnit',
+        autopopulate: true
     },
     date: Date,
     state: Number, // 0 - created, 1 - orders collected, 2 - closed
@@ -71,4 +75,5 @@ const JointPurchaseSchema = new Schema({
     }
 });
 
+JointPurchaseSchema.plugin(autopopulate);
 module.exports = mongoose.model('JointPurchase', JointPurchaseSchema);

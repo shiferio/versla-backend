@@ -74,9 +74,6 @@ module.exports = {
 
         const purchase = await JointPurchase
             .findOne({_id: purchaseId})
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (purchase) {
@@ -112,9 +109,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (purchase) {
@@ -132,7 +126,6 @@ module.exports = {
 
         const purchase = await JointPurchase
             .findOne({_id: purchaseId})
-            .populate('measurement_unit')
             .exec();
 
         if (!purchase) {
@@ -171,9 +164,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (updatedPurchase) {
@@ -201,9 +191,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (purchase) {
@@ -231,9 +218,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (purchase) {
@@ -261,9 +245,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (purchase) {
@@ -292,9 +273,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (purchase) {
@@ -323,9 +301,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (purchase) {
@@ -384,9 +359,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (updatedPurchase) {
@@ -433,9 +405,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (updatedPurchase) {
@@ -483,9 +452,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (updatedPurchase) {
@@ -533,9 +499,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (updatedPurchase) {
@@ -550,9 +513,6 @@ module.exports = {
             .find({
                 creator: creatorId
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (purchases) {
@@ -567,9 +527,6 @@ module.exports = {
             .find({
                 'participants.user': userId.toString()
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (purchases) {
@@ -615,9 +572,6 @@ module.exports = {
             }, {
                 'new': true
             })
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
 
         if (updatedPurchase) {
@@ -637,9 +591,6 @@ module.exports = {
                     skip: skip
                 }
             )
-            .populate('category')
-            .populate('creator')
-            .populate('measurement_unit')
             .exec();
         const total = await JointPurchase
             .count(filter)
