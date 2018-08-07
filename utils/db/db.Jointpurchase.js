@@ -354,6 +354,13 @@ module.exports = {
                     participants: {
                         user: userId,
                         volume: volume
+                    },
+                    history: {
+                        parameter: 'participants.joint',
+                        value: {
+                            user: userId,
+                            volume: volume
+                        }
                     }
                 }
             }, {
@@ -401,6 +408,15 @@ module.exports = {
                 },
                 '$inc': {
                     remaining_volume: volume
+                },
+                '$push': {
+                    history: {
+                        parameter: 'participants.detached',
+                        value: {
+                            user: userId,
+                            volume: volume
+                        }
+                    }
                 }
             }, {
                 'new': true
