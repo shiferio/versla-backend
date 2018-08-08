@@ -27,7 +27,8 @@ class PurchaseFilterBuilder {
         this._filter = {
             state: {
                 '$in': [0, 1]
-            }
+            },
+            is_public: true
         };
     }
 
