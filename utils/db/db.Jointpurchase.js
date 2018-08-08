@@ -36,7 +36,8 @@ module.exports = {
             .checkArgument(data.measurement_unit_id.length === 24, 'INVALID ID')
             .shouldBeDefined(data.date, 'MISSED DATE')
             .shouldBeNumber(data.state, 'MISSED STATE')
-            .shouldBeNumber(data.payment_type, 'MISSED PAYMENT TYPE');
+            .shouldBeNumber(data.payment_type, 'MISSED PAYMENT TYPE')
+            .shouldBeBoolean(data.is_public, 'MISSED PUBLIC STATE');
 
         const purchase = new JointPurchase({
             name: data.name,
@@ -59,7 +60,8 @@ module.exports = {
                     parameter: 'state',
                     value: data.state
                 }
-            ]
+            ],
+            is_public: data.is_public
         });
 
         await purchase.save();

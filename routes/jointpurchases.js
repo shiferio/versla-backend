@@ -21,6 +21,7 @@ const dbJointPurchases = require('../utils/db/db.Jointpurchase');
  * @apiParam {Date} date
  * @apiParam {Number} state
  * @apiParam {Number} payment_type
+ * @apiParam {Boolean} is_public
  */
 router.route('/add').post(checkJWT, async (req, res) => {
     try {
