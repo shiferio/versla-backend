@@ -182,21 +182,46 @@ module.exports = {
             .shouldBeString(purchaseId, 'MISSED USER ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID');
 
-        const purchase = await JointPurchase
+        const purchase = await JointPurchase.findById(purchaseId);
+        pre.shouldBeDefined(purchase, 'NO SUCH PURCHASE');
+
+        const index = purchase.participants.findIndex(p => p.user.equals(userId));
+        pre.checkArgument(index !== -1, 'NOT JOINT');
+
+        const volume = purchase.participants[index].volume;
+
+        const updatedPurchase = await JointPurchase
             .findOneAndUpdate({
                 _id: purchaseId,
-                creator: creatorId
+                creator: creatorId,
+                'participants.user': userId
             }, {
                 '$addToSet': {
                     black_list: userId.toString()
+                },
+                '$pull': {
+                    participants: {
+                        user: userId
+                    }
+                },
+                '$inc': {
+                    remaining_volume: volume
+                },
+                '$push': {
+                    history: {
+                        parameter: 'black_list.add',
+                        value: {
+                            user: userId.toString()
+                        }
+                    }
                 }
             }, {
                 'new': true
             })
             .exec();
 
-        if (purchase) {
-            return purchase;
+        if (updatedPurchase) {
+            return updatedPurchase;
         } else {
             throw new Error('NOT ADDED');
         }
@@ -216,6 +241,14 @@ module.exports = {
             }, {
                 '$pull': {
                     black_list: userId.toString()
+                },
+                '$push': {
+                    history: {
+                        parameter: 'black_list.remove',
+                        value: {
+                            user: userId.toString()
+                        }
+                    }
                 }
             }, {
                 'new': true

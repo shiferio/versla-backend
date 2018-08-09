@@ -490,7 +490,7 @@ router.route('/update/payment_info').put(checkJWT, async (req, res) => {
 });
 
 /**
- * @api {put} /api/jointpurchases/black_list Add user to black list
+ * @api {put} /api/jointpurchases/black_list Add user (participant only) to black list
  * @apiName Add user to black list
  * @apiGroup Joint purchases
  *
