@@ -17,6 +17,11 @@ const JointPurchaseSchema = new Schema({
         autopopulate: true
     },
     address: String,
+    city: {
+        type: Schema.Types.ObjectId,
+        ref: 'City',
+        autopopulate: true
+    },
     volume: Number,
     min_volume: Number,
     remaining_volume: Number,

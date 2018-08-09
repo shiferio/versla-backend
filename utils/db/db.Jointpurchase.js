@@ -37,7 +37,9 @@ module.exports = {
             .shouldBeDefined(data.date, 'MISSED DATE')
             .shouldBeNumber(data.state, 'MISSED STATE')
             .shouldBeNumber(data.payment_type, 'MISSED PAYMENT TYPE')
-            .shouldBeBoolean(data.is_public, 'MISSED PUBLIC STATE');
+            .shouldBeBoolean(data.is_public, 'MISSED PUBLIC STATE')
+            .shouldBeString(data.city_id, 'MISSED CITY')
+            .checkArgument(data.city_id.length === 24, 'INVALID ID');
 
         const purchase = new JointPurchase({
             name: data.name,
@@ -46,6 +48,7 @@ module.exports = {
             category: mongoose.Types.ObjectId(data.category_id),
             creator: userId,
             address: data.address,
+            city: mongoose.Types.ObjectId(data.city_id),
             volume: data.volume,
             min_volume: data.min_volume,
             remaining_volume: data.volume,
