@@ -73,10 +73,6 @@ const JointPurchaseSchema = new Schema({
     is_public: {
         type: Boolean,
         default: true
-    },
-    white_list: {    // Array of documents contains ONLY IDs of users as STRINGS
-        type: Array, // No more nested documents or implicit '_id' by mongoose
-        default: []  // Because we use '$addToSet' operator
     }
 });
 
