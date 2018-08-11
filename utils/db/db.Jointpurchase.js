@@ -1,6 +1,5 @@
 const JointPurchase = require('../../models/jointpurchase');
 const mongoose = require('mongoose');
-const CodeError = require('../code-error');
 const pre = require('preconditions').singleton();
 const {Comparator} = require('../search/filter');
 
@@ -321,7 +320,7 @@ module.exports = {
         if (updatedPurchase) {
             return updatedPurchase;
         } else {
-            throw new CodeError('NOT JOINT');
+            throw new Error('NOT JOINT');
         }
     },
 
