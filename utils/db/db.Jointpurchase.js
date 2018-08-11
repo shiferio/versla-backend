@@ -364,8 +364,7 @@ module.exports = {
             .checkArgument(purchase.min_volume <= volume, 'VOLUME IS LESSER THAN MINIMUM')
             .checkArgument(purchase.remaining_volume >= volume, 'TOO MUCH VOLUME')
             .checkArgument(
-                purchase.black_list.indexOf(userId.toString()) === -1 &&
-                (purchase.is_public || purchase.white_list.indexOf(userId.toString()) !== -1),
+                purchase.black_list.indexOf(userId.toString()) === -1,
                 'ACCESS DENIED'
             )
             .checkArgument(
@@ -379,11 +378,7 @@ module.exports = {
                 min_volume: {'$lte': volume},
                 remaining_volume: {'$gte': volume},
                 'participants.user': {'$nin': [userId]},
-                black_list: {'$nin': [userId.toString()]},
-                '$or': [
-                    {is_public: true},
-                    {white_list: {'$in': userId.toString()}}
-                ]
+                black_list: {'$nin': [userId.toString()]}
             }, {
                 '$inc': {
                     remaining_volume: -volume
