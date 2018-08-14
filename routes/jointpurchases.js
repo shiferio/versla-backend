@@ -3,6 +3,7 @@ const checkJWT = require('../middlewares/check-jwt.js');
 const pre = require('preconditions').singleton();
 
 const dbJointPurchases = require('../utils/db/db.Jointpurchase');
+const dbJPComment = require('../utils/db/db.jpcomment');
 
 /**
  * @api {post} /api/jointpurchases/add Add Joint purchase
@@ -802,6 +803,77 @@ router.route('/sent/update').put(checkJWT, async (req, res) => {
             },
             data: {
                 purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
+ * @api {post} /api/jointpurchases/comment/add Add comment to Joint purchase
+ * @apiName Add comment
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} text Comment body
+ * @apiParam {String} id Purchase ID
+ * @apiParam {String} parent_id Parent comment ID
+ */
+router.route('/comment/add').post(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJPComment.addComment(
+            req.body,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'ADDED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
+* @api {get} /api/jointpurchases/comment/tree Get comment tree for Joint purchase
+* @apiName Get comments
+* @apiGroup Joint purchases
+*
+* @apiParam {String} id Purchase ID
+*/
+router.get('/comment/tree/:id', async (req, res) => {
+    try {
+        const tree = await dbJPComment.getPurchaseCommentTree(
+            req.params.id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'FETCHED'
+            },
+            data: {
+                comments: tree
             }
         })
     } catch (error) {
