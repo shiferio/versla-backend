@@ -548,14 +548,26 @@ module.exports = {
 
     findByFilter: async (filter, skip, limit, order) => {
         const purchases = await JointPurchase
-            .find(
-                filter,
-                { __v: 0 },
+            .aggregate([
+                {'$match': filter},
                 {
-                    limit: limit,
-                    skip: skip
-                }
-            )
+                    '$project': {
+                        recent: {'$arrayElemAt': ['$history', -1]},
+                        picture: 1,
+                        name: 1,
+                        description: 1,
+                        price_per_unit: 1,
+                        state: 1,
+                        volume: 1,
+                        remaining_volume: 1,
+                        measurement_unit: 1,
+                        date: 1
+                    }
+                },
+                {'$sort': {recent: -1}},
+                {'$skip': skip},
+                {'$limit': limit}
+            ])
             .exec();
         const total = await JointPurchase
             .count(filter)
