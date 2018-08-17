@@ -63,6 +63,9 @@ const JointPurchaseSchema = new Schema({
             sent: {
                 type: Boolean,
                 default: false
+            },
+            fake_user: {
+                login: String
             }
         }
     ],

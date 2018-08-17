@@ -187,7 +187,9 @@ module.exports = {
         const purchase = await JointPurchase.findById(purchaseId);
         pre.shouldBeDefined(purchase, 'NO SUCH PURCHASE');
 
-        const index = purchase.participants.findIndex(p => p.user.equals(userId));
+        const index = purchase.participants
+            .filter(p => !!p.user)
+            .findIndex(p => p.user.equals(userId));
         pre.checkArgument(index !== -1, 'NOT JOINT');
 
         const volume = purchase.participants[index].volume;
@@ -284,7 +286,9 @@ module.exports = {
                 'ACCESS DENIED'
             )
             .checkArgument(
-                purchase.participants.findIndex(p => p.user.toString() === userId.toString()) === -1,
+                purchase.participants
+                    .filter(p => !!p.user)
+                    .findIndex(p => p.user.equals(userId)) === -1,
                 'ALREADY JOINT'
             );
 
@@ -324,6 +328,63 @@ module.exports = {
         }
     },
 
+    joinFakeUserWithPurchase: async (purchaseId, creatorId, userLogin, volume) => {
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(userLogin, 'MISSED USER LOGIN')
+            .shouldBeNumber(volume, 'MISSED VOLUME')
+            .checkArgument(volume > 0, 'INVALID VOLUME');
+
+        const purchase = await JointPurchase
+            .findOne({
+                _id: purchaseId,
+                creator: creatorId
+            })
+            .exec();
+
+        pre
+            .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
+            .checkArgument(purchase.min_volume <= volume, 'VOLUME IS LESSER THAN MINIMUM')
+            .checkArgument(purchase.remaining_volume >= volume, 'TOO MUCH VOLUME')
+            .checkArgument(
+                purchase.participants
+                    .filter(p => !!p.fake_user)
+                    .findIndex(p => p.fake_user.login === userLogin) === -1,
+                'ALREADY JOINT'
+            );
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: creatorId,
+                min_volume: {'$lte': volume},
+                remaining_volume: {'$gte': volume},
+                'participants.fake_user.login': {'$nin': [userLogin]}
+            }, {
+                '$inc': {
+                    remaining_volume: -volume
+                },
+                '$push': {
+                    participants: {
+                        fake_user: {
+                            login: userLogin
+                        },
+                        volume: volume
+                    }
+                }
+            }, {
+                'new': true
+            })
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT JOINT');
+        }
+    },
+
     detachFromThePurchase: async (purchaseId, userId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
@@ -336,12 +397,15 @@ module.exports = {
         pre
             .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
             .checkArgument(
-                purchase.participants.findIndex(p => p.user.equals(userId)) !== -1,
+                purchase.participants
+                    .filter(p => !!p.user)
+                    .findIndex(p => p.user.equals(userId)) !== -1,
                 'NOT JOINT'
             );
 
         const index = purchase
             .participants
+            .filter(p => !!p.user)
             .findIndex(p => p.user.equals(userId));
         const volume = purchase.participants[index].volume;
 
@@ -379,6 +443,61 @@ module.exports = {
         }
     },
 
+    detachFakeUserFromThePurchase: async (purchaseId, creatorId, userLogin) => {
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(userLogin, 'MISSED USER LOGIN');
+
+        const purchase = await JointPurchase
+            .findOne({
+                _id: purchaseId,
+                creator: creatorId
+            })
+            .exec();
+
+        pre
+            .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
+            .checkArgument(
+                purchase.participants
+                    .filter(p => !!p.fake_user)
+                    .findIndex(p => p.fake_user.login === userLogin) !== -1,
+                'NOT JOINT'
+            );
+
+        const index = purchase
+            .participants
+            .filter(p => !!p.fake_user)
+            .findIndex(p => p.fake_user.login === userLogin);
+        const volume = purchase.participants[index].volume;
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                'participants.fake_user.login': userLogin
+            }, {
+                '$pull': {
+                    participants: {
+                        fake_user: {
+                            login: userLogin
+                        }
+                    }
+                },
+                '$inc': {
+                    remaining_volume: volume
+                }
+            }, {
+                'new': true
+            })
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT DETACHED');
+        }
+    },
+
     updateUserPayment: async (purchaseId, userId, state, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
@@ -392,7 +511,9 @@ module.exports = {
         pre
             .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
             .checkArgument(
-                purchase.participants.findIndex(p => p.user.equals(userId)) !== -1,
+                purchase.participants
+                    .filter(p => !!p.user)
+                    .findIndex(p => p.user.equals(userId)) !== -1,
                 'NOT JOINT'
             );
 
@@ -426,6 +547,50 @@ module.exports = {
         }
     },
 
+    updateFakeUserPayment: async (purchaseId, userLogin, state, creatorId) => {
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(userLogin, 'MISSED USER LOGIN')
+            .shouldBeBoolean(state, 'MISSED STATE');
+
+        const purchase = await JointPurchase
+            .findOne({
+                _id: purchaseId,
+                creator: creatorId
+            })
+            .exec();
+
+        pre
+            .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
+            .checkArgument(
+                purchase.participants
+                    .filter(p => !!p.fake_user)
+                    .findIndex(p => p.fake_user.login === userLogin) !== -1,
+                'NOT JOINT'
+            );
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: mongoose.Types.ObjectId(creatorId),
+                'participants.fake_user.login': userLogin
+            }, {
+                '$set': {
+                    'participants.$.paid': state
+                }
+            }, {
+                'new': true
+            })
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT UPDATED');
+        }
+    },
+
     updateUserOrderSent: async (purchaseId, userId, state, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
@@ -439,7 +604,9 @@ module.exports = {
         pre
             .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
             .checkArgument(
-                purchase.participants.findIndex(p => p.user.equals(userId)) !== -1,
+                purchase.participants
+                    .filter(p => !!p.user)
+                    .findIndex(p => p.user.equals(userId)) !== -1,
                 'NOT JOINT'
             );
 
@@ -460,6 +627,50 @@ module.exports = {
                             state: state
                         }
                     }
+                }
+            }, {
+                'new': true
+            })
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT UPDATED');
+        }
+    },
+
+    updateFakeUserOrderSent: async (purchaseId, userLogin, state, creatorId) => {
+        pre
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(userLogin, 'MISSED USER LOGIN')
+            .shouldBeBoolean(state, 'MISSED STATE');
+
+        const purchase = await JointPurchase
+            .findOne({
+                _id: purchaseId,
+                creator: creatorId
+            })
+            .exec();
+
+        pre
+            .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
+            .checkArgument(
+                purchase.participants
+                    .filter(p => !!p.fake_user)
+                    .findIndex(p => p.fake_user.login === userLogin) !== -1,
+                'NOT JOINT'
+            );
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: mongoose.Types.ObjectId(creatorId),
+                'participants.fake_user.login': userLogin
+            }, {
+                '$set': {
+                    'participants.$.sent': state
                 }
             }, {
                 'new': true

@@ -603,6 +603,45 @@ router.route('/participants').put(checkJWT, async (req, res) => {
 });
 
 /**
+ * @api {put} /api/jointpurchases/participants/fake Join fake user to purchase
+ * @apiName Join fake user to purchase
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {String} login Fake user login
+ * @apiParam {Number} volume Volume user wants to order
+ */
+router.route('/participants/fake').put(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.joinFakeUserWithPurchase(
+            req.body.id,
+            req.decoded.user._id,
+            req.body.login,
+            req.body.volume
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'JOINT'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
  * @api {delete} /api/jointpurchases/participants Detach user from purchase
  * @apiName Detach user from purchase
  * @apiGroup Joint purchases
@@ -614,6 +653,43 @@ router.route('/participants').delete(checkJWT, async (req, res) => {
         const purchase = await dbJointPurchases.detachFromThePurchase(
             req.body.id,
             req.decoded.user._id,
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'DETACHED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
+ * @api {delete} /api/jointpurchases/participants/fake Detach fake user from purchase
+ * @apiName Detach fake user from purchase
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {String} login Fake user login
+ */
+router.route('/participants/fake').delete(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.detachFakeUserFromThePurchase(
+            req.body.id,
+            req.decoded.user._id,
+            req.body.login
         );
         return res.status(200).send({
             meta: {
@@ -651,6 +727,45 @@ router.route('/payments/update').put(checkJWT, async (req, res) => {
         const purchase = await dbJointPurchases.updateUserPayment(
             req.body.id,
             req.body.user_id,
+            req.body.state,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
+ * @api {put} /api/jointpurchases/payments/update/fake Update fake user payment state
+ * @apiName Update fake user payment state
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} login Login of fake user which payment has to be updated
+ * @apiParam {String} id Purchase ID
+ * @apiParam {Boolean} state Payment state
+ */
+router.route('/payments/update/fake').put(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.updateFakeUserPayment(
+            req.body.id,
+            req.body.login,
             req.body.state,
             req.decoded.user._id
         );
@@ -792,6 +907,45 @@ router.route('/sent/update').put(checkJWT, async (req, res) => {
         const purchase = await dbJointPurchases.updateUserOrderSent(
             req.body.id,
             req.body.user_id,
+            req.body.state,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
+ * @api {put} /api/jointpurchases/sent/update/fake Update fake user's order 'is sent' state
+ * @apiName Update fake user's order 'is sent' state
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} login Login of fake user which order 'is sent' state has to be updated
+ * @apiParam {String} id Purchase ID
+ * @apiParam {Boolean} state 'is sent' state
+ */
+router.route('/sent/update/fake').put(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.updateFakeUserOrderSent(
+            req.body.id,
+            req.body.login,
             req.body.state,
             req.decoded.user._id
         );
