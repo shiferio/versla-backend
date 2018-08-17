@@ -181,8 +181,8 @@ module.exports = {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(purchaseId, 'MISSED USER ID')
-            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+            .shouldBeString(userId, 'MISSED USER ID')
+            .checkArgument(userId.length === 24, 'INVALID ID');
 
         const purchase = await JointPurchase.findById(purchaseId);
         pre.shouldBeDefined(purchase, 'NO SUCH PURCHASE');
@@ -235,8 +235,8 @@ module.exports = {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(purchaseId, 'MISSED USER ID')
-            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+            .shouldBeString(userId, 'MISSED USER ID')
+            .checkArgument(userId.length === 24, 'INVALID ID');
 
         const purchase = await JointPurchase
             .findOneAndUpdate({
@@ -270,8 +270,8 @@ module.exports = {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(purchaseId, 'MISSED USER ID')
-            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(userId, 'MISSED USER ID')
+            .checkArgument(userId.length === 24, 'INVALID ID')
             .shouldBeNumber(volume, 'MISSED VOLUME')
             .checkArgument(volume > 0, 'INVALID VOLUME');
 
@@ -389,8 +389,8 @@ module.exports = {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(purchaseId, 'MISSED USER ID')
-            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+            .shouldBeString(userId, 'MISSED USER ID')
+            .checkArgument(userId.length === 24, 'INVALID ID');
 
         const purchase = await JointPurchase.findById(purchaseId);
 
@@ -502,8 +502,8 @@ module.exports = {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(purchaseId, 'MISSED USER ID')
-            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(userId, 'MISSED USER ID')
+            .checkArgument(userId.length === 24, 'INVALID ID')
             .shouldBeBoolean(state, 'MISSED STATE');
 
         const purchase = await JointPurchase.findById(purchaseId);
@@ -595,8 +595,8 @@ module.exports = {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(purchaseId, 'MISSED USER ID')
-            .checkArgument(purchaseId.length === 24, 'INVALID ID')
+            .shouldBeString(userId, 'MISSED USER ID')
+            .checkArgument(userId.length === 24, 'INVALID ID')
             .shouldBeBoolean(state, 'MISSED STATE');
 
         const purchase = await JointPurchase.findById(purchaseId);
@@ -716,8 +716,8 @@ module.exports = {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(purchaseId, 'MISSED USER ID')
-            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+            .shouldBeString(userId, 'MISSED USER ID')
+            .checkArgument(userId.length === 24, 'INVALID ID');
 
         const purchase = await JointPurchase.findById(purchaseId);
 

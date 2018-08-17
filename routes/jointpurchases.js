@@ -571,7 +571,7 @@ router.route('/black_list').delete(checkJWT, async (req, res) => {
  * @apiGroup Joint purchases
  *
  * @apiParam {String} id Purchase ID
- * @apiParam {Number} volume Volume user want to order
+ * @apiParam {Number} volume Volume user wants to order
  */
 router.route('/participants').put(checkJWT, async (req, res) => {
     try {
