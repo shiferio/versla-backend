@@ -2,105 +2,80 @@ const User = require('../../models/user');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const mongoose = require('mongoose');
+const pre = require('preconditions').singleton();
 
 module.exports = {
     /**
      * SignUp user
-     * @param newUser Brand new user data
+     * @param data New user's data
      * @param req Request
-     * @returns {Object}
+     * @returns {String}
      */
-    signUp: async (newUser, req) => {
-        let user = new User();
-        user.login = newUser.login;
-        user.password = newUser.password;
-        user.email = newUser.email;
-        user.phone = newUser.phone;
-        user.ip = (req.headers['x-forwarded-for'] ||
-            req.connection.remoteAddress ||
-            req.socket.remoteAddress ||
-            req.connection.socket.remoteAddress).split(",")[0];
-        user.city = mongoose.Types.ObjectId(newUser.city);
+    signUp: async (data, req) => {
+        const {login, password, email, phone, city} = data;
+        pre
+            .shouldBeString(login, 'MISSED LOGIN')
+            .checkArgument(login.length > 0, 'EMPTY LOGIN')
+            .shouldBeString(password, 'MISSED PASSWORD')
+            .checkArgument(password.length > 0, 'EMPTY PASSWORD')
+            .shouldBeString(email, 'MISSED EMAIL')
+            .checkArgument(email.length > 0, 'EMPTY EMAIL')
+            .shouldBeString(phone, 'MISSED PHONE')
+            .checkArgument(phone.length > 0, 'EMPTY PHONE')
+            .shouldBeString(city, 'MISSED CITY')
+            .checkArgument(city.length === 24, 'INVALID CITY');
+
+        const existingPhoneUser = await User.findOne({phone: phone}).exec();
+        const existingEmailUser = await User.findOne({email: email}).exec();
+        pre
+            .checkArgument(!existingEmailUser, 'EMAIL ALREADY EXISTS')
+            .checkArgument(!existingPhoneUser, 'PHONE ALREADY EXISTS');
+
+        const user = new User({
+            login, password, email, phone,
+            city: mongoose.Types.ObjectId(city),
+            ip: (req.headers['x-forwarded-for'] ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress ||
+                req.connection.socket.remoteAddress).split(",")[0]
+        });
         user.picture = user.gravatar();
 
-        let existingPhoneUser = await User.findOne().where("phone").in(newUser.phone).exec();
-        let existingEmailUser = await User.findOne().where("email").in(newUser.email).exec();
-        if (existingPhoneUser || existingEmailUser) {
-            return {
-                meta: {
-                    success: false,
-                    code: 503,
-                    message: 'Account with that email or phone is already exists'
-                },
-                data: null
-            };
-        } else {
-            await user.save();
-            let token = jwt.sign({
-                user: user
-            }, config.secret, {
-                expiresIn: '360d'
-            });
+        await user.save();
 
-            return {
-                meta: {
-                    success: true,
-                    code: 200,
-                    message: 'You are successfully registered'
-                },
-                data: {
-                    token: token
-                }
-            };
-        }
+        return jwt.sign({
+            user: user
+        }, config.secret, {
+            expiresIn: '360d'
+        });
     },
+
     /**
      * Login user
-     * @param userData User data for login
-     * @returns {Object}
+     * @param data User data for login
+     * @returns {String}
      */
-    login: async userData => {
-        let user = await User.findOne().where("phone").in(userData.phone).exec();
+    login: async data => {
+        const {phone, password} = data;
+        pre
+            .shouldBeString(phone, 'MISSED PHONE')
+            .checkArgument(phone.length > 0, 'EMPTY PHONE')
+            .shouldBeString(password, 'MISSED PASSWORD')
+            .checkArgument(password.length > 0, 'EMPTY PASSWORD');
 
-        if (!user) {
-            return {
-                meta: {
-                    success: false,
-                    code: 503,
-                    message: 'Authentification failed. User not found'
-                },
-                data: null
-            };
-        } else if (user) {
-            let validPassword = user.comparePassword(userData.password);
-            if (!validPassword) {
-                return {
-                    meta: {
-                        success: false,
-                        code: 503,
-                        message: 'Authentification failed. Wrong password.'
-                    },
-                    data: null
-                };
-            } else {
-                let token = jwt.sign({
-                    user: user
-                }, config.secret, {
-                    expiresIn: '7d'
-                });
-                return {
-                    meta: {
-                        success: true,
-                        code: 200,
-                        message: 'You are successfully logined'
-                    },
-                    data: {
-                        token: token
-                    }
-                };
-            }
-        }
+        const user = await User.findOne({phone: phone}).exec();
+
+        pre
+            .checkArgument(user, 'NO SUCH USER')
+            .checkArgument(user.comparePassword(password), 'PASSWORD MISMATCH');
+
+        return jwt.sign({
+                user: user
+            }, config.secret, {
+                expiresIn: '7d'
+            });
     },
+
     /**
      * Update user profile
      * @param userInfo User info
