@@ -270,8 +270,6 @@ module.exports = {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(userId, 'MISSED USER ID')
-            .checkArgument(userId.length === 24, 'INVALID ID')
             .shouldBeNumber(volume, 'MISSED VOLUME')
             .checkArgument(volume > 0, 'INVALID VOLUME');
 
@@ -388,9 +386,7 @@ module.exports = {
     detachFromThePurchase: async (purchaseId, userId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
-            .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(userId, 'MISSED USER ID')
-            .checkArgument(userId.length === 24, 'INVALID ID');
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
 
         const purchase = await JointPurchase.findById(purchaseId);
 
