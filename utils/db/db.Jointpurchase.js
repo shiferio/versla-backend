@@ -4,7 +4,7 @@ const pre = require('preconditions').singleton();
 const {Comparator} = require('../search/filter');
 
 const MODIFIABLE_FIELDS = [
-    'name', 'picture', 'description', 'category',
+    'name', 'picture', 'description', 'category', 'price_per_unit',
     'address', 'volume', 'min_volume', 'measurement_unit',
     'state', 'payment_type', 'payment_info'
 ];
