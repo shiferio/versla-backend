@@ -5,7 +5,7 @@ const {Comparator} = require('../search/filter');
 
 const MODIFIABLE_FIELDS = [
     'name', 'picture', 'description', 'category',
-    'address', 'volume', 'measurement_unit',
+    'address', 'volume', 'min_volume', 'measurement_unit',
     'state', 'payment_type', 'payment_info'
 ];
 
@@ -159,6 +159,56 @@ module.exports = {
                 '$push': {
                     history: {
                         parameter: 'volume',
+                        value: {
+                            volume: volume,
+                            measurement_unit: purchase.measurement_unit.name
+                        }
+                    }
+                }
+            }, {
+                'new': true
+            })
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT UPDATED');
+        }
+    },
+
+    updateMinVolume: async (volume, purchaseId, userId) => {
+        pre
+            .shouldBeDefined(volume, 'MISSED FIELD VALUE')
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+
+        const purchase = await JointPurchase
+            .findOne({_id: purchaseId})
+            .exec();
+
+        if (!purchase) {
+            throw new Error('NO SUCH PURCHASE');
+        }
+
+        if (volume > purchase.remaining_volume) {
+            throw new Error('GREATER THAN REMAINING');
+        }
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: userId,
+                remaining_volume: {
+                    '$gte': volume
+                }
+            }, {
+                '$set': {
+                    min_volume: volume
+                },
+                '$push': {
+                    history: {
+                        parameter: 'min_volume',
                         value: {
                             volume: volume,
                             measurement_unit: purchase.measurement_unit.name

@@ -327,6 +327,47 @@ router.route('/update/volume').put(checkJWT, async (req, res) => {
 });
 
 /**
+ * @api {put} /api/jointpurchases/update/min_volume Update minimum volume to order of joint purchase
+ * @apiName Update Joint purchase's minimum volume
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {Number} value New purchase minimum volume
+ */
+router.route('/update/min_volume').put(checkJWT, async (req, res) => {
+    try {
+        pre
+            .shouldBeNumber(req.body.value, 'MISSED VOLUME')
+            .checkArgument(req.body.value > 0, 'INVALID VOLUME');
+
+        const purchase = await dbJointPurchases.updateMinVolume(
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
  * @api {put} /api/jointpurchases/update/measurement_unit Update measurement unit of joint purchase
  * @apiName Update Joint purchase's measurement unit
  * @apiGroup Joint purchases
