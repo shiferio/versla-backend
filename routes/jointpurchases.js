@@ -286,6 +286,46 @@ router.route('/update/address').put(checkJWT, async (req, res) => {
 });
 
 /**
+ * @api {put} /api/jointpurchases/update/date Update date of joint purchase
+ * @apiName Update Joint purchase's date
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {String} value New purchase date
+ */
+router.route('/update/date').put(checkJWT, async (req, res) => {
+    try {
+        pre.shouldBeString(req.body.value, 'MISSED DATE');
+
+        const purchase = await dbJointPurchases.updateField(
+            'date',
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
  * @api {put} /api/jointpurchases/update/volume Update volume of joint purchase
  * @apiName Update Joint purchase's volume
  * @apiGroup Joint purchases
