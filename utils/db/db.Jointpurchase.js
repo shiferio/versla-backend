@@ -6,7 +6,7 @@ const {Comparator} = require('../search/filter');
 const MODIFIABLE_FIELDS = [
     'name', 'picture', 'description', 'category', 'price_per_unit',
     'address', 'volume', 'min_volume', 'measurement_unit',
-    'date', 'state', 'payment_type', 'payment_info'
+    'date', 'state', 'payment_type', 'payment_info', 'is_public'
 ];
 
 const PURCHASE_STATES = {
@@ -214,6 +214,40 @@ module.exports = {
                             measurement_unit: purchase.measurement_unit.name
                         }
                     }
+                }
+            }, {
+                'new': true
+            })
+            .exec();
+
+        if (updatedPurchase) {
+            return updatedPurchase;
+        } else {
+            throw new Error('NOT UPDATED');
+        }
+    },
+
+    updateIsPublicState: async (state, purchaseId, userId) => {
+        pre
+            .shouldBeDefined(state, 'MISSED FIELD VALUE')
+            .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
+            .checkArgument(purchaseId.length === 24, 'INVALID ID');
+
+        const purchase = await JointPurchase
+            .findOne({_id: purchaseId})
+            .exec();
+
+        if (!purchase) {
+            throw new Error('NO SUCH PURCHASE');
+        }
+
+        const updatedPurchase = await JointPurchase
+            .findOneAndUpdate({
+                _id: purchaseId,
+                creator: userId,
+            }, {
+                '$set': {
+                    is_public: state
                 }
             }, {
                 'new': true

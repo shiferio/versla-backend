@@ -326,6 +326,43 @@ router.route('/update/date').put(checkJWT, async (req, res) => {
 });
 
 /**
+ * @api {put} /api/jointpurchases/update/is_public Update visibility of joint purchase
+ * @apiName Update Joint purchase's visibility
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ * @apiParam {Boolean} value New visibility state
+ */
+router.route('/update/is_public').put(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.updateIsPublicState(
+            req.body.value,
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
  * @api {put} /api/jointpurchases/update/volume Update volume of joint purchase
  * @apiName Update Joint purchase's volume
  * @apiGroup Joint purchases
