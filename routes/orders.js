@@ -43,4 +43,60 @@ router.get('/user/:id', async (req, res) => {
     return res.status(data['meta'].code).send(data);
 });
 
+router.route('/status/delivered').put(checkJWT, async (req, res) => {
+    try {
+        const order = dbOrders.updateStatusDelivered(
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                order: order
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+router.route('/status/obtained').put(checkJWT, async (req, res) => {
+    try {
+        const order = dbOrders.updateStatusObtained(
+            req.body.id,
+            req.decoded.user._id
+        );
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'UPDATED'
+            },
+            data: {
+                order: order
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
 module.exports = router;
