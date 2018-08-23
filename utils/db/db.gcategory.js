@@ -1,5 +1,29 @@
 const GoodCategory = require('../../models/gcategory');
 const mongoose = require('mongoose');
+const {Comparator} = require('../search/filter');
+
+const categoryDFS = async (category, depth, map) => {
+    if (map) {
+        map.set(category._id.toString(), depth);
+    }
+
+    const subcategories = await GoodCategory
+        .find({
+            parent: category._id
+        })
+        .exec();
+    const models = [];
+    for (const subcategory of subcategories) {
+        const model = await categoryDFS(subcategory, depth + 1, map);
+        models.push(model);
+    }
+
+    return {
+        id: category._id,
+        name: category.name,
+        children: models
+    };
+};
 
 module.exports = {
     /**
@@ -84,5 +108,44 @@ module.exports = {
                 data: null
             };
         }
+    },
+    getCategoryTree: async () => {
+        const topLevelCategories = await GoodCategory
+            .find({
+                parent: {
+                    '$exists': false
+                }
+            })
+            .exec();
+        const models = [];
+        for (const category of topLevelCategories) {
+            const model = await categoryDFS(category, 1);
+            models.push(model);
+        }
+        return models;
+    },
+    categoryDFS: async (category, depth, map) => {
+        return await categoryDFS(category, depth, map);
+    },
+    /**
+     * @return {Object} categories: Array<String>, order: Map<String, Number>
+     */
+    getSubcategories: async (categoryId) => {
+        const map = new Map();
+        await categoryDFS({
+            _id: categoryId,
+            name: ''
+        }, 1, map);
+
+        const cmp = new Comparator((a, b) => {
+            return map.get(a) < map.get(b);
+        });
+
+        return {
+            categories: Array
+                .of(...map.keys())
+                .sort((a, b) => cmp.compare(a, b)),
+            order: map
+        };
     }
 };

@@ -19,6 +19,7 @@ const mongoose = require('mongoose');
  * @apiParam {String} password
  * @apiParam {String} email
  * @apiParam {String} phone
+ * @apiParam {String} city
  *
  * @apiSuccess {String} token Security token
  *
@@ -27,15 +28,35 @@ const mongoose = require('mongoose');
  *     meta: {
  *      "success": true,
  *      "code": 200,
- *      "message": "You are successfully logined"
+ *      "message": "SIGNED UP"
  *     },
  *     data: {
  *      "token": "token"
  *     }
  */
 router.post('/signup', async (req, res) => {
-    let data = await dbAccount.signUp(req.body, req);
-    return res.status(data['meta'].code).send(data);
+    try {
+        const token = await dbAccount.signUp(req.body, req);
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'SIGNED UP'
+            },
+            data: {
+                token: token
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
 });
 
 /**
@@ -43,7 +64,7 @@ router.post('/signup', async (req, res) => {
  * @apiName Login
  * @apiGroup Accounts
  *
- * @apiParam {String} email
+ * @apiParam {String} phone
  * @apiParam {String} password
  *
  * @apiSuccess {String} token Security token
@@ -53,7 +74,7 @@ router.post('/signup', async (req, res) => {
  *     meta: {
  *      "success": true,
  *      "code": 200,
- *      "message": "You are successfully logined"
+ *      "message": "LOGGED IN"
  *     },
  *     data: {
  *      "token": "token"
@@ -63,8 +84,29 @@ router.post(
     '/login',
     passport.authenticate('local', {session: false}),
     async (req, res) => {
-        const data = req.user;
-        return res.status(data['meta'].code).send(data);
+        const {token, error} = req.user;
+
+        if (token) {
+            return res.status(200).send({
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: 'LOGGED IN'
+                },
+                data: {
+                    token: token
+                }
+            })
+        } else {
+            return res.status(500).send({
+                meta: {
+                    code: 500,
+                    success: false,
+                    message: error.message || 'UNKNOWN ERROR'
+                },
+                data: null
+            })
+        }
     });
 
 /**

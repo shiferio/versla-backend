@@ -1,7 +1,10 @@
 const router = require('express').Router();
-const {build} = require('../utils/search/filter');
+const {buildForGoods, PurchaseFilterBuilder} = require('../utils/search/filter');
 
 const Good = require('../models/good');
+const dbJointPurchase = require('../utils/db/db.Jointpurchase');
+const {getSubcategories} = require('../utils/db/db.gcategory');
+const qs = require('qs');
 
 
 /**
@@ -106,7 +109,7 @@ router.get('/all/:pageNumber/:pageSize', (req, res) => {
  *     }
  */
 router.get('/any/:pageNumber/:pageSize', async (req, res) => {
-    const db_filter = build(req.query['query'], req.query['filter']);
+    const db_filter = buildForGoods(req.query['query'], req.query['filter']);
 
     const pageNumber = Number.parseInt(req.params.pageNumber);
     const pageSize = Number.parseInt(req.params.pageSize);
@@ -157,6 +160,53 @@ router.get('/any/:pageNumber/:pageSize', async (req, res) => {
                 code: 500,
                 success: false,
                 message: "Unexpected error"
+            },
+            data: null
+        });
+    }
+});
+
+router.get('/jointpurchases/:pageNumber/:pageSize', async (req, res) => {
+    const filter = qs.parse(req.query['filter']);
+    let categoriesData = {};
+
+    const builder = new PurchaseFilterBuilder()
+        .text(req.query['query'])
+        .price(filter['min_price'], filter['max_price']);
+
+    if (filter['volume']) builder.volume(filter['volume']);
+    if (filter['min_volume']) builder.minVolume(filter['min_volume']);
+    if (filter['date']) builder.date(filter['date']);
+    if (filter['category']) {
+        categoriesData = await getSubcategories(filter['category']);
+        builder.category(categoriesData['categories']);
+    }
+
+    const pageNumber = Number.parseInt(req.params.pageNumber);
+    const pageSize = Number.parseInt(req.params.pageSize);
+
+    try {
+        const skip = pageNumber > 0 ? ((pageNumber - 1) * pageSize) : 0;
+        const limit = pageSize;
+
+        const data = await dbJointPurchase
+            .findByFilter(builder.build(), skip, limit, categoriesData['order']);
+
+        res.json({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'FOUND'
+            },
+            data: data
+        });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
             },
             data: null
         });

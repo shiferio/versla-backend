@@ -15,11 +15,15 @@ module.exports = {
                 passwordField: 'password'
             },
             async (username, password, done) => {
-                const data = await dbAccount.login({
-                    phone: username,
-                    password: password
-                });
-                return done(null, data);
+                try {
+                    const token = await dbAccount.login({
+                        phone: username,
+                        password: password
+                    });
+                    return done(null, {token});
+                } catch (error) {
+                    return done(null , {error});
+                }
             })
         );
     },
