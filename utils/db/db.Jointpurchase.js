@@ -857,7 +857,16 @@ module.exports = {
                 },
                 {'$sort': {recent: -1}},
                 {'$skip': skip},
-                {'$limit': limit}
+                {'$limit': limit},
+                {
+                    '$lookup': {
+                        from: 'measurementunits',
+                        localField: 'measurement_unit',
+                        foreignField: '_id',
+                        as: 'measurement_unit'
+                    }
+                },
+                {'$unwind': '$measurement_unit'}
             ])
             .exec();
         const total = await JointPurchase
