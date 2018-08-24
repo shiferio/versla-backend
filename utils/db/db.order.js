@@ -1,4 +1,5 @@
 const Order = require('../../models/order');
+const Store = require('../../models/store');
 const mongoose = require('mongoose');
 module.exports = {
     /**
@@ -121,5 +122,61 @@ module.exports = {
                 data: null
             };
         }
+    },
+
+    updateStatusDelivered: async (orderId, userId) => {
+        const order = await Order
+            .findOne({
+              _id: orderId
+            })
+            .exec();
+
+        const storeId = order.store;
+        const store = await Store
+            .findOne({
+              _id: storeId
+            })
+            .exec();
+        const creatorId = store.creator_id;
+
+        if (!creatorId.equals(userId)) {
+            throw Error('NOT STORE CREATOR');
+        }
+
+        const updatedOrder = await Order
+            .findOneAndUpdate({
+                _id: orderId
+            }, {
+                status: 1
+            }, {
+                'new': true
+            })
+            .exec();
+
+        return updatedOrder;
+    },
+
+    updateStatusObtained: async (orderId, userId) => {
+        const order = await Order
+            .findOne({
+                _id: orderId
+            })
+            .exec();
+
+        if (!order.user.equals(userId)) {
+            throw Error('NOT ORDER OWNER');
+        }
+
+        const updatedOrder = await Order
+            .findOneAndUpdate({
+                _id: orderId
+            }, {
+                status: 2
+            }, {
+                'new': true
+            })
+            .exec();
+
+        return updatedOrder;
     }
 };
