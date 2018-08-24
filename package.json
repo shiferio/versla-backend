@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "mocha --timeout 10000",
-    "dev": "nodemon"
+    "dev": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
@@ -21,7 +21,6 @@
     "mongoose-autopopulate": "^0.8.0",
     "mongoose-plugin-autoinc": "^1.1.9",
     "morgan": "^1.9.0",
-    "nodemon": "^1.17.5",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
@@ -34,6 +33,7 @@
     "chai": "^3.5.0",
     "chai-http": "^2.0.1",
     "mocha": "^2.4.5",
-    "node-env-file": "^0.1.8"
+    "node-env-file": "^0.1.8",
+    "nodemon": "^1.17.5"
   }
 }
