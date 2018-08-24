@@ -846,6 +846,7 @@ module.exports = {
                         recent: {'$arrayElemAt': ['$history', -1]},
                         picture: 1,
                         name: 1,
+                        category: 1,
                         description: 1,
                         price_per_unit: 1,
                         state: 1,
