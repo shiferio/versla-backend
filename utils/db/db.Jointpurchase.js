@@ -50,7 +50,6 @@ module.exports = {
             city: mongoose.Types.ObjectId(data.city_id),
             volume: data.volume,
             min_volume: data.min_volume,
-            remaining_volume: data.volume,
             price_per_unit: data.price_per_unit,
             measurement_unit: mongoose.Types.ObjectId(data.measurement_unit_id),
             date: data.date,
@@ -147,14 +146,10 @@ module.exports = {
             .findOneAndUpdate({
                 _id: purchaseId,
                 creator: userId,
-                volume: oldVolume,
-                remaining_volume: remainingVolume
+                volume: oldVolume
             }, {
                 '$set': {
                     volume: volume
-                },
-                '$inc': {
-                    remaining_volume: volume - oldVolume
                 },
                 '$push': {
                     history: {
@@ -198,10 +193,7 @@ module.exports = {
         const updatedPurchase = await JointPurchase
             .findOneAndUpdate({
                 _id: purchaseId,
-                creator: userId,
-                remaining_volume: {
-                    '$gte': volume
-                }
+                creator: userId
             }, {
                 '$set': {
                     min_volume: volume
@@ -292,9 +284,6 @@ module.exports = {
                         user: userId
                     }
                 },
-                '$inc': {
-                    remaining_volume: volume
-                },
                 '$push': {
                     history: {
                         parameter: 'black_list.add',
@@ -378,13 +367,9 @@ module.exports = {
             .findOneAndUpdate({
                 _id: purchaseId,
                 min_volume: {'$lte': volume},
-                remaining_volume: {'$gte': volume},
                 'participants.user': {'$nin': [userId]},
                 black_list: {'$nin': [userId.toString()]}
             }, {
-                '$inc': {
-                    remaining_volume: -volume
-                },
                 '$push': {
                     participants: {
                         user: userId,
@@ -441,12 +426,8 @@ module.exports = {
                 _id: purchaseId,
                 creator: creatorId,
                 min_volume: {'$lte': volume},
-                remaining_volume: {'$gte': volume},
                 'participants.fake_user.login': {'$nin': [userLogin]}
             }, {
-                '$inc': {
-                    remaining_volume: -volume
-                },
                 '$push': {
                     participants: {
                         fake_user: {
@@ -498,9 +479,6 @@ module.exports = {
                     participants: {
                         user: userId
                     }
-                },
-                '$inc': {
-                    remaining_volume: volume
                 },
                 '$push': {
                     history: {
@@ -563,9 +541,6 @@ module.exports = {
                         }
                     }
                 },
-                '$inc': {
-                    remaining_volume: volume
-                }
             }, {
                 'new': true
             })
@@ -851,9 +826,15 @@ module.exports = {
                         price_per_unit: 1,
                         state: 1,
                         volume: 1,
-                        remaining_volume: 1,
                         measurement_unit: 1,
-                        date: 1
+                        date: 1,
+                        remaining_volume: {
+                            '$reduce': {
+                                input: '$participants',
+                                initialValue: '$volume',
+                                'in': {'$subtract': ['$$value', '$$this.volume']}
+                            }
+                        }
                     }
                 },
                 {'$sort': {recent: -1}},

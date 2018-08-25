@@ -24,7 +24,6 @@ const JointPurchaseSchema = new Schema({
     },
     volume: Number,
     min_volume: Number,
-    remaining_volume: Number,
     price_per_unit: Number,
     measurement_unit: {
         type: Schema.Types.ObjectId,
@@ -78,6 +77,22 @@ const JointPurchaseSchema = new Schema({
         default: true
     }
 });
+
+JointPurchaseSchema.virtual('stats').get(function () {
+    const stats = {};
+    stats['ordered_volume'] = this.participants.reduce(((total, part) => total + part.volume), 0);
+    stats['remaining_volume'] = this.volume - stats['ordered_volume'];
+    return stats;
+});
+
+JointPurchaseSchema.virtual('remaining_volume').get(function () {
+    const orderedVolume = this.participants.reduce(((total, part) => total + part.volume), 0);
+    return this.volume - orderedVolume;
+});
+
+
+JointPurchaseSchema.set("toObject", { virtuals: true });
+JointPurchaseSchema.set("toJSON", { virtuals: true });
 
 JointPurchaseSchema.plugin(autopopulate);
 module.exports = mongoose.model('JointPurchase', JointPurchaseSchema);
