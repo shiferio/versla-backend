@@ -144,7 +144,8 @@ module.exports = {
         return {
             categories: Array
                 .of(...map.keys())
-                .sort((a, b) => cmp.compare(a, b)),
+                .sort((a, b) => cmp.compare(a, b))
+                .map(c => mongoose.Types.ObjectId(c)),
             order: map
         };
     }
