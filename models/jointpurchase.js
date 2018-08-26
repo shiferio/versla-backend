@@ -52,7 +52,7 @@ const JointPurchaseSchema = new Schema({
             },
             volume: Number,
             paid: {
-                type: Boolean,
+                type: String,
                 default: false
             },
             delivered: {
@@ -60,7 +60,7 @@ const JointPurchaseSchema = new Schema({
                 default: false
             },
             sent: {
-                type: Boolean,
+                type: String,
                 default: false
             },
             fake_user: {

@@ -887,7 +887,7 @@ router.route('/payments/update').put(checkJWT, async (req, res) => {
         const purchase = await dbJointPurchases.updateUserPayment(
             req.body.id,
             req.body.user_id,
-            req.body.state,
+            req.body.date,
             req.decoded.user._id
         );
         return res.status(200).send({
@@ -926,7 +926,7 @@ router.route('/payments/update/fake').put(checkJWT, async (req, res) => {
         const purchase = await dbJointPurchases.updateFakeUserPayment(
             req.body.id,
             req.body.login,
-            req.body.state,
+            req.body.date,
             req.decoded.user._id
         );
         return res.status(200).send({
@@ -1067,7 +1067,7 @@ router.route('/sent/update').put(checkJWT, async (req, res) => {
         const purchase = await dbJointPurchases.updateUserOrderSent(
             req.body.id,
             req.body.user_id,
-            req.body.state,
+            req.body.date,
             req.decoded.user._id
         );
         return res.status(200).send({
@@ -1106,7 +1106,7 @@ router.route('/sent/update/fake').put(checkJWT, async (req, res) => {
         const purchase = await dbJointPurchases.updateFakeUserOrderSent(
             req.body.id,
             req.body.login,
-            req.body.state,
+            req.body.date,
             req.decoded.user._id
         );
         return res.status(200).send({

@@ -553,13 +553,12 @@ module.exports = {
         }
     },
 
-    updateUserPayment: async (purchaseId, userId, state, creatorId) => {
+    updateUserPayment: async (purchaseId, userId, date, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
             .shouldBeString(userId, 'MISSED USER ID')
-            .checkArgument(userId.length === 24, 'INVALID ID')
-            .shouldBeBoolean(state, 'MISSED STATE');
+            .checkArgument(userId.length === 24, 'INVALID ID');
 
         const purchase = await JointPurchase.findById(purchaseId);
 
@@ -579,16 +578,7 @@ module.exports = {
                 'participants.user': userId
             }, {
                 '$set': {
-                    'participants.$.paid': state
-                },
-                '$push': {
-                    history: {
-                        parameter: 'participants.paid',
-                        value: {
-                            user: userId,
-                            state: state
-                        }
-                    }
+                    'participants.$.paid': date
                 }
             }, {
                 'new': true
@@ -602,12 +592,11 @@ module.exports = {
         }
     },
 
-    updateFakeUserPayment: async (purchaseId, userLogin, state, creatorId) => {
+    updateFakeUserPayment: async (purchaseId, userLogin, date, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(userLogin, 'MISSED USER LOGIN')
-            .shouldBeBoolean(state, 'MISSED STATE');
+            .shouldBeString(userLogin, 'MISSED USER LOGIN');
 
         const purchase = await JointPurchase
             .findOne({
@@ -632,7 +621,7 @@ module.exports = {
                 'participants.fake_user.login': userLogin
             }, {
                 '$set': {
-                    'participants.$.paid': state
+                    'participants.$.paid': date
                 }
             }, {
                 'new': true
@@ -646,13 +635,12 @@ module.exports = {
         }
     },
 
-    updateUserOrderSent: async (purchaseId, userId, state, creatorId) => {
+    updateUserOrderSent: async (purchaseId, userId, date, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
             .shouldBeString(userId, 'MISSED USER ID')
-            .checkArgument(userId.length === 24, 'INVALID ID')
-            .shouldBeBoolean(state, 'MISSED STATE');
+            .checkArgument(userId.length === 24, 'INVALID ID');
 
         const purchase = await JointPurchase.findById(purchaseId);
 
@@ -672,16 +660,7 @@ module.exports = {
                 'participants.user': userId
             }, {
                 '$set': {
-                    'participants.$.sent': state
-                },
-                '$push': {
-                    history: {
-                        parameter: 'participants.sent',
-                        value: {
-                            user: userId,
-                            state: state
-                        }
-                    }
+                    'participants.$.sent': date
                 }
             }, {
                 'new': true
@@ -695,12 +674,11 @@ module.exports = {
         }
     },
 
-    updateFakeUserOrderSent: async (purchaseId, userLogin, state, creatorId) => {
+    updateFakeUserOrderSent: async (purchaseId, userLogin, date, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(userLogin, 'MISSED USER LOGIN')
-            .shouldBeBoolean(state, 'MISSED STATE');
+            .shouldBeString(userLogin, 'MISSED USER LOGIN');
 
         const purchase = await JointPurchase
             .findOne({
@@ -725,7 +703,7 @@ module.exports = {
                 'participants.fake_user.login': userLogin
             }, {
                 '$set': {
-                    'participants.$.sent': state
+                    'participants.$.sent': date
                 }
             }, {
                 'new': true
