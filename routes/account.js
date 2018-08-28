@@ -59,6 +59,23 @@ router.post('/signup', async (req, res) => {
     }
 });
 
+router.post('/reset', async (req, res) => {
+    try {
+        const result = await dbAccount.resetPassword(req.body.email);
+        console.log(result);
+        return res.status(200).send(result);
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        });
+    }
+});
+
 /**
  * @api {post} /api/accounts/login User authorization
  * @apiName Login
