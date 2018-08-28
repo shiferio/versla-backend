@@ -80,8 +80,39 @@ const JointPurchaseSchema = new Schema({
 
 JointPurchaseSchema.virtual('stats').get(function () {
     const stats = {};
-    stats['ordered_volume'] = this.participants.reduce(((total, part) => total + part.volume), 0);
-    stats['remaining_volume'] = this.volume - stats['ordered_volume'];
+    const accumulator = (total, part) => total + part.volume;
+
+    stats['ordered'] = this.participants.reduce(accumulator, 0);
+    stats['remaining'] = this.volume - stats['ordered'];
+
+    stats['paid'] = this.participants
+        .filter(part => !!part.paid)
+        .reduce(accumulator, 0);
+    stats['not_paid'] = this.participants
+        .filter(part => !part.paid)
+        .reduce(accumulator, 0);
+
+    const paidAndSent = this.participants
+        .filter(part => part.paid && part.sent)
+        .reduce(accumulator, 0);
+    const paidAndNotSent = this.participants
+        .filter(part => part.paid && !part.sent)
+        .reduce(accumulator, 0);
+    const notPaidAndSent = this.participants
+        .filter(part => !part.paid && part.sent)
+        .reduce(accumulator, 0);
+    const notPaidAndNotSent = this.participants
+        .filter(part => !part.paid && !part.sent)
+        .reduce(accumulator, 0);
+
+    stats['paid_and_sent'] = paidAndSent;
+    stats['paid_and_not_sent'] = paidAndNotSent;
+    stats['not_paid_and_sent'] = notPaidAndSent;
+    stats['not_paid_and_not_sent'] = notPaidAndNotSent;
+
+    stats['sent'] = paidAndSent + notPaidAndSent;
+    stats['not_sent'] = paidAndNotSent + notPaidAndNotSent;
+
     return stats;
 });
 
