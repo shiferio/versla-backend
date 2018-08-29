@@ -1,6 +1,7 @@
 const User = require('../../models/user');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
+const sendmail = require('../mail/send');
 const mongoose = require('mongoose');
 const pre = require('preconditions').singleton();
 
@@ -101,6 +102,41 @@ module.exports = {
                     message: "Successfully updated your profile"
                 },
                 data: user
+            };
+        } else {
+            return {
+                meta: {
+                    code: 404,
+                    success: false,
+                    message: "User not found"
+                },
+                data: null
+            };
+        }
+    },
+
+    /**
+     * Reset user password
+     * @param email User email
+     * @returns {Object}
+     */
+    resetPassword: async (email) => {
+        let user = await User.findOne().where("email").in(email).exec();
+        if (user) {
+            let newPassword = Math.random().toString(36).slice(-8);
+            console.log(newPassword);
+            user.password = newPassword;
+
+            user.save();
+
+            sendmail.sendNoReplyMessage('Пароль успешно сброшен', 'Ваш новый пароль: ' + newPassword + '. Если это были не Вы, срочно обновите регистрационные данные!', email);
+            return {
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Password successfully reseted"
+                },
+                data: null
             };
         } else {
             return {
