@@ -114,7 +114,8 @@ module.exports = {
                     value: data.state
                 }
             ],
-            is_public: data.is_public
+            is_public: data.is_public,
+            good: mongoose.Types.ObjectId(data.good_id)
         });
 
         await purchase.save();
