@@ -75,6 +75,7 @@ module.exports = {
         pre
             .shouldBeString(data.good_id, 'MISSED GOOD')
             .checkArgument(data.good_id.length === 24, 'INVALID ID')
+            .shouldBeString(data.description, 'MISSED DESCRIPTION')
             .shouldBeString(data.address, 'MISSED ADDRESS')
             .shouldBeNumber(data.volume, 'MISSED VOLUME')
             .shouldBeString(data.measurement_unit_id, 'MISSED MEASURE')
@@ -87,15 +88,16 @@ module.exports = {
             .checkArgument(data.city_id.length === 24, 'INVALID ID');
 
         const good = await Good.findById(data.good_id).populate('store_id');
+        const store = good.store_id;
         pre
             .shouldBeDefined(good, 'GOOD NOT FOUND')
-            .shouldBeDefined(good.store_id, 'STORE NOT FOUND');
+            .shouldBeDefined(store, 'STORE NOT FOUND');
         const price = store.goods_type === 'retail' ? good.price : good.purchase_info.wholesale_price;
 
         const purchase = new JointPurchase({
             name: good.name,
             picture: good.picture,
-            description: good.description,
+            description: data.description,
             category: good.category,
             creator: userId,
             address: data.address,
