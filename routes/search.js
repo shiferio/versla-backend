@@ -213,4 +213,36 @@ router.get('/jointpurchases/:pageNumber/:pageSize', async (req, res) => {
     }
 });
 
+router.get('/goodpurchases', async (req, res) => {
+    const filter = qs.parse(req.query['filter']);
+
+    const builder = new PurchaseFilterBuilder();
+    if (filter['good_id']) builder.good(filter['good_id']);
+    if (filter['city_id']) builder.city(filter['city_id']);
+
+    try {
+        const data = await dbJointPurchase
+            .findGoodByFilter(builder.build());
+
+        res.json({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'FOUND'
+            },
+            data: data
+        });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        });
+    }
+});
+
 module.exports = router;

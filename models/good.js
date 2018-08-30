@@ -34,7 +34,13 @@ const GoodSchema = new Schema({
     created: {
         type: Date,
         default: Date.now
-    }
+    },
+    purchase_info: {
+        wholesale_price: Number,
+        min_volume: Number,
+        purchase_enabled: Boolean
+    },
+    volume: Number
 });
 
 

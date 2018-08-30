@@ -75,6 +75,11 @@ const JointPurchaseSchema = new Schema({
     is_public: {
         type: Boolean,
         default: true
+    },
+    good: { // for good purchases
+        type: Schema.Types.ObjectId,
+        ref: 'Good',
+        autopopulate: true
     }
 });
 

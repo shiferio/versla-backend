@@ -1,4 +1,5 @@
 const JointPurchase = require('../../models/jointpurchase');
+const Good = require('../../models/good');
 const mongoose = require('mongoose');
 const pre = require('preconditions').singleton();
 const {Comparator} = require('../search/filter');
@@ -51,6 +52,57 @@ module.exports = {
             volume: data.volume,
             min_volume: data.min_volume,
             price_per_unit: data.price_per_unit,
+            measurement_unit: mongoose.Types.ObjectId(data.measurement_unit_id),
+            date: data.date,
+            state: data.state,
+            payment_type: data.payment_type,
+            payment_info: data.payment_info,
+            history: [
+                {
+                    parameter: 'state',
+                    value: data.state
+                }
+            ],
+            is_public: data.is_public
+        });
+
+        await purchase.save();
+
+        return purchase;
+    },
+
+    addGoodPurchase: async (data, userId) => {
+        pre
+            .shouldBeString(data.good_id, 'MISSED GOOD')
+            .checkArgument(data.good_id.length === 24, 'INVALID ID')
+            .shouldBeString(data.address, 'MISSED ADDRESS')
+            .shouldBeNumber(data.volume, 'MISSED VOLUME')
+            .shouldBeString(data.measurement_unit_id, 'MISSED MEASURE')
+            .checkArgument(data.measurement_unit_id.length === 24, 'INVALID ID')
+            .shouldBeDefined(data.date, 'MISSED DATE')
+            .shouldBeNumber(data.state, 'MISSED STATE')
+            .shouldBeNumber(data.payment_type, 'MISSED PAYMENT TYPE')
+            .shouldBeBoolean(data.is_public, 'MISSED PUBLIC STATE')
+            .shouldBeString(data.city_id, 'MISSED CITY')
+            .checkArgument(data.city_id.length === 24, 'INVALID ID');
+
+        const good = await Good.findById(data.good_id).populate('store_id');
+        pre
+            .shouldBeDefined(good, 'GOOD NOT FOUND')
+            .shouldBeDefined(good.store_id, 'STORE NOT FOUND');
+        const price = store.goods_type === 'retail' ? good.price : good.purchase_info.wholesale_price;
+
+        const purchase = new JointPurchase({
+            name: good.name,
+            picture: good.picture,
+            description: good.description,
+            category: good.category,
+            creator: userId,
+            address: data.address,
+            city: mongoose.Types.ObjectId(data.city_id),
+            volume: data.volume,
+            min_volume: good.purchase_info.min_volume,
+            price_per_unit: price,
             measurement_unit: mongoose.Types.ObjectId(data.measurement_unit_id),
             date: data.date,
             state: data.state,
@@ -846,5 +898,13 @@ module.exports = {
             purchases,
             total
         };
+    },
+
+    findGoodByFilter: async (filter) => {
+        const purchases = await JointPurchase
+            .find(filter)
+            .exec();
+
+        return purchases || [];
     }
 };

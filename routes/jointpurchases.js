@@ -51,6 +51,51 @@ router.route('/add').post(checkJWT, async (req, res) => {
 });
 
 /**
+ * @api {post} /api/jointpurchases/add/good Add Good Joint purchase
+ * @apiName Add Joint purchase
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} name
+ * @apiParam {String} picture
+ * @apiParam {String} description
+ * @apiParam {ObjectID} category_id
+ * @apiParam {String} address
+ * @apiParam {ObjectID} city_id
+ * @apiParam {Number} volume
+ * @apiParam {Number} min_volume
+ * @apiParam {Number} price_per_unit
+ * @apiParam {ObjectID} measurement_unit_id
+ * @apiParam {Date} date
+ * @apiParam {Number} state
+ * @apiParam {Number} payment_type
+ * @apiParam {Boolean} is_public
+ */
+router.route('/add/good').post(checkJWT, async (req, res) => {
+    try {
+        const purchase = await dbJointPurchases.addGoodPurchase(req.body, req.decoded.user._id);
+        return res.status(200).send({
+            meta: {
+                code: 200,
+                success: true,
+                message: 'PURCHASE ADDED'
+            },
+            data: {
+                purchase: purchase
+            }
+        })
+    } catch (error) {
+        return res.status(500).send({
+            meta: {
+                code: 500,
+                success: false,
+                message: error.message || 'UNKNOWN ERROR'
+            },
+            data: null
+        })
+    }
+});
+
+/**
  * @api {get} /api/jointpurchases/get/:id Get Joint purchase by ID
  * @apiName Get Joint purchase
  * @apiGroup Joint purchases

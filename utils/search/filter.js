@@ -117,6 +117,96 @@ class PurchaseFilterBuilder {
 }
 
 
+class GoodPurchaseFilterBuilder {
+
+    constructor() {
+        this._filter = {
+            state: {
+                '$in': [0, 1]
+            },
+            is_public: true
+        };
+    }
+
+    city(cityId) {
+        this._filter['city'] = ObjectId(cityId);
+    }
+
+    good(goodId) {
+        this._filter['good'] = ObjectId(goodId);
+    }
+
+    volume(volume) {
+        if (typeof volume === 'string') {
+            volume = Number.parseFloat(volume);
+        }
+        this._filter['volume'] = {
+            '$gte': volume
+        };
+
+        return this;
+    }
+
+    minVolume(minVolume) {
+        if (typeof minVolume === 'string') {
+            minVolume = Number.parseFloat(minVolume);
+        }
+        this._filter['min_volume'] = {
+            '$gte': minVolume
+        };
+
+        return this;
+    }
+
+    category(categories) {
+        this._filter['category'] = {
+            '$in': categories
+        };
+
+        return this;
+    }
+
+    date(date) {
+        const day = Number.parseInt(date.slice(0, 2));
+        const month = Number.parseInt(date.slice(2, 4)) - 1;
+        const year = Number.parseInt(date.slice(4, 8));
+
+        this._filter['date'] = {
+            '$gte': new Date(year, month, day)
+        };
+
+        return this;
+    }
+
+    price(min, max) {
+        if (min || max) {
+            this._filter['price_per_unit'] = {};
+        }
+
+        if (min) {
+            if (typeof min === 'string') {
+                min = Number.parseInt(min);
+            }
+            this._filter['price_per_unit']['$gte'] = min
+        }
+
+        if (max) {
+            if (typeof max === 'string') {
+                max = Number.parseInt(max);
+            }
+            this._filter['price_per_unit']['$lte'] = max
+        }
+
+        return this;
+    }
+
+    build() {
+        return Object.assign({}, this._filter);
+    }
+
+}
+
+
 function buildForGoods(query, filter) {
     query = (query || '')
         .trim()
@@ -167,5 +257,6 @@ function buildForGoods(query, filter) {
 module.exports = {
     buildForGoods: buildForGoods,
     PurchaseFilterBuilder,
+    GoodPurchaseFilterBuilder,
     Comparator
 };

@@ -142,68 +142,29 @@ router.get('/cart/:good_id', async (req, res, next) => {
  *      "goods": good
  *     }
  */
-router.route('/add').post(checkJWT, async (req, res, next) => {
-     User.findOne({
-        _id: req.decoded.user._id,
-    }, (err, user) => {
-        if (user.isSeller) {
-            Store.findOne({
-                _id: req.body.store_id
-            }, async (err, store) => {
-
-                if (store) {
-                    console.log(store.creator_id.toString() + " " + req.decoded.user._id.toString());
-                    if (store.creator_id.toString() === req.decoded.user._id.toString()) {
-                        console.log("ok");
-                        let good = new Good();
-                        good.store_id = store._id;
-                        good.creator_id = req.decoded.user._id;
-                        good.price = req.body.price;
-                        good.name = req.body.name;
-                        if (req.body.category) good.category = mongoose.Types.ObjectId(req.body.category);
-                        if (req.body.city) good.city = mongoose.Types.ObjectId(req.body.city);
-                        good.picture = req.body.picture;
-                        good.tags = req.body.tags;
-                        good.type = req.body.type;
-                        await good.save();
-
-                        let newgood = await Good.findOne().where("_id").in(good._id).exec();
-
-                        if (newgood) {
-                            res.json({
-                                meta: {
-                                    code: 200,
-                                    success: true,
-                                    message: "Good successfully added"
-                                },
-                                data: {
-                                    good: newgood
-                                }
-                            });
-                        } else {
-                            res.json({
-                                meta: {
-                                    success: false,
-                                    code: 200,
-                                    message: 'FATAL ERROR'
-                                },
-                                data: null
-                            });
-                        }
-                    }
-                }
-            });
-        } else {
-            res.json({
-                meta: {
-                    code: 403,
-                    success: false,
-                    message: "User isn't seller"
-                },
-                data: null
-            });
-        }
-    });
+router.route('/add').post(checkJWT, async (req, res) => {
+     try {
+         const good = await dbGoods.addGood(req.body, req.decoded.user._id);
+         return res.status(200).send({
+             meta: {
+                 code: 200,
+                 success: true,
+                 message: 'GOOD ADDED'
+             },
+             data: {
+                 good: good
+             }
+         })
+     } catch (error) {
+         return res.status(500).send({
+             meta: {
+                 code: 500,
+                 success: false,
+                 message: error.message || 'UNKNOWN ERROR'
+             },
+             data: null
+         })
+     }
 });
 
 /**
