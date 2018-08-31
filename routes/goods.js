@@ -479,6 +479,39 @@ router.route('/update/city').put(checkJWT, (req, res, next) => {
     });
 });
 
+router.route('/update/volume').put(checkJWT, (req, res, next) => {
+    Good.findOneAndUpdate({
+        creator_id: req.decoded.user._id,
+        _id: req.body.good_id
+    }, {
+        $set: {
+            volume: req.body.volume
+        }
+    }, {new: true}, function (err, good) {
+        if (err) {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: false,
+                    message: err.message
+                },
+                data: null
+            });
+        } else {
+            res.json({
+                meta: {
+                    code: 200,
+                    success: true,
+                    message: "Good successfully updated"
+                },
+                data: {
+                    good: good
+                }
+            });
+        }
+    });
+});
+
 router.route('/update/rating').put(checkJWT, async (req, res) => {
     let data = await dbGoods.updateGoodRating(req.body.rate, req.body.good, req.decoded.user._id);
     return res.status(data['meta'].code).send(data);
