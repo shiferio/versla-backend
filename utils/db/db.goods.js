@@ -27,7 +27,8 @@ module.exports = {
             picture: data.picture,
             tags: data.tags,
             type: data.type,
-            volume: data.volume
+            volume: data.volume,
+            measurement_unit: data.measurement_unit_id
         });
         if (data.category) good.category = mongoose.Types.ObjectId(data.category);
         if (data.city) good.city = mongoose.Types.ObjectId(data.city);
