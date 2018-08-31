@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const {buildForGoods, PurchaseFilterBuilder} = require('../utils/search/filter');
+const {buildForGoods, PurchaseFilterBuilder, GoodPurchaseFilterBuilder} = require('../utils/search/filter');
 
 const Good = require('../models/good');
 const dbJointPurchase = require('../utils/db/db.Jointpurchase');
@@ -216,7 +216,7 @@ router.get('/jointpurchases/:pageNumber/:pageSize', async (req, res) => {
 router.get('/goodpurchases', async (req, res) => {
     const filter = qs.parse(req.query['filter']);
 
-    const builder = new PurchaseFilterBuilder();
+    const builder = new GoodPurchaseFilterBuilder();
     if (filter['good_id']) builder.good(filter['good_id']);
     if (filter['city_id']) builder.city(filter['city_id']);
 

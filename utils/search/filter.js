@@ -130,10 +130,14 @@ class GoodPurchaseFilterBuilder {
 
     city(cityId) {
         this._filter['city'] = ObjectId(cityId);
+
+        return this;
     }
 
     good(goodId) {
         this._filter['good'] = ObjectId(goodId);
+
+        return this;
     }
 
     volume(volume) {

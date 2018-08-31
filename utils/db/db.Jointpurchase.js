@@ -104,7 +104,7 @@ module.exports = {
             city: mongoose.Types.ObjectId(data.city_id),
             volume: data.volume,
             min_volume: good.purchase_info.min_volume,
-            price_per_unit: price,
+            price_per_unit: data.price_per_unit,
             measurement_unit: mongoose.Types.ObjectId(data.measurement_unit_id),
             date: data.date,
             state: data.state,
