@@ -434,6 +434,13 @@ module.exports = {
                             login: userLogin
                         },
                         volume: volume
+                    },
+                    history: {
+                        parameter: 'fake_participants.joint',
+                        value: {
+                            user: userLogin,
+                            volume: volume
+                        }
                     }
                 }
             }, {
@@ -541,6 +548,15 @@ module.exports = {
                         }
                     }
                 },
+                '$push': {
+                    history: {
+                        parameter: 'fake_participants.detached',
+                        value: {
+                            user: userLogin,
+                            volume: volume
+                        }
+                    }
+                }
             }, {
                 'new': true
             })
@@ -622,6 +638,15 @@ module.exports = {
             }, {
                 '$set': {
                     'participants.$.paid': date
+                },
+                '$push': {
+                    history: {
+                        parameter: 'fake_participants.paid',
+                        value: {
+                            user: userLogin,
+                            state: date
+                        }
+                    }
                 }
             }, {
                 'new': true
@@ -704,6 +729,15 @@ module.exports = {
             }, {
                 '$set': {
                     'participants.$.sent': date
+                },
+                '$push': {
+                    history: {
+                        parameter: 'fake_participants.sent',
+                        value: {
+                            user: userLogin,
+                            state: date
+                        }
+                    }
                 }
             }, {
                 'new': true
