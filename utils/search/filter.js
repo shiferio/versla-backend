@@ -76,6 +76,12 @@ class PurchaseFilterBuilder {
         return this;
     }
 
+    city(cityId) {
+        this._filter['city'] = new ObjectId(cityId);
+
+        return this;
+    }
+
     date(date) {
         const day = Number.parseInt(date.slice(0, 2));
         const month = Number.parseInt(date.slice(2, 4)) - 1;

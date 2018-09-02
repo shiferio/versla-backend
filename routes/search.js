@@ -177,6 +177,7 @@ router.get('/jointpurchases/:pageNumber/:pageSize', async (req, res) => {
     if (filter['volume']) builder.volume(filter['volume']);
     if (filter['min_volume']) builder.minVolume(filter['min_volume']);
     if (filter['date']) builder.date(filter['date']);
+    if (filter['city']) builder.city(filter['city']);
     if (filter['category']) {
         categoriesData = await getSubcategories(filter['category']);
         builder.category(categoriesData['categories']);
