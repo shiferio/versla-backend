@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const autopopulate = require('mongoose-autopopulate');
 const Schema = mongoose.Schema;
+const Big = require('big.js');
 
 const JointPurchaseSchema = new Schema({
     name: String,
@@ -85,38 +86,48 @@ const JointPurchaseSchema = new Schema({
 
 JointPurchaseSchema.virtual('stats').get(function () {
     const stats = {};
-    const accumulator = (total, part) => total + part.volume;
+    const accumulator = (total, part) => total.plus(part.volume);
 
-    stats['ordered'] = this.participants.reduce(accumulator, 0);
-    stats['remaining'] = this.volume - stats['ordered'];
+    const participants = this.participants.map(part => {
+        return {
+            volume: new Big(part.volume),
+            paid: part.paid,
+            sent: part.sent
+        };
+    });
 
-    stats['paid'] = this.participants
+    stats['ordered'] = participants.reduce(accumulator, new Big(0)).toFixed();
+    stats['remaining'] = new Big(this.volume).minus(stats['ordered']).toFixed();
+
+    stats['paid'] = participants
         .filter(part => !!part.paid)
-        .reduce(accumulator, 0);
-    stats['not_paid'] = this.participants
+        .reduce(accumulator, new Big(0))
+        .toFixed();
+    stats['not_paid'] = participants
         .filter(part => !part.paid)
-        .reduce(accumulator, 0);
+        .reduce(accumulator, new Big(0))
+        .toFixed();
 
-    const paidAndSent = this.participants
+    const paidAndSent = participants
         .filter(part => part.paid && part.sent)
-        .reduce(accumulator, 0);
-    const paidAndNotSent = this.participants
+        .reduce(accumulator, new Big(0));
+    const paidAndNotSent = participants
         .filter(part => part.paid && !part.sent)
-        .reduce(accumulator, 0);
-    const notPaidAndSent = this.participants
+        .reduce(accumulator, new Big(0));
+    const notPaidAndSent = participants
         .filter(part => !part.paid && part.sent)
-        .reduce(accumulator, 0);
-    const notPaidAndNotSent = this.participants
+        .reduce(accumulator, new Big(0));
+    const notPaidAndNotSent = participants
         .filter(part => !part.paid && !part.sent)
-        .reduce(accumulator, 0);
+        .reduce(accumulator, new Big(0));
 
-    stats['paid_and_sent'] = paidAndSent;
-    stats['paid_and_not_sent'] = paidAndNotSent;
-    stats['not_paid_and_sent'] = notPaidAndSent;
-    stats['not_paid_and_not_sent'] = notPaidAndNotSent;
+    stats['paid_and_sent'] = paidAndSent.toFixed();
+    stats['paid_and_not_sent'] = paidAndNotSent.toFixed();
+    stats['not_paid_and_sent'] = notPaidAndSent.toFixed();
+    stats['not_paid_and_not_sent'] = notPaidAndNotSent.toFixed();
 
-    stats['sent'] = paidAndSent + notPaidAndSent;
-    stats['not_sent'] = paidAndNotSent + notPaidAndNotSent;
+    stats['sent'] = paidAndSent.plus(notPaidAndSent).toFixed();
+    stats['not_sent'] = paidAndNotSent.plus(notPaidAndNotSent).toFixed();
 
     return stats;
 });
