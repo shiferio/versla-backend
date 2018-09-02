@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const autopopulate = require('mongoose-autopopulate');
 const Schema = mongoose.Schema;
 
 const GoodSchema = new Schema({
@@ -34,8 +35,19 @@ const GoodSchema = new Schema({
     created: {
         type: Date,
         default: Date.now
+    },
+    purchase_info: {
+        wholesale_price: Number,
+        min_volume: Number,
+        purchase_enabled: Boolean
+    },
+    volume: Number,
+    measurement_unit: {
+        type: Schema.Types.ObjectId,
+        ref: 'MeasurementUnit',
+        autopopulate: true
     }
 });
 
-
+GoodSchema.plugin(autopopulate);
 module.exports = mongoose.model('Good', GoodSchema);
