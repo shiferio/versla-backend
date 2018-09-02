@@ -23,8 +23,8 @@ const JointPurchaseSchema = new Schema({
         ref: 'City',
         autopopulate: true
     },
-    volume: Number,
-    min_volume: Number,
+    volume_dec: Schema.Types.Decimal128,
+    min_volume_dec: Schema.Types.Decimal128,
     price_per_unit: Number,
     measurement_unit: {
         type: Schema.Types.ObjectId,
@@ -132,11 +132,33 @@ JointPurchaseSchema.virtual('stats').get(function () {
     return stats;
 });
 
-JointPurchaseSchema.virtual('remaining_volume').get(function () {
-    const orderedVolume = this.participants.reduce(((total, part) => total + part.volume), 0);
-    return this.volume - orderedVolume;
+JointPurchaseSchema.virtual('remaining_volume_big').get(function () {
+    const volumeBig = new Big(this.volume_dec.toString());
+    return this.participants
+        .reduce(((total, part) => total.minus(part.volume)), volumeBig);
 });
 
+JointPurchaseSchema.virtual('remaining_volume').get(function () {
+    const volumeBig = new Big(this.volume_dec.toString());
+    return Number.parseFloat(this.participants
+        .reduce(((total, part) => total.minus(part.volume)), volumeBig));
+});
+
+JointPurchaseSchema.virtual('volume_big').get(function () {
+    return new Big(this.volume_dec.toString());
+});
+
+JointPurchaseSchema.virtual('min_volume_big').get(function () {
+    return new Big(this.min_volume_dec.toString());
+});
+
+JointPurchaseSchema.virtual('volume').get(function () {
+    return Number.parseFloat(this.volume_dec);
+});
+
+JointPurchaseSchema.virtual('min_volume').get(function () {
+    return Number.parseFloat(this.min_volume_dec);
+});
 
 JointPurchaseSchema.set("toObject", { virtuals: true });
 JointPurchaseSchema.set("toJSON", { virtuals: true });

@@ -3,6 +3,7 @@ const Good = require('../../models/good');
 const mongoose = require('mongoose');
 const pre = require('preconditions').singleton();
 const {Comparator} = require('../search/filter');
+const Big = require('big.js');
 
 const MODIFIABLE_FIELDS = [
     'name', 'picture', 'description', 'category', 'price_per_unit',
@@ -49,8 +50,8 @@ module.exports = {
             creator: userId,
             address: data.address,
             city: mongoose.Types.ObjectId(data.city_id),
-            volume: data.volume,
-            min_volume: data.min_volume,
+            volume_dec: mongoose.Types.Decimal128.fromString(data.volume.toString()),
+            min_volume_dec: mongoose.Types.Decimal128.fromString(data.min_volume.toString()),
             price_per_unit: data.price_per_unit,
             measurement_unit: mongoose.Types.ObjectId(data.measurement_unit_id),
             date: data.date,
@@ -102,8 +103,8 @@ module.exports = {
             creator: userId,
             address: data.address,
             city: mongoose.Types.ObjectId(data.city_id),
-            volume: data.volume,
-            min_volume: good.purchase_info.min_volume,
+            volume_dec: mongoose.Types.Decimal128.fromString(data.volume.toString()),
+            min_volume_dec: mongoose.Types.Decimal128.fromString(good.purchase_info.min_volume.toString()),
             price_per_unit: data.price_per_unit,
             measurement_unit: mongoose.Types.ObjectId(data.measurement_unit_id),
             date: data.date,
@@ -190,10 +191,11 @@ module.exports = {
             throw new Error('NO SUCH PURCHASE');
         }
 
-        const oldVolume = purchase.volume;
-        const remainingVolume = purchase.remaining_volume;
-        const usedVolume = oldVolume - remainingVolume;
-        if (volume < usedVolume) {
+        const volumeBig = new Big(volume);
+        const oldVolume = purchase.volume_big;
+        const remainingVolume = purchase.remaining_volume_big;
+        const usedVolume = oldVolume.minus(remainingVolume);
+        if (volumeBig.lt(usedVolume)) {
             throw new Error('LESSER THAN USED');
         }
 
@@ -201,16 +203,16 @@ module.exports = {
             .findOneAndUpdate({
                 _id: purchaseId,
                 creator: userId,
-                volume: oldVolume
+                volume_dec: purchase.volume_dec
             }, {
                 '$set': {
-                    volume: volume
+                    volume_dec: mongoose.Types.Decimal128.fromString(volume.toString())
                 },
                 '$push': {
                     history: {
                         parameter: 'volume',
                         value: {
-                            volume: volume,
+                            volume: volumeBig.toFixed(),
                             measurement_unit: purchase.measurement_unit.name
                         }
                     }
@@ -241,7 +243,8 @@ module.exports = {
             throw new Error('NO SUCH PURCHASE');
         }
 
-        if (volume > purchase.remaining_volume) {
+        const volumeBig = new Big(volume);
+        if (volumeBig.gt(purchase.remaining_volume_big)) {
             throw new Error('GREATER THAN REMAINING');
         }
 
@@ -251,13 +254,13 @@ module.exports = {
                 creator: userId
             }, {
                 '$set': {
-                    min_volume: volume
+                    min_volume_dec: mongoose.Types.Decimal128.fromString(volume.toString())
                 },
                 '$push': {
                     history: {
                         parameter: 'min_volume',
                         value: {
-                            volume: volume,
+                            volume: volumeBig.toFixed(),
                             measurement_unit: purchase.measurement_unit.name
                         }
                     }
@@ -402,11 +405,13 @@ module.exports = {
             .checkArgument(volume > 0, 'INVALID VOLUME');
 
         const purchase = await JointPurchase.findById(purchaseId);
+        const volumeBig = new Big(volume);
+        const volumeDec = mongoose.Types.Decimal128.fromString(volume.toString());
 
         pre
             .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
-            .checkArgument(purchase.min_volume <= volume, 'VOLUME IS LESSER THAN MINIMUM')
-            .checkArgument(purchase.remaining_volume >= volume, 'TOO MUCH VOLUME')
+            .checkArgument(purchase.min_volume_big.lte(volumeBig), 'VOLUME IS LESSER THAN MINIMUM')
+            .checkArgument(purchase.remaining_volume_big.gte(volumeBig), 'TOO MUCH VOLUME')
             .checkArgument(
                 purchase.black_list.indexOf(userId.toString()) === -1,
                 'ACCESS DENIED'
@@ -421,7 +426,7 @@ module.exports = {
         const updatedPurchase = await JointPurchase
             .findOneAndUpdate({
                 _id: purchaseId,
-                min_volume: {'$lte': volume},
+                min_volume_dec: {'$lte': volumeDec},
                 'participants.user': {'$nin': [userId]},
                 black_list: {'$nin': [userId.toString()]}
             }, {
@@ -434,7 +439,7 @@ module.exports = {
                         parameter: 'participants.joint',
                         value: {
                             user: userId,
-                            volume: volume
+                            volume: volumeBig.toFixed()
                         }
                     }
                 }
@@ -464,11 +469,13 @@ module.exports = {
                 creator: creatorId
             })
             .exec();
+        const volumeBig = new Big(volume);
+        const volumeDec = mongoose.Types.Decimal128.fromString(volume.toString());
 
         pre
             .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
-            .checkArgument(purchase.min_volume <= volume, 'VOLUME IS LESSER THAN MINIMUM')
-            .checkArgument(purchase.remaining_volume >= volume, 'TOO MUCH VOLUME')
+            .checkArgument(purchase.min_volume_big.lte(volumeBig), 'VOLUME IS LESSER THAN MINIMUM')
+            .checkArgument(purchase.remaining_volume_big.gte(volumeBig), 'TOO MUCH VOLUME')
             .checkArgument(
                 purchase.participants
                     .filter(p => !!p.fake_user)
@@ -480,7 +487,7 @@ module.exports = {
             .findOneAndUpdate({
                 _id: purchaseId,
                 creator: creatorId,
-                min_volume: {'$lte': volume},
+                min_volume_dec: {'$lte': volumeDec},
                 'participants.fake_user.login': {'$nin': [userLogin]}
             }, {
                 '$push': {
@@ -494,7 +501,7 @@ module.exports = {
                         parameter: 'fake_participants.joint',
                         value: {
                             user: userLogin,
-                            volume: volume
+                            volume: volumeBig.toFixed()
                         }
                     }
                 }
@@ -547,7 +554,7 @@ module.exports = {
                         parameter: 'participants.detached',
                         value: {
                             user: userId,
-                            volume: volume
+                            volume: volume.toString()
                         }
                     }
                 }
@@ -608,7 +615,7 @@ module.exports = {
                         parameter: 'fake_participants.detached',
                         value: {
                             user: userLogin,
-                            volume: volume
+                            volume: volume.toString()
                         }
                     }
                 }
@@ -883,25 +890,8 @@ module.exports = {
         const purchases = await JointPurchase
             .aggregate([
                 {'$match': filter},
-                {
-                    '$project': {
-                        recent: {'$arrayElemAt': ['$history', -1]},
-                        picture: 1,
-                        name: 1,
-                        category: 1,
-                        description: 1,
-                        price_per_unit: 1,
-                        state: 1,
-                        volume: 1,
-                        measurement_unit: 1,
-                        date: 1,
-                        remaining_volume: {
-                            '$reduce': {
-                                input: '$participants',
-                                initialValue: '$volume',
-                                'in': {'$subtract': ['$$value', '$$this.volume']}
-                            }
-                        }
+                {'$addFields': {
+                        recent: {'$arrayElemAt': ['$history', -1]}
                     }
                 },
                 {'$sort': {recent: -1}},
@@ -930,6 +920,14 @@ module.exports = {
             });
             purchases.sort((a, b) => cmp.compare(a, b));
         }
+        purchases.forEach(purchase => {
+            purchase.volume = Number.parseFloat(purchase.volume_dec);
+            purchase.min_volume = Number.parseFloat(purchase.min_volume_dec);
+
+            const volumeBig = new Big(purchase.volume_dec.toString());
+            purchase.remaining_volume = Number.parseFloat(purchase.participants
+                .reduce(((total, part) => total.minus(part.volume)), volumeBig));
+        });
 
         return {
             purchases,

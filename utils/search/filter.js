@@ -1,5 +1,5 @@
 const qs = require('qs');
-const ObjectId = require('mongoose').Types.ObjectId;
+const {ObjectId, Decimal128}= require('mongoose').Types;
 
 
 class Comparator {
@@ -47,22 +47,16 @@ class PurchaseFilterBuilder {
     }
 
     volume(volume) {
-        if (typeof volume === 'string') {
-            volume = Number.parseFloat(volume);
-        }
-        this._filter['volume'] = {
-            '$gte': volume
+        this._filter['volume_dec'] = {
+            '$gte': Decimal128.fromString(volume.toString())
         };
 
         return this;
     }
 
     minVolume(minVolume) {
-        if (typeof minVolume === 'string') {
-            minVolume = Number.parseFloat(minVolume);
-        }
-        this._filter['min_volume'] = {
-            '$gte': minVolume
+        this._filter['min_volume_dec'] = {
+            '$gte': Decimal128.fromString(minVolume.toString())
         };
 
         return this;
@@ -147,22 +141,16 @@ class GoodPurchaseFilterBuilder {
     }
 
     volume(volume) {
-        if (typeof volume === 'string') {
-            volume = Number.parseFloat(volume);
-        }
-        this._filter['volume'] = {
-            '$gte': volume
+        this._filter['volume_dec'] = {
+            '$gte': Decimal128.fromString(volume.toString())
         };
 
         return this;
     }
 
     minVolume(minVolume) {
-        if (typeof minVolume === 'string') {
-            minVolume = Number.parseFloat(minVolume);
-        }
-        this._filter['min_volume'] = {
-            '$gte': minVolume
+        this._filter['min_volume_dec'] = {
+            '$gte': Decimal128.fromString(minVolume.toString())
         };
 
         return this;
