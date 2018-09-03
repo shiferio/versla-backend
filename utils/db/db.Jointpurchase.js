@@ -1,7 +1,9 @@
 const JointPurchase = require('../../models/jointpurchase');
+const Good = require('../../models/good');
 const mongoose = require('mongoose');
 const pre = require('preconditions').singleton();
 const {Comparator} = require('../search/filter');
+const Big = require('big.js');
 
 const MODIFIABLE_FIELDS = [
     'name', 'picture', 'description', 'category', 'price_per_unit',
@@ -48,8 +50,8 @@ module.exports = {
             creator: userId,
             address: data.address,
             city: mongoose.Types.ObjectId(data.city_id),
-            volume: data.volume,
-            min_volume: data.min_volume,
+            volume_dec: mongoose.Types.Decimal128.fromString(data.volume.toString()),
+            min_volume_dec: mongoose.Types.Decimal128.fromString(data.min_volume.toString()),
             price_per_unit: data.price_per_unit,
             measurement_unit: mongoose.Types.ObjectId(data.measurement_unit_id),
             date: data.date,
@@ -63,6 +65,60 @@ module.exports = {
                 }
             ],
             is_public: data.is_public
+        });
+
+        await purchase.save();
+
+        return purchase;
+    },
+
+    addGoodPurchase: async (data, userId) => {
+        pre
+            .shouldBeString(data.good_id, 'MISSED GOOD')
+            .checkArgument(data.good_id.length === 24, 'INVALID ID')
+            .shouldBeString(data.description, 'MISSED DESCRIPTION')
+            .shouldBeString(data.address, 'MISSED ADDRESS')
+            .shouldBeNumber(data.volume, 'MISSED VOLUME')
+            .shouldBeString(data.measurement_unit_id, 'MISSED MEASURE')
+            .checkArgument(data.measurement_unit_id.length === 24, 'INVALID ID')
+            .shouldBeDefined(data.date, 'MISSED DATE')
+            .shouldBeNumber(data.state, 'MISSED STATE')
+            .shouldBeNumber(data.payment_type, 'MISSED PAYMENT TYPE')
+            .shouldBeBoolean(data.is_public, 'MISSED PUBLIC STATE')
+            .shouldBeString(data.city_id, 'MISSED CITY')
+            .checkArgument(data.city_id.length === 24, 'INVALID ID');
+
+        const good = await Good.findById(data.good_id).populate('store_id');
+        const store = good.store_id;
+        pre
+            .shouldBeDefined(good, 'GOOD NOT FOUND')
+            .shouldBeDefined(store, 'STORE NOT FOUND');
+        const price = store.goods_type === 'retail' ? good.price : good.purchase_info.wholesale_price;
+
+        const purchase = new JointPurchase({
+            name: good.name,
+            picture: good.picture,
+            description: data.description,
+            category: good.category,
+            creator: userId,
+            address: data.address,
+            city: mongoose.Types.ObjectId(data.city_id),
+            volume_dec: mongoose.Types.Decimal128.fromString(data.volume.toString()),
+            min_volume_dec: mongoose.Types.Decimal128.fromString(good.purchase_info.min_volume.toString()),
+            price_per_unit: data.price_per_unit,
+            measurement_unit: mongoose.Types.ObjectId(data.measurement_unit_id),
+            date: data.date,
+            state: data.state,
+            payment_type: data.payment_type,
+            payment_info: data.payment_info,
+            history: [
+                {
+                    parameter: 'state',
+                    value: data.state
+                }
+            ],
+            is_public: data.is_public,
+            good: mongoose.Types.ObjectId(data.good_id)
         });
 
         await purchase.save();
@@ -135,10 +191,11 @@ module.exports = {
             throw new Error('NO SUCH PURCHASE');
         }
 
-        const oldVolume = purchase.volume;
-        const remainingVolume = purchase.remaining_volume;
-        const usedVolume = oldVolume - remainingVolume;
-        if (volume < usedVolume) {
+        const volumeBig = new Big(volume);
+        const oldVolume = purchase.volume_big;
+        const remainingVolume = purchase.remaining_volume_big;
+        const usedVolume = oldVolume.minus(remainingVolume);
+        if (volumeBig.lt(usedVolume)) {
             throw new Error('LESSER THAN USED');
         }
 
@@ -146,16 +203,16 @@ module.exports = {
             .findOneAndUpdate({
                 _id: purchaseId,
                 creator: userId,
-                volume: oldVolume
+                volume_dec: purchase.volume_dec
             }, {
                 '$set': {
-                    volume: volume
+                    volume_dec: mongoose.Types.Decimal128.fromString(volume.toString())
                 },
                 '$push': {
                     history: {
                         parameter: 'volume',
                         value: {
-                            volume: volume,
+                            volume: volumeBig.toFixed(),
                             measurement_unit: purchase.measurement_unit.name
                         }
                     }
@@ -186,7 +243,8 @@ module.exports = {
             throw new Error('NO SUCH PURCHASE');
         }
 
-        if (volume > purchase.remaining_volume) {
+        const volumeBig = new Big(volume);
+        if (volumeBig.gt(purchase.remaining_volume_big)) {
             throw new Error('GREATER THAN REMAINING');
         }
 
@@ -196,13 +254,13 @@ module.exports = {
                 creator: userId
             }, {
                 '$set': {
-                    min_volume: volume
+                    min_volume_dec: mongoose.Types.Decimal128.fromString(volume.toString())
                 },
                 '$push': {
                     history: {
                         parameter: 'min_volume',
                         value: {
-                            volume: volume,
+                            volume: volumeBig.toFixed(),
                             measurement_unit: purchase.measurement_unit.name
                         }
                     }
@@ -347,11 +405,13 @@ module.exports = {
             .checkArgument(volume > 0, 'INVALID VOLUME');
 
         const purchase = await JointPurchase.findById(purchaseId);
+        const volumeBig = new Big(volume);
+        const volumeDec = mongoose.Types.Decimal128.fromString(volume.toString());
 
         pre
             .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
-            .checkArgument(purchase.min_volume <= volume, 'VOLUME IS LESSER THAN MINIMUM')
-            .checkArgument(purchase.remaining_volume >= volume, 'TOO MUCH VOLUME')
+            .checkArgument(purchase.min_volume_big.lte(volumeBig), 'VOLUME IS LESSER THAN MINIMUM')
+            .checkArgument(purchase.remaining_volume_big.gte(volumeBig), 'TOO MUCH VOLUME')
             .checkArgument(
                 purchase.black_list.indexOf(userId.toString()) === -1,
                 'ACCESS DENIED'
@@ -366,7 +426,7 @@ module.exports = {
         const updatedPurchase = await JointPurchase
             .findOneAndUpdate({
                 _id: purchaseId,
-                min_volume: {'$lte': volume},
+                min_volume_dec: {'$lte': volumeDec},
                 'participants.user': {'$nin': [userId]},
                 black_list: {'$nin': [userId.toString()]}
             }, {
@@ -379,7 +439,7 @@ module.exports = {
                         parameter: 'participants.joint',
                         value: {
                             user: userId,
-                            volume: volume
+                            volume: volumeBig.toFixed()
                         }
                     }
                 }
@@ -409,11 +469,13 @@ module.exports = {
                 creator: creatorId
             })
             .exec();
+        const volumeBig = new Big(volume);
+        const volumeDec = mongoose.Types.Decimal128.fromString(volume.toString());
 
         pre
             .shouldBeDefined(purchase, 'NO SUCH PURCHASE')
-            .checkArgument(purchase.min_volume <= volume, 'VOLUME IS LESSER THAN MINIMUM')
-            .checkArgument(purchase.remaining_volume >= volume, 'TOO MUCH VOLUME')
+            .checkArgument(purchase.min_volume_big.lte(volumeBig), 'VOLUME IS LESSER THAN MINIMUM')
+            .checkArgument(purchase.remaining_volume_big.gte(volumeBig), 'TOO MUCH VOLUME')
             .checkArgument(
                 purchase.participants
                     .filter(p => !!p.fake_user)
@@ -425,7 +487,7 @@ module.exports = {
             .findOneAndUpdate({
                 _id: purchaseId,
                 creator: creatorId,
-                min_volume: {'$lte': volume},
+                min_volume_dec: {'$lte': volumeDec},
                 'participants.fake_user.login': {'$nin': [userLogin]}
             }, {
                 '$push': {
@@ -434,6 +496,13 @@ module.exports = {
                             login: userLogin
                         },
                         volume: volume
+                    },
+                    history: {
+                        parameter: 'fake_participants.joint',
+                        value: {
+                            user: userLogin,
+                            volume: volumeBig.toFixed()
+                        }
                     }
                 }
             }, {
@@ -485,7 +554,7 @@ module.exports = {
                         parameter: 'participants.detached',
                         value: {
                             user: userId,
-                            volume: volume
+                            volume: volume.toString()
                         }
                     }
                 }
@@ -541,6 +610,15 @@ module.exports = {
                         }
                     }
                 },
+                '$push': {
+                    history: {
+                        parameter: 'fake_participants.detached',
+                        value: {
+                            user: userLogin,
+                            volume: volume.toString()
+                        }
+                    }
+                }
             }, {
                 'new': true
             })
@@ -553,13 +631,12 @@ module.exports = {
         }
     },
 
-    updateUserPayment: async (purchaseId, userId, state, creatorId) => {
+    updateUserPayment: async (purchaseId, userId, date, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
             .shouldBeString(userId, 'MISSED USER ID')
-            .checkArgument(userId.length === 24, 'INVALID ID')
-            .shouldBeBoolean(state, 'MISSED STATE');
+            .checkArgument(userId.length === 24, 'INVALID ID');
 
         const purchase = await JointPurchase.findById(purchaseId);
 
@@ -579,16 +656,7 @@ module.exports = {
                 'participants.user': userId
             }, {
                 '$set': {
-                    'participants.$.paid': state
-                },
-                '$push': {
-                    history: {
-                        parameter: 'participants.paid',
-                        value: {
-                            user: userId,
-                            state: state
-                        }
-                    }
+                    'participants.$.paid': date
                 }
             }, {
                 'new': true
@@ -602,12 +670,11 @@ module.exports = {
         }
     },
 
-    updateFakeUserPayment: async (purchaseId, userLogin, state, creatorId) => {
+    updateFakeUserPayment: async (purchaseId, userLogin, date, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(userLogin, 'MISSED USER LOGIN')
-            .shouldBeBoolean(state, 'MISSED STATE');
+            .shouldBeString(userLogin, 'MISSED USER LOGIN');
 
         const purchase = await JointPurchase
             .findOne({
@@ -632,7 +699,16 @@ module.exports = {
                 'participants.fake_user.login': userLogin
             }, {
                 '$set': {
-                    'participants.$.paid': state
+                    'participants.$.paid': date
+                },
+                '$push': {
+                    history: {
+                        parameter: 'fake_participants.paid',
+                        value: {
+                            user: userLogin,
+                            state: date
+                        }
+                    }
                 }
             }, {
                 'new': true
@@ -646,13 +722,12 @@ module.exports = {
         }
     },
 
-    updateUserOrderSent: async (purchaseId, userId, state, creatorId) => {
+    updateUserOrderSent: async (purchaseId, userId, date, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
             .shouldBeString(userId, 'MISSED USER ID')
-            .checkArgument(userId.length === 24, 'INVALID ID')
-            .shouldBeBoolean(state, 'MISSED STATE');
+            .checkArgument(userId.length === 24, 'INVALID ID');
 
         const purchase = await JointPurchase.findById(purchaseId);
 
@@ -672,16 +747,7 @@ module.exports = {
                 'participants.user': userId
             }, {
                 '$set': {
-                    'participants.$.sent': state
-                },
-                '$push': {
-                    history: {
-                        parameter: 'participants.sent',
-                        value: {
-                            user: userId,
-                            state: state
-                        }
-                    }
+                    'participants.$.sent': date
                 }
             }, {
                 'new': true
@@ -695,12 +761,11 @@ module.exports = {
         }
     },
 
-    updateFakeUserOrderSent: async (purchaseId, userLogin, state, creatorId) => {
+    updateFakeUserOrderSent: async (purchaseId, userLogin, date, creatorId) => {
         pre
             .shouldBeString(purchaseId, 'MISSED PURCHASE ID')
             .checkArgument(purchaseId.length === 24, 'INVALID ID')
-            .shouldBeString(userLogin, 'MISSED USER LOGIN')
-            .shouldBeBoolean(state, 'MISSED STATE');
+            .shouldBeString(userLogin, 'MISSED USER LOGIN');
 
         const purchase = await JointPurchase
             .findOne({
@@ -725,7 +790,16 @@ module.exports = {
                 'participants.fake_user.login': userLogin
             }, {
                 '$set': {
-                    'participants.$.sent': state
+                    'participants.$.sent': date
+                },
+                '$push': {
+                    history: {
+                        parameter: 'fake_participants.sent',
+                        value: {
+                            user: userLogin,
+                            state: date
+                        }
+                    }
                 }
             }, {
                 'new': true
@@ -816,25 +890,8 @@ module.exports = {
         const purchases = await JointPurchase
             .aggregate([
                 {'$match': filter},
-                {
-                    '$project': {
-                        recent: {'$arrayElemAt': ['$history', -1]},
-                        picture: 1,
-                        name: 1,
-                        category: 1,
-                        description: 1,
-                        price_per_unit: 1,
-                        state: 1,
-                        volume: 1,
-                        measurement_unit: 1,
-                        date: 1,
-                        remaining_volume: {
-                            '$reduce': {
-                                input: '$participants',
-                                initialValue: '$volume',
-                                'in': {'$subtract': ['$$value', '$$this.volume']}
-                            }
-                        }
+                {'$addFields': {
+                        recent: {'$arrayElemAt': ['$history', -1]}
                     }
                 },
                 {'$sort': {recent: -1}},
@@ -863,10 +920,26 @@ module.exports = {
             });
             purchases.sort((a, b) => cmp.compare(a, b));
         }
+        purchases.forEach(purchase => {
+            purchase.volume = Number.parseFloat(purchase.volume_dec);
+            purchase.min_volume = Number.parseFloat(purchase.min_volume_dec);
+
+            const volumeBig = new Big(purchase.volume_dec.toString());
+            purchase.remaining_volume = Number.parseFloat(purchase.participants
+                .reduce(((total, part) => total.minus(part.volume)), volumeBig));
+        });
 
         return {
             purchases,
             total
         };
+    },
+
+    findGoodByFilter: async (filter) => {
+        const purchases = await JointPurchase
+            .find(filter)
+            .exec();
+
+        return purchases || [];
     }
 };

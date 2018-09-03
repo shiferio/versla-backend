@@ -3,8 +3,48 @@ const User = require('../../models/user');
 const Good = require('../../models/good');
 const GoodRate = require('../../models/goodrate');
 const _ = require('underscore-node');
+const pre = require('preconditions').singleton();
+const mongoose = require('mongoose');
 
 module.exports = {
+    addGood: async (data, userId) => {
+        const user = await User.findById(userId);
+        pre
+            .shouldBeDefined(user, 'NO SUCH USER')
+            .shouldBeTruthy(user.isSeller, 'NOT A SELLER');
+        const store = await Store.findById(data.store_id);
+        pre
+            .shouldBeDefined(store, 'STORE NOT FOUND')
+            .checkArgument(
+                store.creator_id.toString() === userId.toString(),
+                'NOT A STORE CREATOR'
+            );
+        const good = new Good({
+            store_id: store._id,
+            creator_id: userId,
+            price: data.price,
+            name: data.name,
+            picture: data.picture,
+            tags: data.tags,
+            type: data.type,
+            volume: data.volume,
+            measurement_unit: data.measurement_unit_id
+        });
+        if (data.category) good.category = mongoose.Types.ObjectId(data.category);
+        if (data.city) good.city = mongoose.Types.ObjectId(data.city);
+
+        if (data.purchase_info) {
+            good.purchase_info = {
+                wholesale_price: data.purchase_info.wholesale_price,
+                min_volume: data.purchase_info.min_volume,
+                purchase_enabled: data.purchase_info.purchase_enabled
+            };
+        }
+
+        await good.save();
+
+        return good;
+    },
     /**
      * Update good params
      * @param id Good id
