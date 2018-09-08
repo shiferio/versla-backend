@@ -53,7 +53,7 @@ class EventHandlers {
         console.log('newchat', data);
 
         try {
-            await dbChat.getChatOrCreate(from, to);
+            const chat = await dbChat.getChatOrCreate(from, to);
 
             // Send event with new chats
             const toChats = await dbChat.getChatsWithUser(to);
@@ -62,10 +62,10 @@ class EventHandlers {
             const fromChats = await dbChat.getChatsWithUser(from);
             socket.in(from).emit('allchats', {chats: fromChats});
             socket.emit('allchats', {chats: fromChats});
-            listener('success');
+            listener(chat);
         } catch (error) {
             console.log(error);
-            listener('failed');
+            listener(null);
         }
     }
 
