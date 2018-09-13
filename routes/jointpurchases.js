@@ -13,17 +13,62 @@ const dbJPComment = require('../utils/db/db.jpcomment');
  * @apiParam {String} name
  * @apiParam {String} picture
  * @apiParam {String} description
- * @apiParam {ObjectID} category_id
+ * @apiParam {String} category_id
  * @apiParam {String} address
- * @apiParam {ObjectID} city_id
+ * @apiParam {String} city_id
  * @apiParam {Number} volume
  * @apiParam {Number} min_volume
  * @apiParam {Number} price_per_unit
- * @apiParam {ObjectID} measurement_unit_id
- * @apiParam {Date} date
+ * @apiParam {String} measurement_unit_id
+ * @apiParam {String} date
  * @apiParam {Number} state
  * @apiParam {Number} payment_type
  * @apiParam {Boolean} is_public
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "PURCHASE ADDED"
+ *     },
+ *     "data": {
+ *      "purchase": {
+ *       "_id": "5b8c14a640a1c0234c76675f",
+ *       "black_list": [],
+ *       "is_public": true,
+ *       "name": "Purchase",
+ *       "picture": "http://images2.versla.ru/images/1.png",
+ *       "description": "",
+ *       "category": "5b5afbf9d94cc90f069b3741",
+ *       "creator": "5b589346505ebe4fe345d44c",
+ *       "address": "Address",
+ *       "city": "5b5876e4fb6fc0105da12d92",
+ *       "volume_dec": {
+ *        "$numberDecimal": "11.0000000000000"
+ *       },
+ *       "min_volume_dec": {
+ *        "$numberDecimal": "11.0000000000000"
+ *       },
+ *       "price_per_unit": 111,
+ *       "measurement_unit": "5b805c77d5abaf05e54f40d0",
+ *       "date": "2018-09-01T21:00:00.000Z",
+ *       "state": 0,
+ *       "payment_type": 2,
+ *       "payment_info": "",
+ *       "history": [],
+ *       "participants": []
+ *      }
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/add').post(checkJWT, async (req, res) => {
     try {
@@ -52,23 +97,70 @@ router.route('/add').post(checkJWT, async (req, res) => {
 
 /**
  * @api {post} /api/jointpurchases/add/good Add Good Joint purchase
- * @apiName Add Joint purchase
+ * @apiName Add Good Joint purchase
  * @apiGroup Joint purchases
  *
  * @apiParam {String} name
  * @apiParam {String} picture
  * @apiParam {String} description
- * @apiParam {ObjectID} category_id
+ * @apiParam {String} category_id
  * @apiParam {String} address
- * @apiParam {ObjectID} city_id
+ * @apiParam {String} city_id
  * @apiParam {Number} volume
  * @apiParam {Number} min_volume
  * @apiParam {Number} price_per_unit
- * @apiParam {ObjectID} measurement_unit_id
- * @apiParam {Date} date
+ * @apiParam {String} measurement_unit_id
+ * @apiParam {String} date
  * @apiParam {Number} state
  * @apiParam {Number} payment_type
  * @apiParam {Boolean} is_public
+ * @apiParam {String} good_id
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "PURCHASE ADDED"
+ *     },
+ *     "data": {
+ *      "purchase": {
+ *       "_id": "5b8c14a640a1c0234c76675f",
+ *       "black_list": [],
+ *       "is_public": true,
+ *       "name": "Purchase",
+ *       "picture": "http://images2.versla.ru/images/1.png",
+ *       "description": "",
+ *       "category": "5b5afbf9d94cc90f069b3741",
+ *       "creator": "5b589346505ebe4fe345d44c",
+ *       "address": "Address",
+ *       "city": "5b5876e4fb6fc0105da12d92",
+ *       "volume_dec": {
+ *        "$numberDecimal": "11.0000000000000"
+ *       },
+ *       "min_volume_dec": {
+ *        "$numberDecimal": "11.0000000000000"
+ *       },
+ *       "price_per_unit": 111,
+ *       "measurement_unit": "5b805c77d5abaf05e54f40d0",
+ *       "date": "2018-09-01T21:00:00.000Z",
+ *       "state": 0,
+ *       "payment_type": 2,
+ *       "payment_info": "",
+ *       "history": [],
+ *       "participants": [],
+ *       "good": "5b805c77d5abaf05e14f40d0"
+ *      }
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/add/good').post(checkJWT, async (req, res) => {
     try {
@@ -101,6 +193,113 @@ router.route('/add/good').post(checkJWT, async (req, res) => {
  * @apiGroup Joint purchases
  *
  * @apiParam {String} id Purchase ID
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "PURCHASE FOUND"
+ *     },
+ *     "data": {
+ *      "purchase": {
+ *       "black_list": [],
+ *       "is_public": false,
+ *       "_id": "5b898fc0bc9ae700a4cd9d93",
+ *       "name": "Purchase",
+ *       "picture": "",
+ *       "description": "",
+ *       "category": {
+ *        "_id": "5b4666109795c00013b23dfb",
+ *        "user": "5b4663f99795c00013b23df8",
+ *        "name": "Category"
+ *       },
+ *       "creator": {
+ *        "isSeller": false,
+ *        "_id": "5b7e467d32123500b2c34afd",
+ *        "login": "login",
+ *        "password": "$2a$10$uLjypEyDT7d0sF6EWMIBRfwv3ILrMjwo.",
+ *        "email": "mail@mail.mail",
+ *        "phone": "71234567890",
+ *        "city": "5b3eb2241c90d734a14217cb",
+ *        "ip": "0.0.0.0",
+ *        "cart": [],
+ *        "created": "2018-08-23T05:30:37.349Z",
+ *        "picture": "https://gravatar.com/avatar/a52794f007f574f2c?s200&d=retro"
+ *       },
+ *       "address": "Address",
+ *       "city": {
+ *        "location": {
+ *         "lat": 0,
+ *         "lng": 0
+ *        },
+ *        "_id": "5b56daa0820f4806ecbf6802",
+ *        "name": "City"
+ *       },
+ *       "price_per_unit": 10,
+ *       "measurement_unit": {
+ *        "_id": "5b7e475232123500b5c34afe",
+ *        "name": "л",
+ *        "user": "5b7e467d32123520b5c34afd"
+ *       },
+ *       "date": "2018-08-31T21:00:00.000Z",
+ *       "state": 2,
+ *       "payment_type": 1,
+ *       "payment_info": "",
+ *       "history": [
+ *        {
+ *         "date": "2018-08-31T18:58:08.588Z",
+ *         "_id": "5b898fc0bc9ae780a4cd9d94",
+ *         "parameter": "state",
+ *         "value": 0
+ *        }
+ *       ],
+ *       "participants": [
+ *        {
+ *         "paid": "false",
+ *         "delivered": false,
+ *         "sent": "false",
+ *         "_id": "5b898fcdbc9a1700a4cd9d96",
+ *         "user": "5b898f20bc91e700a4cd9d8e",
+ *         "volume": 10
+ *        }
+ *       ],
+ *       "volume_dec": {
+ *        "$numberDecimal": "11.0000000000000"
+ *       },
+ *       "min_volume_dec": {
+ *        "$numberDecimal": "11.0000000000000"
+ *       },
+ *       "stats": {
+ *        "ordered": "11",
+ *        "remaining": "0",
+ *        "paid": "11",
+ *        "not_paid": "0",
+ *        "paid_and_sent": "11",
+ *        "paid_and_not_sent": "0",
+ *        "not_paid_and_sent": "0",
+ *        "not_paid_and_not_sent": "0",
+ *        "sent": "11",
+ *        "not_sent": "0"
+ *       },
+ *       "remaining_volume_big": "0",
+ *       "remaining_volume": 0,
+ *       "volume_big": "11",
+ *       "min_volume_big": "11",
+ *       "volume": 11,
+ *       "min_volume": 11,
+ *       "id": "5b898fc0bc9ae700a4cd9d93"
+ *      }
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.get('/get/:id', async (req, res) => {
     try {
@@ -134,6 +333,26 @@ router.get('/get/:id', async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} value New purchase name
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/name').put(checkJWT, async (req, res) => {
     try {
@@ -174,6 +393,26 @@ router.route('/update/name').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} value New purchase picture url
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/picture').put(checkJWT, async (req, res) => {
     try {
@@ -214,6 +453,26 @@ router.route('/update/picture').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} value New purchase description
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/description').put(checkJWT, async (req, res) => {
     try {
@@ -254,6 +513,26 @@ router.route('/update/description').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} value New purchase category ID
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/category').put(checkJWT, async (req, res) => {
     try {
@@ -296,6 +575,26 @@ router.route('/update/category').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} value New purchase address
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/address').put(checkJWT, async (req, res) => {
     try {
@@ -337,6 +636,26 @@ router.route('/update/address').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} value New purchase date
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/date').put(checkJWT, async (req, res) => {
     try {
@@ -377,6 +696,26 @@ router.route('/update/date').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {Boolean} value New visibility state
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/is_public').put(checkJWT, async (req, res) => {
     try {
@@ -414,6 +753,26 @@ router.route('/update/is_public').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {Number} value New purchase volume
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/volume').put(checkJWT, async (req, res) => {
     try {
@@ -455,6 +814,26 @@ router.route('/update/volume').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {Number} value New purchase minimum volume
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/min_volume').put(checkJWT, async (req, res) => {
     try {
@@ -496,6 +875,26 @@ router.route('/update/min_volume').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {Number} value New purchase price per unit
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/price_per_unit').put(checkJWT, async (req, res) => {
     try {
@@ -538,6 +937,26 @@ router.route('/update/price_per_unit').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} value New purchase measurement unit ID
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/measurement_unit').put(checkJWT, async (req, res) => {
     try {
@@ -580,6 +999,26 @@ router.route('/update/measurement_unit').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {Number} value New purchase state
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/state').put(checkJWT, async (req, res) => {
     try {
@@ -621,6 +1060,26 @@ router.route('/update/state').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {Number} value New payment type
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/payment_type').put(checkJWT, async (req, res) => {
     try {
@@ -662,6 +1121,26 @@ router.route('/update/payment_type').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} value Payment info
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/update/payment_info').put(checkJWT, async (req, res) => {
     try {
@@ -703,6 +1182,26 @@ router.route('/update/payment_info').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} user_id ID of user to be banned
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "ADDED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/black_list').put(checkJWT, async (req, res) => {
     try {
@@ -740,6 +1239,26 @@ router.route('/black_list').put(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} user_id ID of user to be removed
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "REMOVED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/black_list').delete(checkJWT, async (req, res) => {
     try {
@@ -777,6 +1296,26 @@ router.route('/black_list').delete(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {Number} volume Volume user wants to order
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "JOINT"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/participants').put(checkJWT, async (req, res) => {
     try {
@@ -815,6 +1354,26 @@ router.route('/participants').put(checkJWT, async (req, res) => {
  * @apiParam {String} id Purchase ID
  * @apiParam {String} login Fake user login
  * @apiParam {Number} volume Volume user wants to order
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "JOINT"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/participants/fake').put(checkJWT, async (req, res) => {
     try {
@@ -852,6 +1411,26 @@ router.route('/participants/fake').put(checkJWT, async (req, res) => {
  * @apiGroup Joint purchases
  *
  * @apiParam {String} id Purchase ID
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "DETACHED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/participants').delete(checkJWT, async (req, res) => {
     try {
@@ -888,6 +1467,26 @@ router.route('/participants').delete(checkJWT, async (req, res) => {
  *
  * @apiParam {String} id Purchase ID
  * @apiParam {String} login Fake user login
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "DETACHED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/participants/fake').delete(checkJWT, async (req, res) => {
     try {
@@ -926,6 +1525,26 @@ router.route('/participants/fake').delete(checkJWT, async (req, res) => {
  * @apiParam {String} user_id ID of user which payment has to be updated
  * @apiParam {String} id Purchase ID
  * @apiParam {Boolean} state Payment state
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/payments/update').put(checkJWT, async (req, res) => {
     try {
@@ -965,6 +1584,26 @@ router.route('/payments/update').put(checkJWT, async (req, res) => {
  * @apiParam {String} login Login of fake user which payment has to be updated
  * @apiParam {String} id Purchase ID
  * @apiParam {Boolean} state Payment state
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/payments/update/fake').put(checkJWT, async (req, res) => {
     try {
@@ -1000,6 +1639,29 @@ router.route('/payments/update/fake').put(checkJWT, async (req, res) => {
  * @api {get} /api/jointpurchases/owner Get list of Joint purchases of the given user
  * @apiName List of Joint purchases
  * @apiGroup Joint purchases
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "FETCHED"
+ *     },
+ *     "data": {
+ *      "purchases": [
+ *       { see /api/jointpurchases/get/:id },
+ *       { see /api/jointpurchases/get/:id }
+ *      ]
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/owner').get(checkJWT, async (req, res) => {
     try {
@@ -1032,6 +1694,29 @@ router.route('/owner').get(checkJWT, async (req, res) => {
  * @api {get} /api/jointpurchases/orders Get list of purchase orders of the given user
  * @apiName List of Joint purchases orders
  * @apiGroup Joint purchases
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "FETCHED"
+ *     },
+ *     "data": {
+ *      "purchases": [
+ *       { see /api/jointpurchases/get/:id },
+ *       { see /api/jointpurchases/get/:id }
+ *      ]
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/orders').get(checkJWT, async (req, res) => {
     try {
@@ -1068,6 +1753,26 @@ router.route('/orders').get(checkJWT, async (req, res) => {
  * @apiParam {String} user_id ID of user which wants to update delivery status
  * @apiParam {String} id Purchase ID
  * @apiParam {Boolean} state
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/deliveries/update').put(checkJWT, async (req, res) => {
     try {
@@ -1106,6 +1811,26 @@ router.route('/deliveries/update').put(checkJWT, async (req, res) => {
  * @apiParam {String} user_id ID of user which order 'is sent' state has to be updated
  * @apiParam {String} id Purchase ID
  * @apiParam {Boolean} state 'is sent' state
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/sent/update').put(checkJWT, async (req, res) => {
     try {
@@ -1145,6 +1870,26 @@ router.route('/sent/update').put(checkJWT, async (req, res) => {
  * @apiParam {String} login Login of fake user which order 'is sent' state has to be updated
  * @apiParam {String} id Purchase ID
  * @apiParam {Boolean} state 'is sent' state
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "UPDATED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/sent/update/fake').put(checkJWT, async (req, res) => {
     try {
@@ -1184,6 +1929,26 @@ router.route('/sent/update/fake').put(checkJWT, async (req, res) => {
  * @apiParam {String} text Comment body
  * @apiParam {String} id Purchase ID
  * @apiParam {String} parent_id Parent comment ID
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *      "success": true,
+ *      "code": 200,
+ *      "message": "ADDED"
+ *     },
+ *     "data": {
+ *      "purchase": see /api/jointpurchases/get/:id
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
  */
 router.route('/comment/add').post(checkJWT, async (req, res) => {
     try {
@@ -1214,12 +1979,56 @@ router.route('/comment/add').post(checkJWT, async (req, res) => {
 });
 
 /**
-* @api {get} /api/jointpurchases/comment/tree Get comment tree for Joint purchase
-* @apiName Get comments
-* @apiGroup Joint purchases
-*
-* @apiParam {String} id Purchase ID
-*/
+ * @api {get} /api/jointpurchases/comment/tree/:id Get comment tree for Joint purchase
+ * @apiName Get comments
+ * @apiGroup Joint purchases
+ *
+ * @apiParam {String} id Purchase ID
+ *
+ * @apiSuccessExample Success-Response:
+ *     HTTP/1.1 200 OK
+ *     "meta": {
+ *     "code": 200,
+ *     "success": true,
+ *     "message": "FETCHED"
+ *    },
+ *     "data": {
+ *     "comments": [
+ *      {
+ *       "id": "5b7e97d2cc9f470f14adf9dc",
+ *       "user": "Lol",
+ *       "date": "2018-08-23T11:17:38.717Z",
+ *       "body": "vfadvdfvdf",
+ *       "children": [
+ *        {
+ *         "id": "5b93c88fc1120316840c7573",
+ *         "user": "W",
+ *         "date": "2018-09-08T13:03:11.476Z",
+ *         "body": "wow",
+ *         "children": [
+ *          {
+ *           "id": "5b93ceb5c1120316840c757a",
+ *           "user": "E",
+ *           "date": "2018-09-08T13:29:25.112Z",
+ *           "body": "lol",
+ *           "children": []
+ *          }
+ *         ]
+ *        }
+ *       ]
+ *      }
+ *     ]
+ *    }
+ *
+ * @apiErrorExample Error-Response:
+ *     HTTP/1.1 500 Internal Server Error
+ *     "meta": {
+ *      "code": 500,
+ *      "success": false,
+ *      "message": message || "UNKNOWN ERROR"
+ *     },
+ *     "data": null
+ */
 router.get('/comment/tree/:id', async (req, res) => {
     try {
         const tree = await dbJPComment.getPurchaseCommentTree(
